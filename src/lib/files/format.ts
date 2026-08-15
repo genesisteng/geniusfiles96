@@ -1,4 +1,4 @@
-import { t } from "@/lib/i18n";
+import { t, byteUnitLabels, formatNumber, localeTag } from "@/lib/i18n";
 import type { FileEntry, FileKind, PathRef, StorageRoot } from "./types";
 
 const EXT_MAP: Record<string, FileKind> = {
@@ -112,23 +112,28 @@ export function kindOf(name: string, isDirectory: boolean): FileKind {
   return EXT_MAP[ext] ?? "other";
 }
 
-const UNITS = ["o", "Ko", "Mo", "Go", "To"];
-
 export function formatSize(bytes?: number): string {
+  const units = byteUnitLabels();
   if (bytes == null || Number.isNaN(bytes)) return "—";
-  if (bytes < 1) return "0 o";
-  const i = Math.min(UNITS.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+  if (bytes < 1) return `0 ${units[0]}`;
+  const i = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
   const value = bytes / Math.pow(1024, i);
   const rounded = value >= 100 || i === 0 ? Math.round(value) : Math.round(value * 10) / 10;
-  return `${rounded.toString().replace(".", ",")} ${UNITS[i]}`;
+  return `${formatNumber(rounded, { maximumFractionDigits: 1 })} ${units[i]}`;
 }
 
-const DATE_FMT = new Intl.DateTimeFormat("fr-FR", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-});
-const TIME_FMT = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" });
+// Les formateurs suivent la langue active : ils sont reconstruits à la volée
+// pour que le changement de langue s'applique sans recharger l'application.
+function dateFmt(): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(localeTag(), {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+function timeFmt(): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(localeTag(), { hour: "2-digit", minute: "2-digit" });
+}
 
 export function formatDate(mtime?: number): string {
   if (!mtime) return "—";
@@ -138,15 +143,15 @@ export function formatDate(mtime?: number): string {
     d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate();
-  if (sameDay) return t("files.date.today", { time: TIME_FMT.format(d) });
+  if (sameDay) return t("files.date.today", { time: timeFmt().format(d) });
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
   const isYesterday =
     d.getFullYear() === yesterday.getFullYear() &&
     d.getMonth() === yesterday.getMonth() &&
     d.getDate() === yesterday.getDate();
-  if (isYesterday) return t("files.date.yesterday", { time: TIME_FMT.format(d) });
-  return DATE_FMT.format(d);
+  if (isYesterday) return t("files.date.yesterday", { time: timeFmt().format(d) });
+  return dateFmt().format(d);
 }
 
 export function kindLabel(kind: FileKind, ext?: string): string {

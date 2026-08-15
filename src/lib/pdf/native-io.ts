@@ -104,7 +104,7 @@ export async function writeBytes(
       if (/NOT_A_DIRECTORY|NOT_FOUND/i.test(msg)) {
         throw new Error(t("system.io.destMissing"));
       }
-      throw new Error(`Écriture impossible — ${msg}`);
+      throw new Error(t("system.io.writeFailed", { reason: msg }));
     }
   }
   mem.set(target, bytes);

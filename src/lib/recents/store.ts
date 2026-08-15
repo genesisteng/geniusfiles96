@@ -12,7 +12,7 @@
  *   n'apparaît qu'une seule fois, avec sa date de dernière utilisation) ;
  * - lecture instantanée : aucune analyse du stockage n'est relancée.
  */
-import { t } from "@/lib/i18n";
+import { t, localeTag } from "@/lib/i18n";
 import type { FileEntry, FileKind, PathRef, StorageRootId } from "@/lib/files/types";
 import { kindOf } from "@/lib/files/format";
 import { subscribeFsPatch } from "@/lib/index/patches";
@@ -211,8 +211,12 @@ export function recentLocationLabel(f: RecentFile): string {
   );
 }
 
-const TIME_FMT = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" });
-const DAY_FMT = new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "short" });
+function timeFmt(): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(localeTag(), { hour: "2-digit", minute: "2-digit" });
+}
+function dayFmt(): Intl.DateTimeFormat {
+  return new Intl.DateTimeFormat(localeTag(), { day: "2-digit", month: "short" });
+}
 
 function isSameDay(a: Date, b: Date): boolean {
   return (
@@ -232,16 +236,16 @@ export function formatRecentTime(at: number, now = Date.now()): string {
   const today = new Date(now);
   if (isSameDay(d, today)) {
     const hours = Math.round(minutes / 60);
-    return hours < 6 ? `Il y a ${hours} h` : `Aujourd'hui • ${TIME_FMT.format(d)}`;
+    return hours < 6 ? `Il y a ${hours} h` : `Aujourd'hui • ${timeFmt().format(d)}`;
   }
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
-  if (isSameDay(d, yesterday)) return `Hier • ${TIME_FMT.format(d)}`;
-  return `${DAY_FMT.format(d)} • ${TIME_FMT.format(d)}`;
+  if (isSameDay(d, yesterday)) return `Hier • ${timeFmt().format(d)}`;
+  return `${dayFmt().format(d)} • ${timeFmt().format(d)}`;
 }
 
 export function formatRecentClock(at: number): string {
-  return TIME_FMT.format(new Date(at));
+  return timeFmt().format(new Date(at));
 }
 
 export type RecentGroup<T = RecentFile> = { key: string; label: string; files: T[] };
@@ -265,7 +269,7 @@ export function groupRecents<T extends { at: number }>(
         ? "Aujourd'hui"
         : isSameDay(d, yesterday)
           ? "Hier"
-          : DAY_FMT.format(d);
+          : dayFmt().format(d);
       group = { key, label, files: [] };
       index.set(key, group);
       groups.push(group);

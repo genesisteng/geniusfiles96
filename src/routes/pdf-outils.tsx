@@ -1815,7 +1815,7 @@ function SinglePdfSheet({ mode, onClose }: { mode: SingleMode; onClose: () => vo
           <div className="space-y-2">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">
-                {selected.size} / {info.pageCount} sélectionnée(s)
+                {t("pdf.pages.selectedOf", { count: selected.size, total: info.pageCount })}
               </span>
               <div className="flex gap-2">
                 <button
@@ -2476,7 +2476,7 @@ function WatermarkSheet({ onClose }: { onClose: () => void }) {
 
             <div className="grid grid-cols-2 gap-2">
               <label className="text-[11px] text-muted-foreground">
-                Opacité ({opacity}%)
+                {t("pdf.opacityPercent", { value: opacity })}
                 <input
                   type="range"
                   min={5}
@@ -3796,7 +3796,9 @@ function SearchSheet({ onClose }: { onClose: () => void }) {
                 </p>
               ) : (
                 <div className="max-h-[40vh] space-y-1.5 overflow-y-auto">
-                  <p className="text-[11px] text-muted-foreground">{hits.length} résultat(s)</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {t("pdf.search.resultCount", { count: hits.length })}
+                  </p>
                   {hits.map((h, i) => (
                     <div
                       key={i}
@@ -4001,10 +4003,14 @@ function FilesToPdfSheet({ onClose }: { onClose: () => void }) {
       });
       if (failed.length) {
         toast.warning(
-          `${ok} converti(s), ${failed.length} en échec : ${failed
-            .slice(0, 3)
-            .map((f) => f.error)
-            .join(" · ")}`,
+          t("pdf.convert.partial", {
+            ok,
+            count: failed.length,
+            details: failed
+              .slice(0, 3)
+              .map((f) => f.error)
+              .join(" · "),
+          }),
         );
       } else {
         toast.success(t("pdf.conversionTerminee"), {
@@ -4045,12 +4051,9 @@ function FilesToPdfSheet({ onClose }: { onClose: () => void }) {
             onClick={() => setSourcePicker(true)}
             className="w-full rounded-xl border border-dashed border-border p-4 text-center text-[13px] hover:text-foreground"
           >
-            <FilePlus2 className="mx-auto mb-1 h-5 w-5" /> Ajouter des fichiers
+            <FilePlus2 className="mx-auto mb-1 h-5 w-5" /> {t("pdf.convert.addFiles")}
           </button>
-          <p className="text-[11px] text-muted-foreground">
-            Formats supportés : Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), images
-            (JPG/PNG/WEBP), texte (.txt/.md/.csv), PDF.
-          </p>
+          <p className="text-[11px] text-muted-foreground">{t("pdf.convert.supportedFormats")}</p>
           {sources.length > 0 ? (
             <ul className="space-y-1">
               {sources.map((s, i) => (

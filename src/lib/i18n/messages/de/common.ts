@@ -8,7 +8,7 @@ export default {
   "app.tagline": "Intelligenter, KI-gestützter Dateimanager",
 
   "nav.home": "Start",
-  "nav.assistant": "Genius Ai",
+  "nav.assistant": "Genius AI",
   "nav.automations": "Automatisierungen",
   "nav.settings": "Einstellungen",
 

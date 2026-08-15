@@ -34,7 +34,7 @@ import { BottomSheet, PrimaryButton } from "@/components/files/BottomSheet";
 import { ConfirmDialog as SharedConfirmDialog } from "@/components/common/ConfirmDialog";
 import { formatCount } from "@/lib/copy";
 import { errorMessage } from "@/lib/errors/humanize";
-import { useT, t as translate } from "@/lib/i18n";
+import { useT, t as translate, formatNumber } from "@/lib/i18n";
 import { OrganizerPreview } from "@/components/organizer/OrganizerPreview";
 import { RenameProposalSheet } from "@/components/organizer/RenameProposalSheet";
 import { formatSize } from "@/lib/files/format";
@@ -301,7 +301,7 @@ function OrganizationPage() {
           <Stat label={t("organize.stat.recommendations")} value={String(recs?.length ?? 0)} />
           <Stat
             label={t("organize.stat.scannedFiles")}
-            value={(report?.scannedFiles ?? 0).toLocaleString("fr-FR")}
+            value={formatNumber(report?.scannedFiles ?? 0)}
           />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">

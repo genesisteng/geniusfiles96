@@ -3,7 +3,7 @@ export default {
   "app.name": "GeniusFiles",
   "app.tagline": "Yapay zekâ destekli akıllı dosya yöneticisi",
   "nav.home": "Ana Sayfa",
-  "nav.assistant": "Genius Ai",
+  "nav.assistant": "Genius AI",
   "nav.automations": "Otomasyonlar",
   "nav.settings": "Ayarlar",
   "action.ok": "Tamam",

@@ -4,7 +4,7 @@
  */
 export default {
   "assistant.header.menuLabel": "Apri il menu delle conversazioni",
-  "assistant.header.title": "Genius Ai",
+  "assistant.header.title": "Genius AI",
   "assistant.header.newChat": "Nuova conversazione",
 
   "assistant.input.placeholder": "Scrivi la tua richiesta…",
@@ -12,17 +12,17 @@ export default {
   "assistant.input.stop": "Interrompi la risposta",
   "assistant.input.send": "Invia",
 
-  "assistant.error.title": "Genius Ai non è riuscito a caricarsi",
+  "assistant.error.title": "Genius AI non è riuscito a caricarsi",
   "assistant.error.desc":
     "Una conversazione salvata sembra illeggibile. Puoi riprovare o iniziare una nuova conversazione.",
 
-  "assistant.welcome.title": "Benvenuto in Genius Ai",
+  "assistant.welcome.title": "Benvenuto in Genius AI",
   "assistant.welcome.desc":
     "Chatta in modo naturale con il tuo assistente e gestisci i tuoi file con una semplice conversazione.",
   "assistant.welcome.privacyTitle": "Privacy garantita",
   "assistant.welcome.privacy1": "I tuoi file restano esclusivamente sul tuo dispositivo.",
   "assistant.welcome.privacy2":
-    "Genius Ai non accede mai direttamente alla tua memoria. Comprende semplicemente la tua richiesta e la trasmette al motore di esecuzione locale di GeniusFiles, che esegue le azioni richieste.",
+    "Genius AI non accede mai direttamente alla tua memoria. Comprende semplicemente la tua richiesta e la trasmette al motore di esecuzione locale di GeniusFiles, che esegue le azioni richieste.",
   "assistant.welcome.privacy3": "Nessun file viene mai inviato a un server o a un'IA esterna.",
 
   "assistant.message.copied": "Copiato",
@@ -50,7 +50,7 @@ export default {
   "assistant.templates.compressDocuments": "Comprimi la cartella Documenti in un archivio ZIP.",
   "assistant.templates.countPdfs": "Quanti file PDF ho sul telefono?",
 
-  "assistant.drawer.ariaLabel": "Menu di Genius Ai",
+  "assistant.drawer.ariaLabel": "Menu di Genius AI",
   "assistant.drawer.closeAria": "Chiudi il menu",
   "assistant.drawer.title": "Conversazioni",
   "assistant.drawer.newChat": "Nuova chat",
@@ -58,7 +58,7 @@ export default {
   "assistant.drawer.searchAria": "Cerca una conversazione",
   "assistant.drawer.emptySearch": "Nessuna conversazione corrisponde a questa ricerca.",
   "assistant.drawer.emptyAll":
-    "Ancora nessuna conversazione. Scrivi a Genius Ai per iniziarne una.",
+    "Ancora nessuna conversazione. Scrivi a Genius AI per iniziarne una.",
   "assistant.drawer.today": "Oggi",
   "assistant.drawer.yesterday": "Ieri",
   "assistant.drawer.last7": "Ultimi 7 giorni",
@@ -69,7 +69,7 @@ export default {
   "assistant.drawer.renameLabel": "Nuovo nome",
   "assistant.drawer.defaultTitle": "Nuova conversazione",
 
-  "assistant.pipeline.ariaLabel": "Genius Ai: {label}",
+  "assistant.pipeline.ariaLabel": "Genius AI: {label}",
   "assistant.pipeline.understand": "Comprensione",
   "assistant.pipeline.plan": "Analisi",
   "assistant.pipeline.execute": "Esecuzione",
@@ -101,12 +101,12 @@ export default {
   "assistant.stage.batchProgressCount": "{base} {processed}…",
 
   "assistant.diag.offline":
-    "Nessuna connessione a Internet — Genius Ai ha bisogno della rete per comprendere la tua richiesta.",
+    "Nessuna connessione a Internet — Genius AI ha bisogno della rete per comprendere la tua richiesta.",
   "assistant.diag.network":
-    "Impossibile contattare Genius Ai. Controlla la connessione Internet e riprova.",
-  "assistant.diag.timeout": "Genius Ai sta impiegando troppo tempo a rispondere. Riprova.",
+    "Impossibile contattare Genius AI. Controlla la connessione Internet e riprova.",
+  "assistant.diag.timeout": "Genius AI sta impiegando troppo tempo a rispondere. Riprova.",
   "assistant.diag.config":
-    "Genius Ai non è configurato correttamente su questo server (servizio IA non disponibile lato app).",
+    "Genius AI non è configurato correttamente su questo server (servizio IA non disponibile lato app).",
   "assistant.diag.rateLimit":
     "Troppe richieste inviate di seguito. Attendi qualche secondo e riprova.",
   "assistant.diag.credits": "La quota di utilizzo dell'IA è attualmente esaurita.",

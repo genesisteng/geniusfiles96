@@ -309,10 +309,10 @@ function AppsPage() {
       <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
         <div className="flex min-w-0 gap-1.5 overflow-x-auto scrollbar-hidden">
           <Chip active={filter === "user"} onClick={() => setFilter("user")}>
-            <User className="h-4 w-4" /> Utilisateur
+            <User className="h-4 w-4" /> {t("organize.apps.filter.user")}
           </Chip>
           <Chip active={filter === "system"} onClick={() => setFilter("system")}>
-            <Cpu className="h-4 w-4" /> Système
+            <Cpu className="h-4 w-4" /> {t("organize.apps.filter.system")}
           </Chip>
           <Chip active={filter === "all"} onClick={() => setFilter("all")}>
             {t("organize.apps.filter.all")}
@@ -775,12 +775,14 @@ function AppDetailsSheet({
   };
 
   const handleShare = async () => {
-    const text =
-      `${app.label}\n` +
-      `Version : ${app.versionName} (${app.versionCode})\n` +
-      `Taille : ${formatSize(app.totalBytes || app.apkSize)}\n` +
-      `Installée le : ${formatDate(app.firstInstallTime)}\n` +
-      `Mise à jour le : ${formatDate(app.lastUpdateTime)}`;
+    const text = t("organize.apps.share.template", {
+      name: app.label,
+      version: app.versionName,
+      code: String(app.versionCode),
+      size: formatSize(app.totalBytes || app.apkSize),
+      installed: formatDate(app.firstInstallTime),
+      updated: formatDate(app.lastUpdateTime),
+    });
     const ok = await shareAppInfo(text);
     if (!ok)
       toast.error(t("organize.apps.toast.shareFailed.title"), {

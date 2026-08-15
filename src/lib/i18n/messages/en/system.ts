@@ -250,4 +250,7 @@ export default {
   "system.ai.archiveNameRequired": "Archive name required",
   "system.ai.archiveNameMissing": "Archive name missing",
   "system.ai.archiveNotFound": "Archive not found: {name}",
+  "system.io.writeFailed": "Cannot write — {reason}",
+  "system.engine.noRequestedStorageAvailable":
+    "None of the requested storages is available: {details}",
 } as const;

@@ -57,7 +57,7 @@ import { checkStoragePermission } from "@/lib/native/storage-permission";
 import { useRoots } from "@/lib/fs/useRoots";
 import { StorageScopePicker, type StorageScope } from "@/components/common/StorageScopePicker";
 import { resolveScope } from "@/components/common/storage-scope";
-import { useT, t as translate } from "@/lib/i18n";
+import { useT, t as translate, formatNumber } from "@/lib/i18n";
 import { BACK_PRIORITY, useBackHandler } from "@/lib/navigation/back-stack";
 
 export const Route = createFileRoute("/nettoyeur")({
@@ -580,9 +580,7 @@ function CleanerPage() {
 function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="min-w-0 rounded-2xl bg-surface-2 px-3 py-2.5">
-      <p className="truncate text-[17px] font-semibold leading-none">
-        {value.toLocaleString("fr-FR")}
-      </p>
+      <p className="truncate text-[17px] font-semibold leading-none">{formatNumber(value)}</p>
       <p className="mt-1 text-[11.5px] leading-snug text-muted-foreground">{label}</p>
     </div>
   );

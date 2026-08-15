@@ -16,6 +16,7 @@ import {
 import { runCleanup } from "@/lib/cleaner/deleter";
 import type { CleanItem } from "@/lib/cleaner/types";
 import { finishJob, updateJob, type JobRecord } from "./journal";
+import { t } from "@/lib/i18n";
 
 export type TransferPayload = {
   source: PathRef;
@@ -62,7 +63,7 @@ export async function resumeJob(job: JobRecord): Promise<void> {
       finishJob(
         job.id,
         res.cancelled ? "cancelled" : res.ok ? "done" : "failed",
-        res.ok ? undefined : `${res.failed.length} échec(s)`,
+        res.ok ? undefined : t("ops.jobs.failuresCount", { count: res.failed.length }),
       );
       return;
     }
@@ -123,7 +124,7 @@ export async function resumeJob(job: JobRecord): Promise<void> {
           total: ev.total,
         }),
       );
-      finishJob(job.id, "done", `${res.removed} élément(s) traité(s)`);
+      finishJob(job.id, "done", t("ops.jobs.itemsProcessed", { count: res.removed }));
       return;
     }
   } catch (err) {

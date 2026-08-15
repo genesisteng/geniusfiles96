@@ -295,4 +295,5 @@ export default {
   // Ajouts génération automatique (i18n complet)
   "organize.capturesDEcran": "Screenshots",
   "organize.documentsNumerises": "Scanned documents",
+  "organize.apps.reco.empty": "No recommendations for now.",
 } as const;

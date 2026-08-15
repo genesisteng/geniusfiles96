@@ -8,7 +8,7 @@ export default {
   "app.tagline": "Gestor de ficheiros inteligente, assistido por IA",
 
   "nav.home": "Início",
-  "nav.assistant": "Genius Ai",
+  "nav.assistant": "Genius AI",
   "nav.automations": "Automatizações",
   "nav.settings": "Definições",
 

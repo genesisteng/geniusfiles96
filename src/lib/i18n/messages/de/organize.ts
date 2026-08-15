@@ -314,4 +314,5 @@ export default {
   // Ajouts génération automatique (i18n complet)
   "organize.capturesDEcran": "Screenshots",
   "organize.documentsNumerises": "Gescannte Dokumente",
+  "organize.apps.reco.empty": "Derzeit keine Empfehlungen.",
 } as const;

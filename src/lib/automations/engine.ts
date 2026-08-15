@@ -37,7 +37,7 @@ import type {
   FileSelection,
 } from "./types";
 import type { PathRef } from "@/lib/files/types";
-import { t } from "@/lib/i18n";
+import { t, localeTag } from "@/lib/i18n";
 
 function labels(): Record<ActionKind, string> {
   return Object.fromEntries(getActionCatalog(t).map((c) => [c.kind, c.label])) as Record<
@@ -499,10 +499,10 @@ export async function runAutomation(
   if (!opts.simulate) {
     recordRun(automation.id);
     markStopped(automation.id);
-    const when = new Date(record.finishedAt).toLocaleString("fr-FR", {
+    const when = new Intl.DateTimeFormat(localeTag(), {
       dateStyle: "short",
       timeStyle: "short",
-    });
+    }).format(new Date(record.finishedAt));
     const actionsList = results.map((r) => r.label).join(", ") || t("automations.api.actions.none");
     const notifId = stableNotifId(automation.id);
     if (status === "ok") {

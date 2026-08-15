@@ -263,9 +263,9 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
         if (requested.length > 0 && resolved.available.length === 0) {
           return fail(
             "UNAVAILABLE",
-            `Aucun des stockages demandés n'est disponible : ${resolved.missing
-              .map((m) => `${m.rootId} (${m.reason})`)
-              .join(", ")}`,
+            t("system.engine.noRequestedStorageAvailable", {
+              details: resolved.missing.map((m) => `${m.rootId} (${m.reason})`).join(", "),
+            }),
             started,
           );
         }
@@ -364,9 +364,9 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
         if (requested.length > 0 && resolved.available.length === 0) {
           return fail(
             "UNAVAILABLE",
-            `Aucun des stockages demandés n'est disponible : ${resolved.missing
-              .map((m) => `${m.rootId} (${m.reason})`)
-              .join(", ")}`,
+            t("system.engine.noRequestedStorageAvailable", {
+              details: resolved.missing.map((m) => `${m.rootId} (${m.reason})`).join(", "),
+            }),
             started,
           );
         }

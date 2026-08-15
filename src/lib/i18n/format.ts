@@ -80,6 +80,11 @@ export function formatBytes(bytes: number, opts?: { decimal?: boolean; locale?: 
   return `${formatNumber(value, { minimumFractionDigits: digits, maximumFractionDigits: digits }, locale)} ${units[i]}`;
 }
 
+/** Étiquettes d'unités de taille de la langue active (o/Ko… ou B/KB…). */
+export function byteUnitLabels(locale: Locale = getLocale(), decimal = true): string[] {
+  return decimal ? UNITS[locale].decimal : UNITS[locale].binary;
+}
+
 export function formatDateValue(
   ts: number,
   options?: Intl.DateTimeFormatOptions,
