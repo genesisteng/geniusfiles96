@@ -21,6 +21,7 @@ import {
   subscribeStorageAccess,
 } from "@/lib/native/storage-access";
 import { onStartupReady } from "@/lib/startup/boot";
+import { whenOnboardingDone } from "@/lib/onboarding/store";
 import { useT } from "@/lib/i18n";
 
 /** Laisse à l'accueil le temps d'être découvert avant la demande. */
