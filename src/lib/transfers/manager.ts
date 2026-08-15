@@ -24,6 +24,7 @@ import { requestFileJump } from "@/lib/files/deeplink";
 import { showNotification } from "@/lib/native/notifications";
 import { formatSize } from "@/lib/files/format";
 import { toAbsolutePath } from "@/lib/files/fs";
+import { resolveTransferConflicts } from "./conflicts";
 import {
   cancelNativeTask,
   isNativeTransferAvailable,
@@ -58,6 +59,10 @@ export type TransferTask = {
   etaMs?: number;
   currentName?: string;
   succeeded: number;
+  /** Éléments ignorés sur décision de l'utilisateur (conflit). */
+  skipped: number;
+  /** Éléments qui ont remplacé un élément existant. */
+  overwritten: number;
   failures: TransferFailure[];
   message?: string;
 };
@@ -188,6 +193,8 @@ export function startTransfer(input: StartTransferInput): string {
     totalBytes: 0,
     speedBps: 0,
     succeeded: 0,
+    skipped: 0,
+    overwritten: 0,
     failures: [],
     signal: createSignal(),
     lastTick: now,
@@ -281,6 +288,8 @@ function adopt(snap: NativeTaskSnapshot): Internal | null {
     totalBytes: snap.totalBytes,
     speedBps: snap.speedBps,
     succeeded: snap.completed,
+    skipped: 0,
+    overwritten: 0,
     failures: snap.failures ?? [],
     signal: createSignal(),
     lastTick: Date.now(),
