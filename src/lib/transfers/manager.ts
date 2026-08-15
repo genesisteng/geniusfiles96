@@ -380,6 +380,7 @@ async function run(
   // de dossier) : la même question, le même « appliquer à tous », pour
   // cette opération uniquement.
   let lateBlanket: ConflictChoice | null = null;
+  let stoppedByUser = false;
   const onConflict = async (item: { name: string; isDirectory: boolean }) => {
     if (lateBlanket) return lateBlanket;
     const answer = await requestConflictDecision({
@@ -390,6 +391,7 @@ async function run(
       remaining: 0,
     });
     if (answer.applyToAll && answer.choice !== "cancel") lateBlanket = answer.choice;
+    if (answer.choice === "cancel") stoppedByUser = true;
     return answer.choice;
   };
 
@@ -437,7 +439,7 @@ async function run(
     if (res.cancelled) break;
   }
 
-  const cancelled = task.signal.cancelled || lateBlanket === "cancel";
+  const cancelled = task.signal.cancelled || stoppedByUser;
   task.status = cancelled ? "cancelled" : task.failures.length ? "failed" : "done";
   task.endedAt = Date.now();
   task.etaMs = 0;
