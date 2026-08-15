@@ -24,7 +24,11 @@ import { requestFileJump } from "@/lib/files/deeplink";
 import { showNotification } from "@/lib/native/notifications";
 import { formatSize } from "@/lib/files/format";
 import { toAbsolutePath } from "@/lib/files/fs";
-import { resolveTransferConflicts } from "./conflicts";
+import {
+  requestConflictDecision,
+  resolveTransferConflicts,
+  type ConflictChoice,
+} from "./conflicts";
 import {
   cancelNativeTask,
   isNativeTransferAvailable,
@@ -372,6 +376,24 @@ async function run(
   let baseBytes = 0;
   let baseTotal = 0;
   let baseTotalBytes = 0;
+  // Conflit apparu pendant l'exécution (élément créé entre-temps, fusion
+  // de dossier) : la même question, le même « appliquer à tous », pour
+  // cette opération uniquement.
+  let lateBlanket: ConflictChoice | null = null;
+  let stoppedByUser = false;
+  const onConflict = async (item: { name: string; isDirectory: boolean }) => {
+    if (lateBlanket) return lateBlanket;
+    const answer = await requestConflictDecision({
+      name: item.name,
+      isDirectory: item.isDirectory,
+      mode: task.mode,
+      destLabel: task.destLabel,
+      remaining: 0,
+    });
+    if (answer.applyToAll && answer.choice !== "cancel") lateBlanket = answer.choice;
+    if (answer.choice === "cancel") stoppedByUser = true;
+    return answer.choice;
+  };
 
   for (const group of groups) {
     if (task.signal.cancelled) break;
@@ -382,6 +404,7 @@ async function run(
     const res = await transferEntries(group.parent, group.entries, destination, {
       mode: task.mode,
       signal: task.signal,
+      onConflict,
       ...(overwrite && overwrite.size ? { overwrite } : {}),
       onProgress: (p) => {
         lastTotal = p.total;
@@ -402,6 +425,7 @@ async function run(
     baseCompleted += lastCompleted;
     baseBytes += lastBytes;
     task.succeeded += res.succeeded;
+    task.skipped += res.skipped ?? 0;
     task.failures.push(...res.failed);
     if (overwrite?.size) {
       // Un remplacement n'est compté que si l'élément a réellement été
@@ -415,7 +439,7 @@ async function run(
     if (res.cancelled) break;
   }
 
-  const cancelled = task.signal.cancelled;
+  const cancelled = task.signal.cancelled || stoppedByUser;
   task.status = cancelled ? "cancelled" : task.failures.length ? "failed" : "done";
   task.endedAt = Date.now();
   task.etaMs = 0;

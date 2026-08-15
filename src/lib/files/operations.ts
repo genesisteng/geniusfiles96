@@ -90,6 +90,8 @@ export type OperationResult = {
   succeeded: number;
   failed: { name: string; reason: string }[];
   cancelled: boolean;
+  /** Éléments volontairement ignorés par l'utilisateur (conflit). */
+  skipped?: number;
 };
 
 export function createSignal(): OperationSignal & { cancel: () => void } {
@@ -599,6 +601,15 @@ type TransferOptions = {
    * n'a jamais lieu en dehors de cette liste.
    */
   overwrite?: Iterable<string>;
+  /**
+   * Conflit détecté en cours d'exécution (élément apparu entre-temps, ou
+   * fusion de dossier). Le moteur suspend l'élément concerné, attend la
+   * décision, puis reprend. Sans ce rappel, le conflit reste une erreur.
+   */
+  onConflict?: (item: {
+    name: string;
+    isDirectory: boolean;
+  }) => Promise<"overwrite" | "skip" | "cancel">;
 };
 
 /**
@@ -618,13 +629,16 @@ async function copyTreeStreaming(
     failed: OperationResult["failed"];
     /** Fusion avec remplacement des fichiers déjà présents. */
     overwrite?: boolean;
+    /** Décision utilisateur lorsqu'un fichier existe déjà à destination. */
+    onExists?: () => Promise<"overwrite" | "skip" | "cancel">;
     onFile: (size: number, name: string) => void;
   },
-): Promise<void> {
+): Promise<"ok" | "skip" | "cancel"> {
   const stack: { abs: string; dst: string }[] = [{ abs: srcRoot, dst: dstRoot }];
   let processed = 0;
+  let replace = ctx.overwrite ?? false;
   while (stack.length) {
-    if (ctx.signal?.cancelled) return;
+    if (ctx.signal?.cancelled) return "ok";
     const cur = stack.pop()!;
     try {
       await p.createDirectory({ path: cur.dst });
@@ -634,7 +648,7 @@ async function copyTreeStreaming(
     const res = await listNativeDirectory(cur.abs);
     if (!res.ok) continue;
     for (const e of res.listing.entries) {
-      if (ctx.signal?.cancelled) return;
+      if (ctx.signal?.cancelled) return "ok";
       if (e.name.startsWith(".")) continue;
       const target = joinAbs(cur.dst, e.name);
       if (e.isDirectory) {
@@ -645,15 +659,36 @@ async function copyTreeStreaming(
         await p.copyFile({
           source: e.path,
           destination: target,
-          overwrite: ctx.overwrite ?? false,
+          overwrite: replace,
         });
         ctx.onFile(e.size ?? 0, e.name);
       } catch (err) {
-        ctx.failed.push({ name: e.name, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
+        const msg = err instanceof Error ? err.message : String(err);
+        if (/EXISTS/i.test(msg) && !replace && ctx.onExists) {
+          const choice = await ctx.onExists();
+          if (choice === "cancel") return "cancel";
+          if (choice === "skip") return "skip";
+          replace = true;
+          try {
+            await p.copyFile({ source: e.path, destination: target, overwrite: true });
+            ctx.onFile(e.size ?? 0, e.name);
+          } catch (retryErr) {
+            ctx.failed.push({
+              name: e.name,
+              reason: humanizeIoError(retryErr, t("ops.error.copyFailed")),
+            });
+          }
+        } else {
+          ctx.failed.push({
+            name: e.name,
+            reason: humanizeIoError(err, t("ops.error.copyFailed")),
+          });
+        }
       }
       if (++processed % 24 === 0) await tick();
     }
   }
+  return "ok";
 }
 
 export async function transferEntries(
@@ -675,9 +710,26 @@ async function runTransferEntries(
 ): Promise<OperationResult> {
   const failed: OperationResult["failed"] = [];
   let succeeded = 0;
+  let skipped = 0;
+  let userCancelled = false;
   /** Décisions d'écrasement validées par l'utilisateur (jamais implicites). */
   const overwriteNames = new Set(opts.overwrite ?? []);
   const mayOverwrite = (name: string) => overwriteNames.has(name);
+  /** Une seule question par élément racine, quel que soit le nombre de fichiers. */
+  const decided = new Map<string, "overwrite" | "skip" | "cancel">();
+  const askConflict = async (item: {
+    name: string;
+    isDirectory: boolean;
+  }): Promise<"overwrite" | "skip" | "cancel" | "none"> => {
+    if (!opts.onConflict) return "none";
+    const known = decided.get(item.name);
+    if (known) return known;
+    const choice = await opts.onConflict(item);
+    decided.set(item.name, choice);
+    if (choice === "overwrite") overwriteNames.add(item.name);
+    if (choice === "cancel") userCancelled = true;
+    return choice;
+  };
 
   if (!isAndroidNative()) {
     // Mock — moves and copies at once, ignoring progress detail.
@@ -690,6 +742,23 @@ async function runTransferEntries(
         cancelled: false,
       };
     }
+    // Conflit tardif (élément apparu depuis la détection groupée) :
+    // l'utilisateur décide avant toute écriture.
+    const existingNames = new Set((mockResolve(destination)?.children ?? []).map((c) => c.name));
+    const skippedNames = new Set<string>();
+    for (const e of entries) {
+      if (!existingNames.has(e.name) || mayOverwrite(e.name)) continue;
+      const choice = await askConflict(e);
+      if (choice === "cancel")
+        return { ok: false, succeeded: 0, failed: [], cancelled: true, skipped };
+      if (choice === "skip") {
+        skippedNames.add(e.name);
+        skipped++;
+      }
+    }
+    if (skippedNames.size) entries = entries.filter((e) => !skippedNames.has(e.name));
+    if (entries.length === 0)
+      return { ok: true, succeeded: 0, failed: [], cancelled: false, skipped };
     mockMutate(source, (srcNode) => {
       if (!srcNode.children) return null;
       const names = new Set(entries.map((e) => e.name));
@@ -903,15 +972,34 @@ async function runTransferEntries(
     // atomique — instantané même pour un dossier énorme.
     if (opts.mode === "move") {
       let renamed = false;
-      const replace = mayOverwrite(plan.entry.name);
+      let replace = mayOverwrite(plan.entry.name);
       try {
         await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: replace });
         renamed = true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         if (/EXISTS/i.test(msg) && !replace) {
-          failed.push({ name: plan.entry.name, reason: t("ops.error.alreadyExistsAtDestination") });
-          continue;
+          // Un doublon n'est pas une erreur : l'utilisateur tranche.
+          const choice = await askConflict(plan.entry);
+          if (choice === "cancel") break outer;
+          if (choice === "skip") {
+            skipped++;
+            continue;
+          }
+          if (choice === "none") {
+            failed.push({
+              name: plan.entry.name,
+              reason: t("ops.error.alreadyExistsAtDestination"),
+            });
+            continue;
+          }
+          replace = true;
+          try {
+            await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: true });
+            renamed = true;
+          } catch {
+            /* repli sur copie + suppression ci-dessous */
+          }
         }
         // Volumes différents, ou dossier existant à fusionner : repli sur
         // copie (avec remplacement fichier par fichier) puis suppression.
@@ -934,16 +1022,25 @@ async function runTransferEntries(
     if (plan.bulk) {
       // Trop volumineux pour un plan détaillé : copie en flux, empreinte
       // mémoire constante, progression réelle fichier par fichier.
-      await copyTreeStreaming(p, srcRoot, dstRoot, {
+      const outcome = await copyTreeStreaming(p, srcRoot, dstRoot, {
         signal: opts.signal,
         failed,
         overwrite: mayOverwrite(plan.entry.name),
+        onExists: async () => {
+          const choice = await askConflict(plan.entry);
+          return choice === "none" ? "skip" : choice;
+        },
         onFile: (size, name) => {
           bytesDone += size;
           completed++;
           emit(name);
         },
       });
+      if (outcome === "cancel") break outer;
+      if (outcome === "skip") {
+        skipped++;
+        continue;
+      }
     } else {
       // Squelette de dossiers.
       for (const relDir of plan.dirs) {
@@ -955,6 +1052,8 @@ async function runTransferEntries(
         }
       }
       let done = 0;
+      let replaceFiles = mayOverwrite(plan.entry.name);
+      let skipEntry = false;
       for (const file of plan.files) {
         if (opts.signal?.cancelled) break outer;
         const rel = file.relative;
@@ -962,17 +1061,45 @@ async function runTransferEntries(
           await p.copyFile({
             source: file.source,
             destination: joinAbs(dstAbs, rel),
-            overwrite: mayOverwrite(plan.entry.name),
+            overwrite: replaceFiles,
           });
           bytesDone += file.size;
           completed++;
           emit(rel.split("/").pop() ?? rel);
         } catch (err) {
-          failed.push({ name: rel, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
+          const msg = err instanceof Error ? err.message : String(err);
+          if (/EXISTS/i.test(msg) && !replaceFiles) {
+            const choice = await askConflict(plan.entry);
+            if (choice === "cancel") break outer;
+            if (choice === "skip" || choice === "none") {
+              skipped++;
+              skipEntry = true;
+              break;
+            }
+            replaceFiles = true;
+            try {
+              await p.copyFile({
+                source: file.source,
+                destination: joinAbs(dstAbs, rel),
+                overwrite: true,
+              });
+              bytesDone += file.size;
+              completed++;
+              emit(rel.split("/").pop() ?? rel);
+            } catch (retryErr) {
+              failed.push({
+                name: rel,
+                reason: humanizeIoError(retryErr, t("ops.error.copyFailed")),
+              });
+            }
+          } else {
+            failed.push({ name: rel, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
+          }
         }
         // Respiration périodique : le fil principal reste fluide.
         if (++done % 24 === 0) await tick();
       }
+      if (skipEntry) continue;
       completed += plan.dirs.length;
     }
     if (opts.signal?.cancelled) break outer;
@@ -996,7 +1123,7 @@ async function runTransferEntries(
     await tick();
   }
 
-  const cancelled = Boolean(opts.signal?.cancelled);
+  const cancelled = Boolean(opts.signal?.cancelled) || userCancelled;
   recordOperation({
     kind: opts.mode,
     summary: t(opts.mode === "copy" ? "ops.transfer.copySummary" : "ops.transfer.moveSummary", {
@@ -1015,7 +1142,7 @@ async function runTransferEntries(
     failed.length ? t("ops.transfer.failuresCount", { count: failed.length }) : undefined,
   );
   if (succeeded > 0) dispatchStorageChanged();
-  return { ok: failed.length === 0 && !cancelled, succeeded, failed, cancelled };
+  return { ok: failed.length === 0 && !cancelled, succeeded, failed, cancelled, skipped };
 }
 
 /* ---------- share ---------- */

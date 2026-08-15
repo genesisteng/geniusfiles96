@@ -81,7 +81,7 @@ import { EntryActionSheet, type EntryAction } from "@/components/files/EntryActi
 import { ConfirmDialog, NamePrompt } from "@/components/files/BottomSheet";
 import { DetailsSheet } from "@/components/files/DetailsSheet";
 import { ProgressDialog } from "@/components/files/ProgressDialog";
-import { startTransfer, cancelTransfer } from "@/lib/transfers/manager";
+import { startTransfer, cancelTransfer, openTransferDestination } from "@/lib/transfers/manager";
 import { useTransferTask } from "@/lib/transfers/useTransfers";
 import { UniversalViewer, type ViewerAction } from "@/components/viewer/UniversalViewer";
 import { canOpenInViewer, canPreview } from "@/lib/viewer/kinds";
@@ -793,7 +793,11 @@ export function FilesPage() {
               unit,
               destLabel,
             );
-            toast.success(summary.title, { description: summary.detail });
+            const extra =
+              task.skipped > 0
+                ? ` · ${t("ops.transfer.skippedCount", { count: task.skipped })}`
+                : "";
+            toast.success(summary.title, { description: `${summary.detail}${extra}` });
           } else {
             toast.error(
               t("home.transfer.mixedResult", {
@@ -808,6 +812,9 @@ export function FilesPage() {
               },
             );
           }
+          // L'utilisateur voit immédiatement le résultat : le dossier de
+          // destination s'ouvre dès qu'au moins un élément est arrivé.
+          if (task.succeeded > 0) openTransferDestination(task);
         },
       });
       setTransferTaskId(id);
