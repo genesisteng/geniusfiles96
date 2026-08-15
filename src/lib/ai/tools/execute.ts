@@ -19,6 +19,12 @@ import type { EngineCommand, EngineExecuteOptions, EngineResult } from "@/lib/en
 import { engineProgressLabel, engineStageLabel, setEngineStage } from "./stage";
 import { KIND_FILTER_MATCH, type KindFilter } from "@/lib/search/types";
 import { t } from "@/lib/i18n";
+import {
+  UNTRUSTED_LIMITS,
+  checkEntryName,
+  checkUntrustedPath,
+  checkUntrustedVolume,
+} from "@/lib/security/paths";
 
 type StrictKind = Exclude<KindFilter, "any">;
 
@@ -76,6 +82,47 @@ function normalizePath(p: unknown): PathRef {
     rootId: (o.rootId ?? "internal") as PathRef["rootId"],
     segments: Array.isArray(o.segments) ? o.segments.map(String) : [],
   };
+}
+
+/**
+ * Sécurité : Genius AI est un appelant NON FIABLE. Tout chemin qu'il
+ * produit — même issu d'une instruction glissée dans un nom de fichier —
+ * doit viser une racine de stockage réellement montée, sans segment
+ * d'évasion (`..`), sans dossier masqué et donc sans coffre-fort.
+ * La vérification a lieu avant le moteur : aucune opération n'est
+ * tentée si la cible n'est pas légitime.
+ */
+function guardPaths(params: Record<string, unknown>, started: number): ToolOutput | null {
+  const candidates: unknown[] = [
+    params.path,
+    params.parent,
+    params.source,
+    params.destination,
+    params.folder,
+    ...(Array.isArray(params.roots) ? params.roots : []),
+  ].filter((v) => v != null);
+  for (const candidate of candidates) {
+    const check = checkUntrustedPath(normalizePath(candidate));
+    if (!check.ok) return fail("PERMISSION_DENIED", check.reason, started);
+  }
+  const names = [
+    ...namesOf(params),
+    ...(params.newName ? [String(params.newName)] : []),
+    ...(params.oldName ? [String(params.oldName)] : []),
+    ...(params.archiveName ? [String(params.archiveName)] : []),
+    ...(params.name ? [String(params.name)] : []),
+  ];
+  for (const name of names) {
+    const check = checkEntryName(name);
+    if (!check.ok) return fail("PERMISSION_DENIED", check.reason, started);
+  }
+  return null;
+}
+
+/** Plafond de volume sur les opérations sensibles déclenchées par l'IA. */
+function guardVolume(count: number, limit: number, started: number): ToolOutput | null {
+  const check = checkUntrustedVolume(count, limit);
+  return check.ok ? null : fail("PERMISSION_DENIED", check.reason, started);
 }
 
 function normalizePaths(v: unknown): PathRef[] {
@@ -186,6 +233,9 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
   if (!COMMAND_TYPES.has(type)) {
     return fail("UNKNOWN_COMMAND", t("system.ai.unsupportedCommand", { type }), started);
   }
+
+  const pathGuard = guardPaths(params, started);
+  if (pathGuard) return pathGuard;
 
   // Ligne d'activité : une étape est publiée immédiatement, puis remplacée
   // par la progression réelle du moteur. Jamais de temps mort.
@@ -446,6 +496,8 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
             t("system.extra.noItemsFound", { names: names.join(", ") }),
             started,
           );
+        const volume = guardVolume(resolved.entries.length, UNTRUSTED_LIMITS.delete, started);
+        if (volume) return volume;
         const out = toOutput(
           await run({ type: "delete", params: { parent, entries: resolved.entries } }),
         );
@@ -486,6 +538,8 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
             }),
             started,
           );
+        const volume = guardVolume(entries.length, UNTRUSTED_LIMITS.transfer, started);
+        if (volume) return volume;
         return toOutput(await run({ type, params: { source, entries, destination } }));
       }
 
@@ -512,6 +566,8 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
             t("system.extra.noItemsFound", { names: names.join(", ") }),
             started,
           );
+        const volume = guardVolume(resolved.entries.length, UNTRUSTED_LIMITS.compress, started);
+        if (volume) return volume;
         return toOutput(
           await run({
             type: "compress",
@@ -556,6 +612,8 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
             t("system.extra.noItemsFound", { names: names.join(", ") }),
             started,
           );
+        const volume = guardVolume(resolved.entries.length, UNTRUSTED_LIMITS.share, started);
+        if (volume) return volume;
         return toOutput(
           await run({ type: "share", params: { parent, entries: resolved.entries } }),
         );
