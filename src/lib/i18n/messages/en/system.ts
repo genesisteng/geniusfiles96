@@ -127,24 +127,6 @@ export default {
   "system.storageAccess.enableInAndroid":
     "Enable access in the Android screen, then return to GeniusFiles.",
 
-  "system.analysisProgress.title": "Smart analysis",
-  "system.analysisProgress.currentLabel_one": 'Analyzing "{label}"… ({count} file left)',
-  "system.analysisProgress.currentLabel_other": 'Analyzing "{label}"… ({count} files left)',
-  "system.analysisProgress.pending_one": "Analyzing {count} pending file…",
-  "system.analysisProgress.pending_other": "Analyzing {count} pending files…",
-  "system.analysisProgress.done_one": "{count} file analyzed",
-  "system.analysisProgress.done_other": "{count} files analyzed",
-  "system.analysisProgress.resume.aria": "Resume",
-  "system.analysisProgress.pause.aria": "Pause",
-  "system.analysisProgress.cancel.aria": "Cancel",
-  "system.analysisProgress.clear": "Clear",
-  "system.analysisProgress.running": "running",
-  "system.analysisProgress.queued": "queued",
-  "system.analysisProgress.analyzed": "analyzed",
-  "system.analysisProgress.alreadyKnown": "already known",
-  "system.analysisProgress.failed": "failed",
-  "system.analysisProgress.paused": "Paused",
-
   // Ajouts génération automatique (i18n complet)
   "system.accesRefuseParAndroidAutorisezAcces":
     'Access denied by Android. Allow "All files access" in the app settings.',

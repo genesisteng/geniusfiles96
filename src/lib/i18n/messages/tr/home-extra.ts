@@ -24,16 +24,4 @@ export default {
     "Çöp Kutusunda {size} tutuluyor ({count} öğe). Bu alanı hemen geri kazanmak için boşaltın.",
   "home.rec.trashLarge.description_other":
     "Çöp Kutusunda {size} tutuluyor ({count} öğe). Bu alanı hemen geri kazanmak için boşaltın.",
-  "home.analysis.title": "Akıllı analiz",
-  "home.analysis.analyzingNamed": "“{name}” analiz ediliyor… ({count} kaldı)",
-  "home.analysis.analyzingQueue": "{count} öğe bekliyor…",
-  "home.analysis.done": "{count} analiz edildi",
-  "home.analysis.pause": "Duraklat",
-  "home.analysis.clear": "Temizle",
-  "home.analysis.running": "{count} çalışıyor",
-  "home.analysis.queued": "{count} sırada",
-  "home.analysis.analyzed": "{count} analiz edildi",
-  "home.analysis.skipped": "{count} zaten biliniyor",
-  "home.analysis.failed": "{count} başarısız",
-  "home.analysis.paused": "Duraklatıldı",
 } as const;

@@ -101,21 +101,6 @@ export default {
     "Yapay zekâ hizmeti geçici olarak kullanılamıyor. Birazdan tekrar deneyin.",
   "assistant.diag.internal":
     "İşlem son yanıt alınamadan kesintiye uğradı. Tamamlanan adımlar korundu — devam etmek için tekrar deneyin.",
-  "assistant.analysis.title": "Akıllı analiz",
-  "assistant.analysis.resumeAria": "Sürdür",
-  "assistant.analysis.pauseAria": "Duraklat",
-  "assistant.analysis.clear": "Temizle",
-  "assistant.analysis.progressNamed_one": "“{name}” analiz ediliyor… ({count} kaldı)",
-  "assistant.analysis.progressNamed_other": "“{name}” analiz ediliyor… ({count} kaldı)",
-  "assistant.analysis.queued": "{files} sıraya alındı, analiz ediliyor…",
-  "assistant.analysis.done_one": "{count} dosya analiz edildi",
-  "assistant.analysis.done_other": "{count} dosya analiz edildi",
-  "assistant.analysis.statRunning": "{count} devam ediyor",
-  "assistant.analysis.statQueued": "{count} sırada",
-  "assistant.analysis.statDone": "{count} analiz edildi",
-  "assistant.analysis.statSkipped": "{count} zaten biliniyor",
-  "assistant.analysis.statFailed": "{count} başarısız",
-  "assistant.analysis.statPaused": "Duraklatıldı",
   "assistant.executeReellementUneCommandeSurLe":
     "GeniusFiles'ın yerel dosya motorunda GERÇEKTEN bir komut çalıştırır (gerçek Android API'leri, gerçek dosyalar). Depolama alanında işlem yapmak için izin verilen tek kanaldır: listeleme, arama, analiz etme, özellikleri okuma, klasör oluşturma, yeniden adlandırma, taşıma, kopyalama, silme, düzenleme, sıkıştırma, çıkarma, paylaşma, sıralama, filtreleme. Bir talimat verildiğinde onay istemeden bu aracı hemen çağırın — kalıcı silme veya verilerin üzerine yazma durumları hariç. KESİNLİKLE bir sonuç uydurmayın: yalnızca bu aracın çıktısı depolama alanının gerçek durumunu yansıtır.",
 } as const;

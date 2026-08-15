@@ -121,23 +121,6 @@ export default {
     "Não foi possível abrir o ecrã de permissões. Abra as Definições do GeniusFiles para ativar o acesso aos ficheiros.",
   "system.storageAccess.enableInAndroid":
     "Ative o acesso no ecrã do Android e volte ao GeniusFiles.",
-  "system.analysisProgress.title": "Análise inteligente",
-  "system.analysisProgress.currentLabel_one": 'A analisar "{label}"… (resta {count} ficheiro)',
-  "system.analysisProgress.currentLabel_other": 'A analisar "{label}"… (restam {count} ficheiros)',
-  "system.analysisProgress.pending_one": "A analisar {count} ficheiro pendente…",
-  "system.analysisProgress.pending_other": "A analisar {count} ficheiros pendentes…",
-  "system.analysisProgress.done_one": "{count} ficheiro analisado",
-  "system.analysisProgress.done_other": "{count} ficheiros analisados",
-  "system.analysisProgress.resume.aria": "Retomar",
-  "system.analysisProgress.pause.aria": "Pausar",
-  "system.analysisProgress.cancel.aria": "Cancelar",
-  "system.analysisProgress.clear": "Limpar",
-  "system.analysisProgress.running": "em curso",
-  "system.analysisProgress.queued": "em espera",
-  "system.analysisProgress.analyzed": "analisados",
-  "system.analysisProgress.alreadyKnown": "já conhecidos",
-  "system.analysisProgress.failed": "falhados",
-  "system.analysisProgress.paused": "Pausado",
   "system.accesRefuseParAndroidAutorisezAcces":
     'Acesso recusado pelo Android. Permita "Acesso a todos os ficheiros" nas definições da aplicação.',
   "system.apercuDeLEspaceUtiliseDisponible":

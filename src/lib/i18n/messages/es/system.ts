@@ -122,24 +122,6 @@ export default {
     "No se pudo abrir la pantalla de permisos. Abre los ajustes de GeniusFiles para activar el acceso a los archivos.",
   "system.storageAccess.enableInAndroid":
     "Activa el acceso en la pantalla de Android y vuelve a GeniusFiles.",
-  "system.analysisProgress.title": "Análisis inteligente",
-  "system.analysisProgress.currentLabel_one": "Analizando «{label}»… ({count} archivo restante)",
-  "system.analysisProgress.currentLabel_other":
-    "Analizando «{label}»… ({count} archivos restantes)",
-  "system.analysisProgress.pending_one": "Analizando {count} archivo pendiente…",
-  "system.analysisProgress.pending_other": "Analizando {count} archivos pendientes…",
-  "system.analysisProgress.done_one": "{count} archivo analizado",
-  "system.analysisProgress.done_other": "{count} archivos analizados",
-  "system.analysisProgress.resume.aria": "Reanudar",
-  "system.analysisProgress.pause.aria": "Pausar",
-  "system.analysisProgress.cancel.aria": "Cancelar",
-  "system.analysisProgress.clear": "Limpiar",
-  "system.analysisProgress.running": "en curso",
-  "system.analysisProgress.queued": "en cola",
-  "system.analysisProgress.analyzed": "analizados",
-  "system.analysisProgress.alreadyKnown": "ya conocidos",
-  "system.analysisProgress.failed": "fallidos",
-  "system.analysisProgress.paused": "En pausa",
   "system.accesRefuseParAndroidAutorisezAcces":
     "Acceso denegado por Android. Permite «Acceso a todos los archivos» en los ajustes de la aplicación.",
   "system.apercuDeLEspaceUtiliseDisponible":

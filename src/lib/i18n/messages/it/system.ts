@@ -121,23 +121,6 @@ export default {
     "Impossibile aprire la schermata di autorizzazione. Apri le impostazioni di GeniusFiles per abilitare l'accesso ai file.",
   "system.storageAccess.enableInAndroid":
     "Attiva l'accesso nella schermata di Android, quindi torna a GeniusFiles.",
-  "system.analysisProgress.title": "Analisi intelligente",
-  "system.analysisProgress.currentLabel_one": 'Analisi di "{label}"… ({count} file rimanente)',
-  "system.analysisProgress.currentLabel_other": 'Analisi di "{label}"… ({count} file rimanenti)',
-  "system.analysisProgress.pending_one": "Analisi di {count} file in attesa…",
-  "system.analysisProgress.pending_other": "Analisi di {count} file in attesa…",
-  "system.analysisProgress.done_one": "{count} file analizzato",
-  "system.analysisProgress.done_other": "{count} file analizzati",
-  "system.analysisProgress.resume.aria": "Riprendi",
-  "system.analysisProgress.pause.aria": "Sospendi",
-  "system.analysisProgress.cancel.aria": "Annulla",
-  "system.analysisProgress.clear": "Cancella",
-  "system.analysisProgress.running": "in corso",
-  "system.analysisProgress.queued": "in coda",
-  "system.analysisProgress.analyzed": "analizzati",
-  "system.analysisProgress.alreadyKnown": "già noti",
-  "system.analysisProgress.failed": "non riusciti",
-  "system.analysisProgress.paused": "In pausa",
   "system.accesRefuseParAndroidAutorisezAcces":
     'Accesso negato da Android. Consenti "Accesso a tutti i file" nelle impostazioni dell\'app.',
   "system.apercuDeLEspaceUtiliseDisponible":

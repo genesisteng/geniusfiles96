@@ -117,22 +117,6 @@ export default {
   "assistant.diag.internal":
     "Die Verarbeitung wurde vor der endgültigen Antwort unterbrochen. Bereits abgeschlossene Schritte bleiben erhalten — erneut versuchen, um fortzufahren.",
 
-  "assistant.analysis.title": "Intelligente Analyse",
-  "assistant.analysis.resumeAria": "Fortsetzen",
-  "assistant.analysis.pauseAria": "Pausieren",
-  "assistant.analysis.clear": "Löschen",
-  "assistant.analysis.progressNamed_one": "„{name}“ wird analysiert… (noch {count})",
-  "assistant.analysis.progressNamed_other": "„{name}“ wird analysiert… (noch {count})",
-  "assistant.analysis.queued": "{files} in Warteschlange werden analysiert…",
-  "assistant.analysis.done_one": "{count} Datei analysiert",
-  "assistant.analysis.done_other": "{count} Dateien analysiert",
-  "assistant.analysis.statRunning": "{count} laufend",
-  "assistant.analysis.statQueued": "{count} in Warteschlange",
-  "assistant.analysis.statDone": "{count} analysiert",
-  "assistant.analysis.statSkipped": "{count} bereits bekannt",
-  "assistant.analysis.statFailed": "{count} fehlgeschlagen",
-  "assistant.analysis.statPaused": "Pausiert",
-
   // Ajouts génération automatique (i18n complet)
   "assistant.executeReellementUneCommandeSurLe":
     "Führt TATSÄCHLICH einen Befehl auf der lokalen Datei-Engine von GeniusFiles aus (echte Android-APIs, echte Dateien). Dies ist der einzige zulässige Kanal, um auf den Speicher einzuwirken: auflisten, suchen, analysieren, Eigenschaften lesen, Ordner erstellen, umbenennen, verschieben, kopieren, löschen, aufräumen, komprimieren, extrahieren, teilen, sortieren, filtern. Dieses Tool sofort aufrufen, sobald ein Befehl erteilt wird, ohne um Bestätigung zu bitten — außer bei endgültigem Löschen oder Überschreiben von Daten. NIEMALS ein Ergebnis erfinden: Nur die Ausgabe dieses Tools spiegelt den tatsächlichen Zustand des Speichers wider.",

@@ -24,16 +24,4 @@ export default {
     "{size} liegen im Papierkorb ({count} Element). Leere ihn, um diesen Speicher sofort zurückzugewinnen.",
   "home.rec.trashLarge.description_other":
     "{size} liegen im Papierkorb ({count} Elemente). Leere ihn, um diesen Speicher sofort zurückzugewinnen.",
-  "home.analysis.title": "Intelligente Analyse",
-  "home.analysis.analyzingNamed": "Analysiere „{name}“… ({count} verbleibend)",
-  "home.analysis.analyzingQueue": "{count} in Warteschlange werden analysiert…",
-  "home.analysis.done": "{count} analysiert",
-  "home.analysis.pause": "Pause",
-  "home.analysis.clear": "Löschen",
-  "home.analysis.running": "{count} läuft",
-  "home.analysis.queued": "{count} in Warteschlange",
-  "home.analysis.analyzed": "{count} analysiert",
-  "home.analysis.skipped": "{count} bereits bekannt",
-  "home.analysis.failed": "{count} fehlgeschlagen",
-  "home.analysis.paused": "Pausiert",
 } as const;
