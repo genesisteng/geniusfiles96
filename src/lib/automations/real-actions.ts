@@ -37,10 +37,15 @@ export async function organizeFolder(
   folder: PathRef,
   rule: "type" | "date" | "name",
 ): Promise<OrganizeOutcome> {
+  const guard = checkUntrustedPath(folder);
+  if (!guard.ok) return { moved: 0, errors: [guard.reason] };
   const listing = await listDirectory(folder, { force: true });
   if (!listing.ok) return { moved: 0, errors: [listing.message ?? listing.reason] };
 
-  const files = listing.entries.filter((e) => !e.isDirectory);
+  // Une automatisation ne touche jamais aux éléments masqués (coffre-fort,
+  // caches d'applications) : elle ne range que des fichiers visibles.
+  const files = listing.entries.filter((e) => !e.isDirectory && !e.name.startsWith("."));
+
   const buckets = new Map<string, FileEntry[]>();
   for (const f of files) {
     const bucket = organizeBucket(f, rule);
