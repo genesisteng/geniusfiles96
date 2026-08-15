@@ -25,4 +25,13 @@ export default {
   "pdf.scan.resultDesc_other": "PDF {count} sayfa ile oluşturuldu.",
   "pdf.scan.savingTitle": "Tarama kaydediliyor…",
   "pdf.scan.sheetTitle": "Bir belge tara",
+  "pdf.pages.selectedOf_one": "{count} / {total} seçildi",
+  "pdf.pages.selectedOf_other": "{count} / {total} seçildi",
+  "pdf.opacityPercent": "Opaklık (%{value})",
+  "pdf.search.resultCount_one": "{count} sonuç",
+  "pdf.search.resultCount_other": "{count} sonuç",
+  "pdf.convert.partial_one": "{ok} dönüştürüldü, {count} başarısız: {details}",
+  "pdf.convert.partial_other": "{ok} dönüştürüldü, {count} başarısız: {details}",
+  "pdf.convert.addFiles": "Dosya ekle",
+  "pdf.convert.supportedFormats": "Desteklenen biçimler: Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), görseller (JPG/PNG/WEBP), metin (.txt/.md/.csv), PDF.",
 } as const;

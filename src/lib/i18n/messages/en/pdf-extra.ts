@@ -25,4 +25,13 @@ export default {
   "pdf.scan.resultDesc_other": "The PDF was created with {count} pages.",
   "pdf.scan.savingTitle": "Saving scan…",
   "pdf.scan.sheetTitle": "Scan a document",
+  "pdf.pages.selectedOf_one": "{count} / {total} selected",
+  "pdf.pages.selectedOf_other": "{count} / {total} selected",
+  "pdf.opacityPercent": "Opacity ({value}%)",
+  "pdf.search.resultCount_one": "{count} result",
+  "pdf.search.resultCount_other": "{count} results",
+  "pdf.convert.partial_one": "{ok} converted, {count} failed: {details}",
+  "pdf.convert.partial_other": "{ok} converted, {count} failed: {details}",
+  "pdf.convert.addFiles": "Add files",
+  "pdf.convert.supportedFormats": "Supported formats: Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), images (JPG/PNG/WEBP), text (.txt/.md/.csv), PDF.",
 } as const;
