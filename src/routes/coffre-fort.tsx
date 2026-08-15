@@ -578,8 +578,10 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
   const [error, setError] = useState<string | null>(null);
   const [biometricReady, setBiometricReady] = useState(false);
   const [showReset, setShowReset] = useState(false);
-  const [attempts, setAttempts] = useState(0);
+  const [attempts, setAttempts] = useState(() => getVaultLockout().failures);
+  const [lockedMs, setLockedMs] = useState(() => getVaultLockout().remainingMs);
   const method: VaultAuthMethod = useMemo(() => getVaultMethod() ?? "pin", []);
+  const lockedOut = lockedMs > 0;
 
   useEffect(() => {
     (async () => {
@@ -589,15 +591,31 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
     })();
   }, []);
 
+  // Décompte de la temporisation anti-force brute : persistée, donc
+  // quitter l'écran ou relancer l'application ne la contourne pas.
+  useEffect(() => {
+    if (lockedMs <= 0) return;
+    const id = window.setInterval(() => {
+      setLockedMs(getVaultLockout().remainingMs);
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [lockedMs]);
+
   const attempt = useCallback(
     async (value: string) => {
       if (busy || !value) return;
+      if (getVaultLockout().remainingMs > 0) {
+        setLockedMs(getVaultLockout().remainingMs);
+        return;
+      }
       setBusy(true);
       setError(null);
       const ok = await verifySecret(value);
       setBusy(false);
       if (!ok) {
-        setAttempts((n) => n + 1);
+        const state = getVaultLockout();
+        setAttempts(state.failures);
+        setLockedMs(state.remainingMs);
         setError(method === "pattern" ? t("vault.lock.error.pattern") : t("vault.lock.error.code"));
         setSecret("");
         try {
@@ -607,14 +625,22 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
         }
         return;
       }
+      setAttempts(0);
+      setLockedMs(0);
       onUnlocked();
     },
     [busy, method, onUnlocked, t],
   );
 
   const tryBiometric = async () => {
+    if (getVaultLockout().remainingMs > 0) {
+      setLockedMs(getVaultLockout().remainingMs);
+      return;
+    }
     const r = await verifyBiometric();
     if (r.ok) {
+      clearVaultLockout();
+      setAttempts(0);
       onUnlocked();
       return;
     }
@@ -624,6 +650,7 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
     }
     setError(biometricStatusMessage(r.status));
   };
+
 
   return (
     <VaultFullScreen>
