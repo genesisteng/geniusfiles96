@@ -61,7 +61,7 @@ export function SelectionActionRow({
         ) : null}
       </span>
       <div className="flex shrink-0 items-center gap-3 pr-1">
-        <TopAction icon={CheckCheck} label="Tout" onClick={onSelectAll} />
+        <TopAction icon={CheckCheck} label={t("action.selectAll")} onClick={onSelectAll} />
         {onSelectRange ? (
           <TopAction
             icon={ArrowLeftRight}
