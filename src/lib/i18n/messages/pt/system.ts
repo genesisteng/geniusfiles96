@@ -230,4 +230,11 @@ export default {
   "system.io.writeFailed": "Não foi possível gravar — {reason}",
   "system.engine.noRequestedStorageAvailable":
     "Nenhum dos armazenamentos solicitados está disponível: {details}",
+  "system.security.blockedPath": "Localização protegida — operação recusada.",
+  "system.security.invalidPath": "Caminho inválido — operação recusada.",
+  "system.security.invalidName": "Nome inválido — operação recusada.",
+  "system.security.untrustedRoot": "Armazenamento não autorizado para esta operação.",
+  "system.security.tooManyItems": "Demasiados itens para uma só operação ({count} no máximo).",
+  "system.security.vaultProtected":
+    "Os ficheiros do cofre não são acessíveis a partir desta funcionalidade.",
 } as const;

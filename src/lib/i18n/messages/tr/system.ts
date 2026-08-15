@@ -203,4 +203,10 @@ export default {
   "system.io.writeFailed": "Yazma başarısız — {reason}",
   "system.engine.noRequestedStorageAvailable":
     "İstenen depolama alanlarının hiçbiri kullanılamıyor: {details}",
+  "system.security.blockedPath": "Korumalı konum — işlem reddedildi.",
+  "system.security.invalidPath": "Geçersiz yol — işlem reddedildi.",
+  "system.security.invalidName": "Geçersiz ad — işlem reddedildi.",
+  "system.security.untrustedRoot": "Bu işlem için depolama alanına izin verilmiyor.",
+  "system.security.tooManyItems": "Tek bir işlem için çok fazla öğe (en fazla {count}).",
+  "system.security.vaultProtected": "Kasadaki dosyalara bu özellikten erişilemez.",
 } as const;

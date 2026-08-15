@@ -43,18 +43,39 @@ function scheduleAutoLock() {
   }, remaining);
 }
 
+/**
+ * Filet de sécurité : même lorsque « verrouiller en arrière-plan » est
+ * désactivé, une absence prolongée reverrouille le coffre-fort. Un
+ * appareil laissé sans surveillance ne reste jamais ouvert.
+ */
+const BACKGROUND_GRACE_MS = 60_000;
+let hiddenAt = 0;
+
 function bindVisibilityOnce() {
   if (visibilityBound || typeof window === "undefined") return;
   visibilityBound = true;
-  const onVisibility = () => {
+  const onHidden = () => {
     if (typeof document === "undefined") return;
-    if (document.visibilityState === "hidden" && unlocked && loadLockOnBackground()) {
+    if (document.visibilityState !== "hidden") return;
+    if (!unlocked) return;
+    hiddenAt = Date.now();
+    if (loadLockOnBackground()) lockSession("background");
+  };
+  const onVisible = () => {
+    if (typeof document === "undefined") return;
+    if (document.visibilityState !== "visible") return;
+    if (unlocked && hiddenAt > 0 && Date.now() - hiddenAt >= BACKGROUND_GRACE_MS) {
       lockSession("background");
     }
+    hiddenAt = 0;
   };
-  document.addEventListener("visibilitychange", onVisibility);
-  window.addEventListener("pagehide", onVisibility);
-  window.addEventListener("blur", onVisibility);
+  document.addEventListener("visibilitychange", () => {
+    onHidden();
+    onVisible();
+  });
+  window.addEventListener("pagehide", onHidden);
+  window.addEventListener("blur", onHidden);
+  window.addEventListener("focus", onVisible);
   window.addEventListener("gf:vault-preferences-changed", scheduleAutoLock);
 }
 

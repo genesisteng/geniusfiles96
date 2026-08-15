@@ -23,6 +23,7 @@ import { recordOperation } from "./history";
 import type { OperationSignal, ProgressEvent } from "./operations";
 import { beginJob, finishJob, updateJob } from "@/lib/jobs/journal";
 import { t } from "@/lib/i18n";
+import { checkEntryName, checkOperationPath, checkOperationTarget } from "@/lib/security/paths";
 
 /** Extensions we can *create* today. */
 export const CREATE_FORMATS = ["zip"] as const;
@@ -303,6 +304,15 @@ export type CreateResult = {
 export async function createArchive(opts: CreateOptions): Promise<CreateResult> {
   const finalName = ensureExtension(opts.archiveName.trim(), opts.format);
   if (!finalName) return { ok: false, cancelled: false, error: t("ops.error.invalidName") };
+  // Source, destination et nom d'archive sont validés avant tout accès disque.
+  for (const check of [
+    checkOperationPath(opts.parent),
+    checkOperationPath(opts.destination),
+    checkEntryName(finalName),
+    ...opts.entries.map((e) => checkOperationTarget(opts.parent, e.name)),
+  ]) {
+    if (!check.ok) return { ok: false, cancelled: false, error: check.reason };
+  }
   const dstAbs = joinAbs(toAbsolutePath(opts.destination), finalName);
 
   const totalItems = opts.entries.length;
@@ -460,6 +470,18 @@ export type ExtractResult = {
 export async function extractArchive(opts: ExtractOptions): Promise<ExtractResult> {
   if (!canReadArchive(opts.entry))
     return { ok: false, cancelled: false, error: t("system.io.unsupportedFormat") };
+  // L'extraction est le vecteur classique d'évasion de dossier : la source,
+  // la destination et chaque entrée sélectionnée sont contrôlées ici, en
+  // complément du contrôle de chemin canonique effectué côté natif.
+  for (const check of [
+    checkOperationTarget(opts.parent, opts.entry.name),
+    checkOperationPath(opts.destination),
+  ]) {
+    if (!check.ok) return { ok: false, cancelled: false, error: check.reason };
+  }
+  if (opts.entries?.some((rel) => rel.split("/").some((seg) => seg === ".." || seg === ""))) {
+    return { ok: false, cancelled: false, error: t("system.security.invalidPath") };
+  }
   const dstAbs = toAbsolutePath(opts.destination);
 
   const jobId = beginJob({

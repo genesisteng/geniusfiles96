@@ -221,4 +221,5 @@ export default {
   "vault.error.fileNotFound": "Fichier introuvable",
   "vault.error.originUnknown": "Emplacement d'origine inconnu",
   "vault.error.destNotFound": "Dossier de destination introuvable",
+  "vault.lock.lockedOut": "Trop de tentatives. Réessayez dans {seconds} s.",
 } as const;

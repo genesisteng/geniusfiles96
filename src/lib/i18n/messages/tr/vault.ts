@@ -168,4 +168,5 @@ export default {
   "vault.error.fileNotFound": "Dosya bulunamadı",
   "vault.error.originUnknown": "Kaynak bilinmiyor",
   "vault.error.destNotFound": "Hedef bulunamadı",
+  "vault.lock.lockedOut": "Çok fazla deneme. {seconds} sn sonra tekrar deneyin.",
 } as const;

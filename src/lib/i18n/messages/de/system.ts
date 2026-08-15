@@ -234,4 +234,11 @@ export default {
   "system.io.writeFailed": "Schreiben nicht möglich — {reason}",
   "system.engine.noRequestedStorageAvailable":
     "Keiner der angeforderten Speicher ist verfügbar: {details}",
+  "system.security.blockedPath": "Geschützter Speicherort – Vorgang abgelehnt.",
+  "system.security.invalidPath": "Ungültiger Pfad – Vorgang abgelehnt.",
+  "system.security.invalidName": "Ungültiger Name – Vorgang abgelehnt.",
+  "system.security.untrustedRoot": "Speicher für diesen Vorgang nicht zulässig.",
+  "system.security.tooManyItems": "Zu viele Elemente für einen Vorgang (maximal {count}).",
+  "system.security.vaultProtected":
+    "Auf Tresordateien kann über diese Funktion nicht zugegriffen werden.",
 } as const;

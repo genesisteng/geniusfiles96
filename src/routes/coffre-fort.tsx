@@ -92,6 +92,8 @@ import {
   resetCredential,
   setBiometricEnabled,
   setupVault,
+  clearVaultLockout,
+  getVaultLockout,
   verifyBiometric,
   verifySecret,
 } from "@/lib/vault/auth";
@@ -578,8 +580,10 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
   const [error, setError] = useState<string | null>(null);
   const [biometricReady, setBiometricReady] = useState(false);
   const [showReset, setShowReset] = useState(false);
-  const [attempts, setAttempts] = useState(0);
+  const [attempts, setAttempts] = useState(() => getVaultLockout().failures);
+  const [lockedMs, setLockedMs] = useState(() => getVaultLockout().remainingMs);
   const method: VaultAuthMethod = useMemo(() => getVaultMethod() ?? "pin", []);
+  const lockedOut = lockedMs > 0;
 
   useEffect(() => {
     (async () => {
@@ -589,15 +593,31 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
     })();
   }, []);
 
+  // Décompte de la temporisation anti-force brute : persistée, donc
+  // quitter l'écran ou relancer l'application ne la contourne pas.
+  useEffect(() => {
+    if (lockedMs <= 0) return;
+    const id = window.setInterval(() => {
+      setLockedMs(getVaultLockout().remainingMs);
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [lockedMs]);
+
   const attempt = useCallback(
     async (value: string) => {
       if (busy || !value) return;
+      if (getVaultLockout().remainingMs > 0) {
+        setLockedMs(getVaultLockout().remainingMs);
+        return;
+      }
       setBusy(true);
       setError(null);
       const ok = await verifySecret(value);
       setBusy(false);
       if (!ok) {
-        setAttempts((n) => n + 1);
+        const state = getVaultLockout();
+        setAttempts(state.failures);
+        setLockedMs(state.remainingMs);
         setError(method === "pattern" ? t("vault.lock.error.pattern") : t("vault.lock.error.code"));
         setSecret("");
         try {
@@ -607,14 +627,22 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
         }
         return;
       }
+      setAttempts(0);
+      setLockedMs(0);
       onUnlocked();
     },
     [busy, method, onUnlocked, t],
   );
 
   const tryBiometric = async () => {
+    if (getVaultLockout().remainingMs > 0) {
+      setLockedMs(getVaultLockout().remainingMs);
+      return;
+    }
     const r = await verifyBiometric();
     if (r.ok) {
+      clearVaultLockout();
+      setAttempts(0);
       onUnlocked();
       return;
     }
@@ -646,7 +674,7 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
           <div className="flex flex-col items-center gap-3">
             <PatternLock
               onComplete={(v) => void attempt(v)}
-              disabled={busy}
+              disabled={busy || lockedOut}
               error={!!error}
               size={272}
             />
@@ -663,7 +691,10 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
             />
             {error ? <p className="mt-2 text-[12px] text-destructive">{error}</p> : null}
             <div className="mt-3">
-              <PrimaryButton onClick={() => void attempt(secret)} disabled={busy || !secret}>
+              <PrimaryButton
+                onClick={() => void attempt(secret)}
+                disabled={busy || lockedOut || !secret}
+              >
                 {busy ? t("vault.lock.verifying") : t("vault.lock.unlock")}
               </PrimaryButton>
             </div>
@@ -680,7 +711,11 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
           </button>
         ) : null}
 
-        {attempts >= 3 ? (
+        {lockedOut ? (
+          <p className="text-[11.5px] font-medium text-destructive">
+            {t("vault.lock.lockedOut", { seconds: Math.ceil(lockedMs / 1000) })}
+          </p>
+        ) : attempts >= 3 ? (
           <p className="text-[11px] text-muted-foreground">
             {t("vault.lock.attempts", { count: attempts })}
           </p>
