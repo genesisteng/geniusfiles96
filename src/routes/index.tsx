@@ -793,7 +793,9 @@ export function FilesPage() {
               unit,
               destLabel,
             );
-            toast.success(summary.title, { description: summary.detail });
+            const extra =
+              task.skipped > 0 ? ` · ${t("ops.transfer.skippedCount", { count: task.skipped })}` : "";
+            toast.success(summary.title, { description: `${summary.detail}${extra}` });
           } else {
             toast.error(
               t("home.transfer.mixedResult", {
@@ -808,6 +810,9 @@ export function FilesPage() {
               },
             );
           }
+          // L'utilisateur voit immédiatement le résultat : le dossier de
+          // destination s'ouvre dès qu'au moins un élément est arrivé.
+          if (task.succeeded > 0) openTransferDestination(task);
         },
       });
       setTransferTaskId(id);
