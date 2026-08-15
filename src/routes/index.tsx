@@ -81,7 +81,7 @@ import { EntryActionSheet, type EntryAction } from "@/components/files/EntryActi
 import { ConfirmDialog, NamePrompt } from "@/components/files/BottomSheet";
 import { DetailsSheet } from "@/components/files/DetailsSheet";
 import { ProgressDialog } from "@/components/files/ProgressDialog";
-import { startTransfer, cancelTransfer } from "@/lib/transfers/manager";
+import { startTransfer, cancelTransfer, openTransferDestination } from "@/lib/transfers/manager";
 import { useTransferTask } from "@/lib/transfers/useTransfers";
 import { UniversalViewer, type ViewerAction } from "@/components/viewer/UniversalViewer";
 import { canOpenInViewer, canPreview } from "@/lib/viewer/kinds";
