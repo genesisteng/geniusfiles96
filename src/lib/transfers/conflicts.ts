@@ -145,7 +145,7 @@ export async function resolveTransferConflicts(input: {
     for (const entry of group.entries) {
       if (!conflicting.has(entry.name)) continue;
       remaining--;
-      let choice = blanket;
+      let choice: ConflictChoice | null = blanket;
       if (!choice) {
         const answer = await requestConflictDecision({
           name: entry.name,
