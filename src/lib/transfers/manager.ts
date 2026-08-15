@@ -24,6 +24,7 @@ import { requestFileJump } from "@/lib/files/deeplink";
 import { showNotification } from "@/lib/native/notifications";
 import { formatSize } from "@/lib/files/format";
 import { toAbsolutePath } from "@/lib/files/fs";
+import { resolveTransferConflicts } from "./conflicts";
 import {
   cancelNativeTask,
   isNativeTransferAvailable,
@@ -58,6 +59,10 @@ export type TransferTask = {
   etaMs?: number;
   currentName?: string;
   succeeded: number;
+  /** Éléments ignorés sur décision de l'utilisateur (conflit). */
+  skipped: number;
+  /** Éléments qui ont remplacé un élément existant. */
+  overwritten: number;
   failures: TransferFailure[];
   message?: string;
 };
@@ -188,6 +193,8 @@ export function startTransfer(input: StartTransferInput): string {
     totalBytes: 0,
     speedBps: 0,
     succeeded: 0,
+    skipped: 0,
+    overwritten: 0,
     failures: [],
     signal: createSignal(),
     lastTick: now,
@@ -197,17 +204,62 @@ export function startTransfer(input: StartTransferInput): string {
   tasks.set(id, task);
   publish();
 
+  void begin(task, groups, destination, input.onDone);
+  return id;
+}
+
+/**
+ * Résolution des conflits PUIS exécution.
+ *
+ * La détection est groupée et ne coûte rien lorsqu'aucun doublon
+ * n'existe : dans ce cas l'opération démarre exactement comme avant.
+ */
+async function begin(
+  task: Internal,
+  groups: TransferGroup[],
+  destination: PathRef,
+  onDone?: (task: TransferTask) => void,
+) {
+  const resolution = await resolveTransferConflicts({
+    mode: task.mode,
+    groups,
+    destination,
+    destLabel: task.destLabel,
+  });
+  if (task.signal.cancelled) return;
+
+  task.skipped = resolution.skipped;
+  const plannedGroups = resolution.groups;
+  const remaining = plannedGroups.flatMap((g) => g.entries);
+  task.total = remaining.length;
+
+  if (resolution.cancelled || remaining.length === 0) {
+    task.status = resolution.cancelled ? "cancelled" : "done";
+    task.endedAt = Date.now();
+    task.speedBps = 0;
+    task.etaMs = 0;
+    task.message = summaryMessage(task);
+    publish();
+    notifyEnd(task);
+    onDone?.(getTask(task.id) ?? task);
+    if (task.status === "done") setTimeout(() => dismissTransfer(task.id), 15_000);
+    return;
+  }
+
+  const overwrite = resolution.overwrite;
   // Chemin privilégié : moteur natif (service Android). Aucun octet n'est
   // copié par la WebView, la tâche survit à la fermeture de l'application.
-  if (isNativeTransferAvailable()) {
+  // Un remplacement décidé par l'utilisateur passe par le moteur JS, seul
+  // à garantir l'écrasement puis sa vérification réelle.
+  if (overwrite.size === 0 && isNativeTransferAvailable()) {
     task.native = true;
-    const sources = groups.flatMap((g) =>
+    const sources = plannedGroups.flatMap((g) =>
       g.entries.map((e) => `${toAbsolutePath(g.parent)}/${e.name}`),
     );
     ensureNativeBridge();
     void startNativeTask({
-      id,
-      mode,
+      id: task.id,
+      mode: task.mode,
       sources,
       destination: toAbsolutePath(destination),
       title: task.title,
@@ -215,14 +267,13 @@ export function startTransfer(input: StartTransferInput): string {
       // Le natif a refusé (ancien build) : bascule transparente sur le JS.
       if (!ok) {
         task.native = false;
-        void run(task, groups, destination, input.onDone);
+        void run(task, plannedGroups, destination, onDone, overwrite);
       }
     });
-    return id;
+    return;
   }
 
-  void run(task, groups, destination, input.onDone);
-  return id;
+  void run(task, plannedGroups, destination, onDone, overwrite);
 }
 
 /* ---------- moteur natif : synchronisation ---------- */
@@ -281,6 +332,8 @@ function adopt(snap: NativeTaskSnapshot): Internal | null {
     totalBytes: snap.totalBytes,
     speedBps: snap.speedBps,
     succeeded: snap.completed,
+    skipped: 0,
+    overwritten: 0,
     failures: snap.failures ?? [],
     signal: createSignal(),
     lastTick: Date.now(),
@@ -311,6 +364,7 @@ async function run(
   groups: TransferGroup[],
   destination: PathRef,
   onDone?: (task: TransferTask) => void,
+  overwrite?: Set<string>,
 ) {
   // Bases cumulées : chaque groupe planifie ses propres totaux, on les
   // additionne pour ne jamais faire reculer la barre de progression.
@@ -328,6 +382,7 @@ async function run(
     const res = await transferEntries(group.parent, group.entries, destination, {
       mode: task.mode,
       signal: task.signal,
+      ...(overwrite && overwrite.size ? { overwrite } : {}),
       onProgress: (p) => {
         lastTotal = p.total;
         lastTotalBytes = p.totalBytes;
@@ -348,6 +403,15 @@ async function run(
     baseBytes += lastBytes;
     task.succeeded += res.succeeded;
     task.failures.push(...res.failed);
+    if (overwrite?.size) {
+      // Un remplacement n'est compté que si l'élément a réellement été
+      // confirmé à destination (les échecs sont exclus).
+      for (const e of group.entries) {
+        if (!overwrite.has(e.name)) continue;
+        if (res.failed.some((f) => f.name === e.name)) continue;
+        task.overwritten++;
+      }
+    }
     if (res.cancelled) break;
   }
 
@@ -371,6 +435,9 @@ async function run(
 export function summaryMessage(task: TransferTask): string {
   const verb = task.mode === "copy" ? t("ops.transfer.verbCopied") : t("ops.transfer.verbMoved");
   const parts = [t("ops.transfer.summary", { count: task.succeeded, verb })];
+  if (task.overwritten > 0)
+    parts.push(t("ops.transfer.overwrittenCount", { count: task.overwritten }));
+  if (task.skipped > 0) parts.push(t("ops.transfer.skippedCount", { count: task.skipped }));
   if (task.failures.length)
     parts.push(t("ops.transfer.failuresCount", { count: task.failures.length }));
   if (task.bytes > 0) parts.push(formatSize(task.bytes));

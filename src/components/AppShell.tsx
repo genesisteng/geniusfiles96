@@ -12,6 +12,7 @@ import { PlayerHost } from "@/components/player/PlayerHost";
 import { QuickScrollFab } from "@/components/common/QuickScrollFab";
 import { ScrollFeel } from "@/components/common/ScrollFeel";
 import { TransferTracker } from "@/components/jobs/TransferTracker";
+import { ConflictDialog } from "@/components/jobs/ConflictDialog";
 import { useReaderMode } from "@/lib/viewer/reader-mode";
 import { useInPickLayer } from "@/components/files/pick-layer-context";
 import { PackageSheetHost } from "@/components/files/PackageSheet";
@@ -99,6 +100,8 @@ export function AppShell({ children }: { children?: ReactNode }) {
       {isChat || reader || inPick ? null : <QuickScrollFab topInset={72} bottomInset={104} />}
       {/* Copies / déplacements en arrière-plan : suivi permanent (sans interface). */}
       {inPick ? null : <TransferTracker />}
+      {/* Conflit de copie / déplacement : une seule question, partout. */}
+      <ConflictDialog />
       {reader || inPick ? null : <BottomNav pathname={pathname} />}
       {/* Écran opaque de la barre d'état. */}
       {reader ? null : (

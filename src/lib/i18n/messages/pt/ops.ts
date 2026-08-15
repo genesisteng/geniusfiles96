@@ -199,4 +199,19 @@ export default {
   "ops.progress.remaining": "~{time} restante",
   "ops.progress.hideHint":
     "Ocultar não interrompe nada: a transferência continua em segundo plano, mesmo se você sair do GeniusFiles.",
+
+  // Conflits de copie / déplacement.
+  "ops.conflict.title": "Um item já existe",
+  "ops.conflict.fileExists": "Já existe um ficheiro com este nome nesta pasta.",
+  "ops.conflict.folderExists": "Já existe uma pasta com este nome nesta pasta.",
+  "ops.conflict.destination": "Destino: {dest}",
+  "ops.conflict.remaining": "Mais {count} conflito(s) a resolver",
+  "ops.conflict.applyToAll": "Aplicar esta escolha aos outros conflitos",
+  "ops.conflict.overwrite": "Substituir",
+  "ops.conflict.skip": "Ignorar",
+  "ops.conflict.cancel": "Cancelar",
+  "ops.conflict.notifyTitle": "Decisão necessária",
+  "ops.conflict.notifyBody": "Já existe um item no destino. Abra o GeniusFiles para escolher.",
+  "ops.transfer.skippedCount": "{count} ignorado(s)",
+  "ops.transfer.overwrittenCount": "{count} substituído(s)",
 } as const;

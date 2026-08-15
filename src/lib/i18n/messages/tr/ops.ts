@@ -198,4 +198,19 @@ export default {
   "ops.progress.remaining": "~{time} kaldı",
   "ops.progress.hideHint":
     "Gizleme hiçbir şeyi durdurmaz: GeniusFiles'tan çıksanız bile aktarım arka planda çalışmaya devam eder.",
+
+  // Conflits de copie / déplacement.
+  "ops.conflict.title": "Bu öğe zaten var",
+  "ops.conflict.fileExists": "Bu klasörde aynı adlı bir dosya zaten var.",
+  "ops.conflict.folderExists": "Bu klasörde aynı adlı bir klasör zaten var.",
+  "ops.conflict.destination": "Hedef: {dest}",
+  "ops.conflict.remaining": "{count} çakışma daha var",
+  "ops.conflict.applyToAll": "Bu seçimi diğer çakışmalara da uygula",
+  "ops.conflict.overwrite": "Değiştir",
+  "ops.conflict.skip": "Atla",
+  "ops.conflict.cancel": "İptal",
+  "ops.conflict.notifyTitle": "Karar gerekli",
+  "ops.conflict.notifyBody": "Hedefte aynı adlı bir öğe var. Seçim için GeniusFiles'ı açın.",
+  "ops.transfer.skippedCount": "{count} atlandı",
+  "ops.transfer.overwrittenCount": "{count} değiştirildi",
 } as const;

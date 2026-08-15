@@ -593,6 +593,12 @@ type TransferOptions = {
   mode: "copy" | "move";
   onProgress?: (p: ProgressEvent) => void;
   signal?: OperationSignal;
+  /**
+   * Noms d'éléments (racine de la sélection) que l'utilisateur a
+   * explicitement autorisés à remplacer l'existant. Aucun écrasement
+   * n'a jamais lieu en dehors de cette liste.
+   */
+  overwrite?: Iterable<string>;
 };
 
 /**
@@ -610,6 +616,8 @@ async function copyTreeStreaming(
   ctx: {
     signal?: OperationSignal;
     failed: OperationResult["failed"];
+    /** Fusion avec remplacement des fichiers déjà présents. */
+    overwrite?: boolean;
     onFile: (size: number, name: string) => void;
   },
 ): Promise<void> {
@@ -634,7 +642,11 @@ async function copyTreeStreaming(
         continue;
       }
       try {
-        await p.copyFile({ source: e.path, destination: target, overwrite: false });
+        await p.copyFile({
+          source: e.path,
+          destination: target,
+          overwrite: ctx.overwrite ?? false,
+        });
         ctx.onFile(e.size ?? 0, e.name);
       } catch (err) {
         ctx.failed.push({ name: e.name, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
@@ -663,6 +675,9 @@ async function runTransferEntries(
 ): Promise<OperationResult> {
   const failed: OperationResult["failed"] = [];
   let succeeded = 0;
+  /** Décisions d'écrasement validées par l'utilisateur (jamais implicites). */
+  const overwriteNames = new Set(opts.overwrite ?? []);
+  const mayOverwrite = (name: string) => overwriteNames.has(name);
 
   if (!isAndroidNative()) {
     // Mock — moves and copies at once, ignoring progress detail.
@@ -684,11 +699,13 @@ async function runTransferEntries(
       mockMutate(destination, (dstNode) => {
         if (!dstNode.children) dstNode.children = [];
         for (const n of cloned) {
-          if (dstNode.children.some((c) => c.name === n.name)) {
+          const existing = dstNode.children.findIndex((c) => c.name === n.name);
+          if (existing >= 0 && !mayOverwrite(n.name)) {
             failed.push({ name: n.name, reason: t("ops.error.alreadyExists") });
             continue;
           }
-          dstNode.children.push(n);
+          if (existing >= 0) dstNode.children[existing] = n;
+          else dstNode.children.push(n);
           succeeded++;
         }
         return null;
@@ -886,16 +903,18 @@ async function runTransferEntries(
     // atomique — instantané même pour un dossier énorme.
     if (opts.mode === "move") {
       let renamed = false;
+      const replace = mayOverwrite(plan.entry.name);
       try {
-        await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: false });
+        await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: replace });
         renamed = true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        if (/EXISTS/i.test(msg)) {
+        if (/EXISTS/i.test(msg) && !replace) {
           failed.push({ name: plan.entry.name, reason: t("ops.error.alreadyExistsAtDestination") });
           continue;
         }
-        // Volumes différents → repli sur copie puis suppression.
+        // Volumes différents, ou dossier existant à fusionner : repli sur
+        // copie (avec remplacement fichier par fichier) puis suppression.
       }
       if (renamed) {
         if (await confirmed()) {
@@ -918,6 +937,7 @@ async function runTransferEntries(
       await copyTreeStreaming(p, srcRoot, dstRoot, {
         signal: opts.signal,
         failed,
+        overwrite: mayOverwrite(plan.entry.name),
         onFile: (size, name) => {
           bytesDone += size;
           completed++;
@@ -942,7 +962,7 @@ async function runTransferEntries(
           await p.copyFile({
             source: file.source,
             destination: joinAbs(dstAbs, rel),
-            overwrite: false,
+            overwrite: mayOverwrite(plan.entry.name),
           });
           bytesDone += file.size;
           completed++;
