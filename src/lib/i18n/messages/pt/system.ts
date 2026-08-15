@@ -244,4 +244,6 @@ export default {
   "system.ai.archiveNameRequired": "Nome do arquivo compactado obrigatório",
   "system.ai.archiveNameMissing": "Nome do arquivo compactado ausente",
   "system.ai.archiveNotFound": "Arquivo compactado não encontrado: {name}",
+  "system.io.writeFailed": "Não foi possível gravar — {reason}",
+  "system.engine.noRequestedStorageAvailable": "Nenhum dos armazenamentos solicitados está disponível: {details}",
 } as const;

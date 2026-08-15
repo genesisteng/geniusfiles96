@@ -264,4 +264,6 @@ export default {
   "system.ai.archiveNameRequired": "Nom d'archive requis",
   "system.ai.archiveNameMissing": "Nom d'archive manquant",
   "system.ai.archiveNotFound": "Archive introuvable : {name}",
+  "system.io.writeFailed": "Écriture impossible — {reason}",
+  "system.engine.noRequestedStorageAvailable": "Aucun des stockages demandés n'est disponible : {details}",
 } as const;

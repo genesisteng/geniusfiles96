@@ -34,4 +34,5 @@ export default {
   "pdf.convert.partial_other": "{ok} dönüştürüldü, {count} başarısız: {details}",
   "pdf.convert.addFiles": "Dosya ekle",
   "pdf.convert.supportedFormats": "Desteklenen biçimler: Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), görseller (JPG/PNG/WEBP), metin (.txt/.md/.csv), PDF.",
+  "pdf.convert.formatUnsupported": "Desteklenmeyen biçim (.{ext})",
 } as const;
