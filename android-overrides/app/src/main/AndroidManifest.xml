@@ -103,6 +103,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
 
+
     <application
         android:name="app.geniusfiles.mobile.GeniusFilesApplication"
         android:allowBackup="true"
