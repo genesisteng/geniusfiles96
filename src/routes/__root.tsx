@@ -332,6 +332,10 @@ function RootComponent() {
         toastOptions={{ className: "gf-toast", unstyled: true }}
       />
 
+      {/* Onboarding officiel : calque affiché uniquement à la première
+          utilisation, au-dessus de l'application et sous le splash. */}
+      <OnboardingOverlay />
+
       <SplashOverlay />
     </QueryClientProvider>
   );
