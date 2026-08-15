@@ -37,7 +37,7 @@ import { EntryActionSheet, type EntryAction } from "@/components/files/EntryActi
 import { ConfirmDialog, NamePrompt } from "@/components/files/BottomSheet";
 import { DetailsSheet } from "@/components/files/DetailsSheet";
 import { ProgressDialog } from "@/components/files/ProgressDialog";
-import { startTransfer, cancelTransfer } from "@/lib/transfers/manager";
+import { startTransfer, cancelTransfer, openTransferDestination } from "@/lib/transfers/manager";
 import { useTransferTask } from "@/lib/transfers/useTransfers";
 import { UniversalViewer, type ViewerAction } from "@/components/viewer/UniversalViewer";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -630,6 +630,12 @@ export function CategoryPage({ kind }: { kind: CategoryKind }) {
           );
           if (s.ok) toast.success(s.message);
           else toast.error(s.message);
+          // Ouverture automatique de la destination : l'utilisateur voit
+          // aussitôt les fichiers arrivés.
+          if (task.succeeded > 0) {
+            openTransferDestination(task);
+            void navigate({ to: "/" });
+          }
         },
       });
       setTransferTaskId(id);
@@ -644,7 +650,7 @@ export function CategoryPage({ kind }: { kind: CategoryKind }) {
       setProgressOpen(true);
       clearSelection();
     },
-    [clearSelection, t],
+    [clearSelection, navigate, t],
   );
 
   /* Copier / Déplacer depuis une catégorie : la destination se choisit
