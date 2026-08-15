@@ -58,9 +58,9 @@ function Illustration({ step, priority }: { step: number; priority: boolean }) {
 
 function Card({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/70 px-3.5 py-2.5">
-      <p className="text-[13px] font-medium leading-tight text-foreground">{title}</p>
-      <p className="mt-0.5 text-[12px] leading-snug text-muted-foreground">{desc}</p>
+    <div className="rounded-2xl border border-border/60 bg-card/70 px-3 py-2">
+      <p className="text-[12.5px] font-medium leading-tight text-foreground">{title}</p>
+      <p className="mt-0.5 text-[11.5px] leading-snug text-muted-foreground">{desc}</p>
     </div>
   );
 }
