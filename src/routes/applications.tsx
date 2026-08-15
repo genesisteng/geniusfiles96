@@ -778,7 +778,7 @@ function AppDetailsSheet({
     const text = t("organize.apps.share.template", {
       name: app.label,
       version: app.versionName,
-      code: app.versionCode,
+      code: String(app.versionCode),
       size: formatSize(app.totalBytes || app.apkSize),
       installed: formatDate(app.firstInstallTime),
       updated: formatDate(app.lastUpdateTime),
