@@ -266,4 +266,5 @@ export default {
   "organize.apps.backupUnavailable": "Yedekleme kullanılamıyor",
   "organize.capturesDEcran": "Ekran görüntüleri",
   "organize.documentsNumerises": "Taranan belgeler",
+  "organize.apps.reco.empty": "Şimdilik öneri yok.",
 } as const;

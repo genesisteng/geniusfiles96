@@ -294,4 +294,5 @@ export default {
   "organize.apps.backupUnavailable": "Non disponibile su questa piattaforma",
   "organize.capturesDEcran": "Screenshot",
   "organize.documentsNumerises": "Documenti scansionati",
+  "organize.apps.reco.empty": "Nessun consiglio per ora.",
 } as const;
