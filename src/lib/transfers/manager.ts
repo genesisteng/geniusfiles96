@@ -364,6 +364,7 @@ async function run(
   groups: TransferGroup[],
   destination: PathRef,
   onDone?: (task: TransferTask) => void,
+  overwrite?: Set<string>,
 ) {
   // Bases cumulées : chaque groupe planifie ses propres totaux, on les
   // additionne pour ne jamais faire reculer la barre de progression.
@@ -381,6 +382,7 @@ async function run(
     const res = await transferEntries(group.parent, group.entries, destination, {
       mode: task.mode,
       signal: task.signal,
+      ...(overwrite && overwrite.size ? { overwrite } : {}),
       onProgress: (p) => {
         lastTotal = p.total;
         lastTotalBytes = p.totalBytes;
@@ -401,6 +403,15 @@ async function run(
     baseBytes += lastBytes;
     task.succeeded += res.succeeded;
     task.failures.push(...res.failed);
+    if (overwrite?.size) {
+      // Un remplacement n'est compté que si l'élément a réellement été
+      // confirmé à destination (les échecs sont exclus).
+      for (const e of group.entries) {
+        if (!overwrite.has(e.name)) continue;
+        if (res.failed.some((f) => f.name === e.name)) continue;
+        task.overwritten++;
+      }
+    }
     if (res.cancelled) break;
   }
 
