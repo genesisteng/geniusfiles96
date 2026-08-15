@@ -12,7 +12,7 @@
  *   n'apparaît qu'une seule fois, avec sa date de dernière utilisation) ;
  * - lecture instantanée : aucune analyse du stockage n'est relancée.
  */
-import { t } from "@/lib/i18n";
+import { t, localeTag } from "@/lib/i18n";
 import type { FileEntry, FileKind, PathRef, StorageRootId } from "@/lib/files/types";
 import { kindOf } from "@/lib/files/format";
 import { subscribeFsPatch } from "@/lib/index/patches";

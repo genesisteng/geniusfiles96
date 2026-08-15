@@ -37,7 +37,7 @@ import type {
   FileSelection,
 } from "./types";
 import type { PathRef } from "@/lib/files/types";
-import { t } from "@/lib/i18n";
+import { t, localeTag } from "@/lib/i18n";
 
 function labels(): Record<ActionKind, string> {
   return Object.fromEntries(getActionCatalog(t).map((c) => [c.kind, c.label])) as Record<

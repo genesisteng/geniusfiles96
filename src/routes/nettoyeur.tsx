@@ -57,7 +57,7 @@ import { checkStoragePermission } from "@/lib/native/storage-permission";
 import { useRoots } from "@/lib/fs/useRoots";
 import { StorageScopePicker, type StorageScope } from "@/components/common/StorageScopePicker";
 import { resolveScope } from "@/components/common/storage-scope";
-import { useT, t as translate } from "@/lib/i18n";
+import { useT, t as translate, formatNumber } from "@/lib/i18n";
 import { BACK_PRIORITY, useBackHandler } from "@/lib/navigation/back-stack";
 
 export const Route = createFileRoute("/nettoyeur")({

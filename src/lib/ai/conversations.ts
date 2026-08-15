@@ -6,7 +6,7 @@
  * automatiquement du premier message utilisateur (nettoyé et tronqué).
  */
 import type { UIMessage } from "ai";
-import { t } from "@/lib/i18n";
+import { t, localeTag } from "@/lib/i18n";
 
 export type Conversation = {
   id: string;
