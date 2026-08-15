@@ -18,6 +18,8 @@ export function isOnboardingDone(): boolean {
   }
 }
 
+const listeners = new Set<() => void>();
+
 /** Marque l'onboarding comme terminé. Idempotent, jamais bloquant. */
 export function markOnboardingDone(): void {
   try {
@@ -25,4 +27,18 @@ export function markOnboardingDone(): void {
   } catch {
     /* stockage indisponible : l'onboarding se ferme quand même */
   }
+  for (const l of Array.from(listeners)) l();
+}
+
+/**
+ * Exécute `cb` dès que l'onboarding est terminé (immédiatement s'il l'est
+ * déjà). Permet de différer toute demande de permission jusqu'à l'accueil.
+ */
+export function whenOnboardingDone(cb: () => void): () => void {
+  if (isOnboardingDone()) {
+    cb();
+    return () => {};
+  }
+  listeners.add(cb);
+  return () => listeners.delete(cb);
 }
