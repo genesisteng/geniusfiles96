@@ -92,6 +92,8 @@ import {
   resetCredential,
   setBiometricEnabled,
   setupVault,
+  clearVaultLockout,
+  getVaultLockout,
   verifyBiometric,
   verifySecret,
 } from "@/lib/vault/auth";
