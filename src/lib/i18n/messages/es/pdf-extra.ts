@@ -33,6 +33,7 @@ export default {
   "pdf.convert.partial_one": "{ok} convertido, {count} con error: {details}",
   "pdf.convert.partial_other": "{ok} convertidos, {count} con errores: {details}",
   "pdf.convert.addFiles": "Añadir archivos",
-  "pdf.convert.supportedFormats": "Formatos admitidos: Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), imágenes (JPG/PNG/WEBP), texto (.txt/.md/.csv), PDF.",
+  "pdf.convert.supportedFormats":
+    "Formatos admitidos: Word (.docx), Excel (.xlsx/.xls), PowerPoint (.pptx), imágenes (JPG/PNG/WEBP), texto (.txt/.md/.csv), PDF.",
   "pdf.convert.formatUnsupported": "Formato no compatible (.{ext})",
 } as const;

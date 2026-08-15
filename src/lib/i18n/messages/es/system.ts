@@ -249,5 +249,6 @@ export default {
   "system.ai.archiveNameMissing": "Falta el nombre del archivo comprimido",
   "system.ai.archiveNotFound": "Archivo comprimido no encontrado: {name}",
   "system.io.writeFailed": "No se puede escribir — {reason}",
-  "system.engine.noRequestedStorageAvailable": "Ninguno de los almacenamientos solicitados está disponible: {details}",
+  "system.engine.noRequestedStorageAvailable":
+    "Ninguno de los almacenamientos solicitados está disponible: {details}",
 } as const;

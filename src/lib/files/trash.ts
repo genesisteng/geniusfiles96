@@ -247,11 +247,10 @@ export async function restoreItems(
     });
     recordOperation({
       kind: "copy",
-      summary:
-        t("ops.trash.restoreSummary", {
-          count: res.restored.length,
-          name: items.find((i) => i.id === res.restored[0].id)?.name ?? "",
-        }),
+      summary: t("ops.trash.restoreSummary", {
+        count: res.restored.length,
+        name: items.find((i) => i.id === res.restored[0].id)?.name ?? "",
+      }),
       names: items.map((i) => i.name),
       succeeded: res.restored.length,
       failed: failed.length,
@@ -312,8 +311,7 @@ export async function restoreItems(
   const restored = removedIds.size;
   recordOperation({
     kind: "copy",
-    summary:
-      t("ops.trash.restoreSummary", { count: restored, name: items[0].name }),
+    summary: t("ops.trash.restoreSummary", { count: restored, name: items[0].name }),
     names: items.map((i) => i.name),
     succeeded: restored,
     failed: failed.length,
@@ -334,11 +332,10 @@ export async function permanentDelete(items: TrashItem[]): Promise<{
       const res = await p.permanentDeleteInTrash({ ids: items.map((i) => i.id) });
       recordOperation({
         kind: "delete",
-        summary:
-          t("ops.trash.permanentDeleteSummary", {
-            count: res.deleted.length,
-            name: items[0].name,
-          }),
+        summary: t("ops.trash.permanentDeleteSummary", {
+          count: res.deleted.length,
+          name: items[0].name,
+        }),
         names: items.map((i) => i.name),
         succeeded: res.deleted.length,
         failed: res.failed.length,
@@ -354,8 +351,7 @@ export async function permanentDelete(items: TrashItem[]): Promise<{
   writeMock(mock.filter((m) => !ids.has(m.id)));
   recordOperation({
     kind: "delete",
-    summary:
-      t("ops.trash.permanentDeleteSummary", { count: items.length, name: items[0].name }),
+    summary: t("ops.trash.permanentDeleteSummary", { count: items.length, name: items[0].name }),
     names: items.map((i) => i.name),
     succeeded: items.length,
     failed: 0,

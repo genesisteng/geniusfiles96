@@ -251,5 +251,6 @@ export default {
   "system.ai.archiveNameMissing": "Archivname fehlt",
   "system.ai.archiveNotFound": "Archiv nicht gefunden: {name}",
   "system.io.writeFailed": "Schreiben nicht möglich — {reason}",
-  "system.engine.noRequestedStorageAvailable": "Keiner der angeforderten Speicher ist verfügbar: {details}",
+  "system.engine.noRequestedStorageAvailable":
+    "Keiner der angeforderten Speicher ist verfügbar: {details}",
 } as const;

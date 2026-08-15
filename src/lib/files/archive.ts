@@ -421,9 +421,9 @@ export async function createArchive(opts: CreateOptions): Promise<CreateResult> 
   recordOperation({
     kind: "archive.create",
     summary: t("ops.archive.createSummary", {
-          name: finalName,
-          count: opts.entries.length,
-        }),
+      name: finalName,
+      count: opts.entries.length,
+    }),
     source: opts.parent,
     destination: opts.destination,
     names: [finalName],

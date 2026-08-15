@@ -218,5 +218,6 @@ export default {
   "system.ai.archiveNameMissing": "Arşiv adı eksik",
   "system.ai.archiveNotFound": "Arşiv bulunamadı: {name}",
   "system.io.writeFailed": "Yazma başarısız — {reason}",
-  "system.engine.noRequestedStorageAvailable": "İstenen depolama alanlarının hiçbiri kullanılamıyor: {details}",
+  "system.engine.noRequestedStorageAvailable":
+    "İstenen depolama alanlarının hiçbiri kullanılamıyor: {details}",
 } as const;

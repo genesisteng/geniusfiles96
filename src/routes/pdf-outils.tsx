@@ -4053,9 +4053,7 @@ function FilesToPdfSheet({ onClose }: { onClose: () => void }) {
           >
             <FilePlus2 className="mx-auto mb-1 h-5 w-5" /> {t("pdf.convert.addFiles")}
           </button>
-          <p className="text-[11px] text-muted-foreground">
-            {t("pdf.convert.supportedFormats")}
-          </p>
+          <p className="text-[11px] text-muted-foreground">{t("pdf.convert.supportedFormats")}</p>
           {sources.length > 0 ? (
             <ul className="space-y-1">
               {sources.map((s, i) => (
