@@ -204,16 +204,61 @@ export function startTransfer(input: StartTransferInput): string {
   tasks.set(id, task);
   publish();
 
+  void begin(task, groups, destination, input.onDone);
+  return id;
+}
+
+/**
+ * Résolution des conflits PUIS exécution.
+ *
+ * La détection est groupée et ne coûte rien lorsqu'aucun doublon
+ * n'existe : dans ce cas l'opération démarre exactement comme avant.
+ */
+async function begin(
+  task: Internal,
+  groups: TransferGroup[],
+  destination: PathRef,
+  onDone?: (task: TransferTask) => void,
+) {
+  const resolution = await resolveTransferConflicts({
+    mode: task.mode,
+    groups,
+    destination,
+    destLabel: task.destLabel,
+  });
+  if (task.signal.cancelled) return;
+
+  task.skipped = resolution.skipped;
+  const plannedGroups = resolution.groups;
+  const remaining = plannedGroups.flatMap((g) => g.entries);
+  task.total = remaining.length;
+
+  if (resolution.cancelled || remaining.length === 0) {
+    task.status = resolution.cancelled ? "cancelled" : "done";
+    task.endedAt = Date.now();
+    task.speedBps = 0;
+    task.etaMs = 0;
+    task.message = summaryMessage(task);
+    publish();
+    notifyEnd(task);
+    onDone?.(getTask(task.id) ?? task);
+    if (task.status === "done") setTimeout(() => dismissTransfer(task.id), 15_000);
+    return;
+  }
+
+  const overwrite = resolution.overwrite;
   // Chemin privilégié : moteur natif (service Android). Aucun octet n'est
   // copié par la WebView, la tâche survit à la fermeture de l'application.
-  if (isNativeTransferAvailable()) {
+  // Un remplacement décidé par l'utilisateur passe par le moteur JS, seul
+  // à garantir l'écrasement puis sa vérification réelle.
+  if (overwrite.size === 0 && isNativeTransferAvailable()) {
     task.native = true;
-    const sources = groups.flatMap((g) =>
+    const sources = plannedGroups.flatMap((g) =>
       g.entries.map((e) => `${toAbsolutePath(g.parent)}/${e.name}`),
     );
     ensureNativeBridge();
     void startNativeTask({
-      id,
+      id: task.id,
       mode,
       sources,
       destination: toAbsolutePath(destination),
@@ -222,14 +267,13 @@ export function startTransfer(input: StartTransferInput): string {
       // Le natif a refusé (ancien build) : bascule transparente sur le JS.
       if (!ok) {
         task.native = false;
-        void run(task, groups, destination, input.onDone);
+        void run(task, plannedGroups, destination, onDone, overwrite);
       }
     });
-    return id;
+    return;
   }
 
-  void run(task, groups, destination, input.onDone);
-  return id;
+  void run(task, plannedGroups, destination, onDone, overwrite);
 }
 
 /* ---------- moteur natif : synchronisation ---------- */
