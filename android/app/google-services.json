@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "863072292413",
+    "project_id": "geniusfilesapp",
+    "storage_bucket": "geniusfilesapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863072292413:android:b4d1f2b93f88b4ed04a454",
+        "android_client_info": {
+          "package_name": "app.geniusfiles.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALmJsA7lHkoOvl6S6-e8jYd3a_h0GeXNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
