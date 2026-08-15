@@ -13,6 +13,7 @@ import { listRoots } from "@/lib/files/fs";
 import { scanCleanup } from "@/lib/cleaner/scanner";
 import type { FileEntry, PathRef } from "@/lib/files/types";
 import type { CleanScanResult } from "@/lib/cleaner/types";
+import { checkUntrustedPath } from "@/lib/security/paths";
 
 /** Sous-dossier cible d'un fichier selon la règle de rangement. */
 export function organizeBucket(entry: FileEntry, rule: "type" | "date" | "name"): string {
