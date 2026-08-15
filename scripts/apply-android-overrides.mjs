@@ -97,7 +97,6 @@ if (existsSync(rootGradlePath)) {
   }
 }
 
-
 // Patch app/build.gradle: stable debug signing + versionCode/versionName from env.
 const gradlePath = join(ANDROID, "app", "build.gradle");
 if (existsSync(gradlePath)) {
@@ -217,7 +216,6 @@ if (hasFirebase) {
 } else {
   console.log("→ No google-services.json — Firebase integration skipped.");
 }
-
 
 const manifestPath = join(ANDROID, "app", "src", "main", "AndroidManifest.xml");
 const manifest = await readFile(manifestPath, "utf8");
