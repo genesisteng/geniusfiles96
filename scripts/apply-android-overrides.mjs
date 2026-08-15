@@ -70,6 +70,8 @@ if (existsSync(overridesKotlin)) {
 // so the generated Gradle files must be patched before the APK/AAB build.
 // Without this, the APK installs but the WebView cannot call GeniusFilesNative.
 const rootGradlePath = join(ANDROID, "build.gradle");
+const googleServicesJson = join(ANDROID, "app", "google-services.json");
+const hasFirebase = existsSync(googleServicesJson);
 if (existsSync(rootGradlePath)) {
   let rootGradle = await readFile(rootGradlePath, "utf8");
   if (!rootGradle.includes("org.jetbrains.kotlin:kotlin-gradle-plugin")) {
@@ -79,6 +81,19 @@ if (existsSync(rootGradlePath)) {
     );
     await writeFile(rootGradlePath, rootGradle, "utf8");
     console.log("✓ Kotlin Gradle plugin enabled in android/build.gradle.");
+  }
+  // Firebase : le projet généré utilise la syntaxe `buildscript`, donc le
+  // plug-in Google Services s'ajoute en classpath (équivalent du bloc
+  // `plugins { id("com.google.gms.google-services") }` de la doc Firebase).
+  // Appliqué uniquement si google-services.json est présent, pour que le
+  // build reste vert sans configuration Firebase.
+  if (hasFirebase && !rootGradle.includes("com.google.gms:google-services")) {
+    rootGradle = rootGradle.replace(
+      /classpath 'com\.android\.tools\.build:gradle:[^']+'\n/,
+      (m) => `${m}        classpath 'com.google.gms:google-services:4.4.2'\n`,
+    );
+    await writeFile(rootGradlePath, rootGradle, "utf8");
+    console.log("✓ Google Services Gradle plugin enabled in android/build.gradle.");
   }
 }
 
@@ -167,8 +182,39 @@ if (existsSync(gradlePath)) {
     console.log("✓ androidx.biometric dependency added to app/build.gradle.");
   }
 
+  // Firebase : BoM + Analytics (aucune collecte personnalisée, aucun
+  // évènement applicatif envoyé par le code GeniusFiles).
+  if (hasFirebase && !gradle.includes("com.google.firebase:firebase-bom")) {
+    gradle = gradle.replace(
+      /dependencies\s*\{/,
+      (m) =>
+        `${m}\n    implementation platform("com.google.firebase:firebase-bom:34.1.0")\n    implementation "com.google.firebase:firebase-analytics"\n`,
+    );
+    console.log("✓ Firebase BoM + Analytics added to app/build.gradle.");
+  }
+  if (hasFirebase && !gradle.includes("com.google.gms.google-services")) {
+    // Le plug-in s'applique en fin de fichier, comme recommandé par Google
+    // pour la syntaxe `apply plugin:`.
+    gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.gms.google-services'\n`;
+    console.log("✓ google-services plugin applied in app/build.gradle.");
+  }
+
   await writeFile(gradlePath, gradle, "utf8");
   console.log(`✓ build.gradle patched (versionCode=${versionCode}, versionName=${versionName}).`);
+}
+
+if (hasFirebase) {
+  const gs = JSON.parse(await readFile(googleServicesJson, "utf8"));
+  const pkgs = (gs.client ?? []).map((c) => c?.client_info?.android_client_info?.package_name);
+  if (!pkgs.includes(ANDROID_PACKAGE_NAME)) {
+    console.error(
+      `✗ google-services.json does not declare ${ANDROID_PACKAGE_NAME} (found: ${pkgs.join(", ") || "none"}).`,
+    );
+    process.exit(1);
+  }
+  console.log(`✓ Firebase config recognized for ${ANDROID_PACKAGE_NAME}.`);
+} else {
+  console.log("→ No google-services.json — Firebase integration skipped.");
 }
 
 const manifestPath = join(ANDROID, "app", "src", "main", "AndroidManifest.xml");
