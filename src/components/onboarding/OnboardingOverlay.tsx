@@ -152,25 +152,45 @@ function StepBody({ step }: { step: number }) {
 
 function Slide({ step, active, reduced }: { step: number; active: boolean; reduced: boolean }) {
   const t = useT();
+  // Les écrans riches en texte laissent moins de place à l'illustration :
+  // elle est simplement affichée plus petite (`object-contain`), jamais
+  // recadrée ni déformée, afin que rien ne soit poussé hors de l'écran.
+  const dense = step >= 3;
   return (
     <section
       className="flex h-full w-full shrink-0 snap-center snap-always flex-col overflow-y-auto px-6 pb-2 pt-14"
       aria-roledescription="slide"
       aria-label={t("onboarding.progress", { current: step, total: TOTAL })}
     >
-      <div className="flex min-h-[34vh] flex-1 items-center justify-center py-2">
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 items-center justify-center py-2",
+          dense ? "max-h-[26vh] basis-[26vh]" : "max-h-[42vh] basis-[42vh]",
+        )}
+      >
         <Illustration step={step} priority={step <= 2} />
       </div>
       <div
         className={cn(
-          "shrink-0 space-y-2.5 pb-2 text-center",
+          "shrink-0 pb-2 text-center",
+          dense ? "space-y-2" : "space-y-2.5",
           !reduced && active && "animate-fade-in",
         )}
       >
-        <h2 className="text-balance text-[22px] font-semibold leading-tight text-foreground">
+        <h2
+          className={cn(
+            "text-balance font-semibold leading-tight text-foreground",
+            dense ? "text-[20px]" : "text-[22px]",
+          )}
+        >
           {t(`onboarding.s${step}.title`)}
         </h2>
-        <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
+        <p
+          className={cn(
+            "text-pretty text-muted-foreground",
+            dense ? "text-[13px] leading-snug" : "text-sm leading-relaxed",
+          )}
+        >
           {t(`onboarding.s${step}.desc`)}
         </p>
         <StepBody step={step} />
