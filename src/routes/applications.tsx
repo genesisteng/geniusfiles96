@@ -309,10 +309,10 @@ function AppsPage() {
       <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
         <div className="flex min-w-0 gap-1.5 overflow-x-auto scrollbar-hidden">
           <Chip active={filter === "user"} onClick={() => setFilter("user")}>
-            <User className="h-4 w-4" /> Utilisateur
+            <User className="h-4 w-4" /> {t("organize.apps.filter.user")}
           </Chip>
           <Chip active={filter === "system"} onClick={() => setFilter("system")}>
-            <Cpu className="h-4 w-4" /> Système
+            <Cpu className="h-4 w-4" /> {t("organize.apps.filter.system")}
           </Chip>
           <Chip active={filter === "all"} onClick={() => setFilter("all")}>
             {t("organize.apps.filter.all")}
