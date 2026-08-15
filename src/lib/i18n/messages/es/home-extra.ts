@@ -24,16 +24,4 @@ export default {
     "Hay {size} en la papelera ({count} elemento). Vacíala para recuperar este espacio de inmediato.",
   "home.rec.trashLarge.description_other":
     "Hay {size} en la papelera ({count} elementos). Vacíala para recuperar este espacio de inmediato.",
-  "home.analysis.title": "Análisis inteligente",
-  "home.analysis.analyzingNamed": "Analizando “{name}”… ({count} restantes)",
-  "home.analysis.analyzingQueue": "Analizando {count} pendientes…",
-  "home.analysis.done": "{count} analizados",
-  "home.analysis.pause": "Pausar",
-  "home.analysis.clear": "Borrar",
-  "home.analysis.running": "{count} en curso",
-  "home.analysis.queued": "{count} en cola",
-  "home.analysis.analyzed": "{count} analizados",
-  "home.analysis.skipped": "{count} ya conocidos",
-  "home.analysis.failed": "{count} fallidos",
-  "home.analysis.paused": "En pausa",
 } as const;

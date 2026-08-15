@@ -115,22 +115,6 @@ export default {
   "assistant.diag.internal":
     "L'elaborazione è stata interrotta prima della risposta finale. I passaggi completati sono mantenuti: riprova per continuare.",
 
-  "assistant.analysis.title": "Analisi intelligente",
-  "assistant.analysis.resumeAria": "Riprendi",
-  "assistant.analysis.pauseAria": "Pausa",
-  "assistant.analysis.clear": "Cancella",
-  "assistant.analysis.progressNamed_one": "Analisi di “{name}”… ({count} rimanente)",
-  "assistant.analysis.progressNamed_other": "Analisi di “{name}”… ({count} rimanenti)",
-  "assistant.analysis.queued": "Analisi di {files} in coda…",
-  "assistant.analysis.done_one": "{count} file analizzato",
-  "assistant.analysis.done_other": "{count} file analizzati",
-  "assistant.analysis.statRunning": "{count} in corso",
-  "assistant.analysis.statQueued": "{count} in coda",
-  "assistant.analysis.statDone": "{count} analizzati",
-  "assistant.analysis.statSkipped": "{count} già noti",
-  "assistant.analysis.statFailed": "{count} falliti",
-  "assistant.analysis.statPaused": "In pausa",
-
   // Ajouts génération automatique (i18n complet)
   "assistant.executeReellementUneCommandeSurLe":
     "Esegue REALMENTE un comando sul motore locale dei file di GeniusFiles (API Android reali, file reali). È l'unico canale consentito per agire sulla memoria: elencare, cercare, analizzare, leggere proprietà, creare una cartella, rinominare, spostare, copiare, eliminare, riordinare, comprimere, estrarre, condividere, ordinare, filtrare. Chiama questo strumento immediatamente non appena viene impartito un ordine, senza chiedere conferma — tranne per l'eliminazione permanente o la sovrascrittura di dati. Non inventare MAI un risultato: solo l'output di questo strumento riflette lo stato reale della memoria.",

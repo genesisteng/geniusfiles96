@@ -121,25 +121,6 @@ export default {
     "Berechtigungsbildschirm konnte nicht geöffnet werden. Öffne die GeniusFiles-Einstellungen, um den Dateizugriff zu aktivieren.",
   "system.storageAccess.enableInAndroid":
     "Aktiviere den Zugriff auf dem Android-Bildschirm und kehre dann zu GeniusFiles zurück.",
-  "system.analysisProgress.title": "Intelligente Analyse",
-  "system.analysisProgress.currentLabel_one":
-    "„{label}“ wird analysiert… ({count} Datei verbleibend)",
-  "system.analysisProgress.currentLabel_other":
-    "„{label}“ wird analysiert… ({count} Dateien verbleibend)",
-  "system.analysisProgress.pending_one": "{count} ausstehende Datei wird analysiert…",
-  "system.analysisProgress.pending_other": "{count} ausstehende Dateien werden analysiert…",
-  "system.analysisProgress.done_one": "{count} Datei analysiert",
-  "system.analysisProgress.done_other": "{count} Dateien analysiert",
-  "system.analysisProgress.resume.aria": "Fortsetzen",
-  "system.analysisProgress.pause.aria": "Pausieren",
-  "system.analysisProgress.cancel.aria": "Abbrechen",
-  "system.analysisProgress.clear": "Löschen",
-  "system.analysisProgress.running": "läuft",
-  "system.analysisProgress.queued": "in Warteschlange",
-  "system.analysisProgress.analyzed": "analysiert",
-  "system.analysisProgress.alreadyKnown": "bereits bekannt",
-  "system.analysisProgress.failed": "fehlgeschlagen",
-  "system.analysisProgress.paused": "Pausiert",
   "system.accesRefuseParAndroidAutorisezAcces":
     "Zugriff von Android verweigert. Erlaube „Zugriff auf alle Dateien“ in den App-Einstellungen.",
   "system.apercuDeLEspaceUtiliseDisponible":

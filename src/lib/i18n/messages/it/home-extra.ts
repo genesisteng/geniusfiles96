@@ -24,16 +24,4 @@ export default {
     "{size} sono conservati nel Cestino ({count} elemento). Svuotalo per recuperare subito questo spazio.",
   "home.rec.trashLarge.description_other":
     "{size} sono conservati nel Cestino ({count} elementi). Svuotalo per recuperare subito questo spazio.",
-  "home.analysis.title": "Analisi intelligente",
-  "home.analysis.analyzingNamed": "Analisi di “{name}”… ({count} rimanenti)",
-  "home.analysis.analyzingQueue": "Analisi di {count} in attesa…",
-  "home.analysis.done": "{count} analizzati",
-  "home.analysis.pause": "Pausa",
-  "home.analysis.clear": "Cancella",
-  "home.analysis.running": "{count} in corso",
-  "home.analysis.queued": "{count} in coda",
-  "home.analysis.analyzed": "{count} analizzati",
-  "home.analysis.skipped": "{count} già noti",
-  "home.analysis.failed": "{count} falliti",
-  "home.analysis.paused": "In pausa",
 } as const;

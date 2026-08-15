@@ -119,22 +119,6 @@ export default {
   "assistant.diag.internal":
     "Le traitement a été interrompu avant la réponse finale. Les étapes déjà effectuées sont conservées — relancez pour reprendre.",
 
-  "assistant.analysis.title": "Analyse intelligente",
-  "assistant.analysis.resumeAria": "Reprendre",
-  "assistant.analysis.pauseAria": "Suspendre",
-  "assistant.analysis.clear": "Effacer",
-  "assistant.analysis.progressNamed_one": "Analyse de « {name} »… ({count} restant)",
-  "assistant.analysis.progressNamed_other": "Analyse de « {name} »… ({count} restants)",
-  "assistant.analysis.queued": "Analyse de {files} en attente…",
-  "assistant.analysis.done_one": "{count} fichier analysé",
-  "assistant.analysis.done_other": "{count} fichiers analysés",
-  "assistant.analysis.statRunning": "{count} en cours",
-  "assistant.analysis.statQueued": "{count} en attente",
-  "assistant.analysis.statDone": "{count} analysés",
-  "assistant.analysis.statSkipped": "{count} déjà connus",
-  "assistant.analysis.statFailed": "{count} en échec",
-  "assistant.analysis.statPaused": "Suspendu",
-
   // Ajouts génération automatique (i18n complet)
   "assistant.executeReellementUneCommandeSurLe":
     "Exécute RÉELLEMENT une commande sur le moteur de fichiers local de GeniusFiles (vraies API Android, vrais fichiers). Seul canal autorisé pour agir sur le stockage : lister, rechercher, analyser, lire les propriétés, créer un dossier, renommer, déplacer, copier, supprimer, ranger, compresser, extraire, partager, trier, filtrer. Appelle cet outil immédiatement dès qu'un ordre est donné, sans demander confirmation — sauf suppression définitive ou écrasement de données. N'invente JAMAIS un résultat : seule la sortie de cet outil reflète l'état réel du stockage.",

@@ -24,16 +24,4 @@ export default {
     "{size} estão na Lixeira ({count} item). Esvazie-a para recuperar esse espaço imediatamente.",
   "home.rec.trashLarge.description_other":
     "{size} estão na Lixeira ({count} itens). Esvazie-a para recuperar esse espaço imediatamente.",
-  "home.analysis.title": "Análise inteligente",
-  "home.analysis.analyzingNamed": "Analisando “{name}”… ({count} restantes)",
-  "home.analysis.analyzingQueue": "Analisando {count} pendentes…",
-  "home.analysis.done": "{count} analisados",
-  "home.analysis.pause": "Pausar",
-  "home.analysis.clear": "Limpar",
-  "home.analysis.running": "{count} em execução",
-  "home.analysis.queued": "{count} na fila",
-  "home.analysis.analyzed": "{count} analisados",
-  "home.analysis.skipped": "{count} já conhecidos",
-  "home.analysis.failed": "{count} falharam",
-  "home.analysis.paused": "Pausado",
 } as const;

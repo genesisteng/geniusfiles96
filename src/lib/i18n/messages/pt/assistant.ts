@@ -116,22 +116,6 @@ export default {
   "assistant.diag.internal":
     "O processamento foi interrompido antes da resposta final. As etapas concluídas são mantidas — tente novamente para retomar.",
 
-  "assistant.analysis.title": "Análise inteligente",
-  "assistant.analysis.resumeAria": "Retomar",
-  "assistant.analysis.pauseAria": "Pausar",
-  "assistant.analysis.clear": "Limpar",
-  "assistant.analysis.progressNamed_one": "A analisar “{name}”… ({count} restante)",
-  "assistant.analysis.progressNamed_other": "A analisar “{name}”… ({count} restantes)",
-  "assistant.analysis.queued": "A analisar {files} na fila…",
-  "assistant.analysis.done_one": "{count} ficheiro analisado",
-  "assistant.analysis.done_other": "{count} ficheiros analisados",
-  "assistant.analysis.statRunning": "{count} em curso",
-  "assistant.analysis.statQueued": "{count} em fila",
-  "assistant.analysis.statDone": "{count} analisados",
-  "assistant.analysis.statSkipped": "{count} já conhecidos",
-  "assistant.analysis.statFailed": "{count} falharam",
-  "assistant.analysis.statPaused": "Em pausa",
-
   // Ajouts génération automatique (i18n complet)
   "assistant.executeReellementUneCommandeSurLe":
     "Executa REALMENTE um comando no motor de ficheiros local do GeniusFiles (APIs Android reais, ficheiros reais). Este é o único canal permitido para agir sobre o armazenamento: listar, pesquisar, analisar, ler propriedades, criar uma pasta, renomear, mover, copiar, eliminar, organizar, comprimir, extrair, partilhar, ordenar, filtrar. Chame esta ferramenta imediatamente assim que uma ordem é dada, sem pedir confirmação — exceto para eliminação permanente ou substituição de dados. NUNCA invente um resultado: apenas o resultado desta ferramenta reflete o estado real do armazenamento.",

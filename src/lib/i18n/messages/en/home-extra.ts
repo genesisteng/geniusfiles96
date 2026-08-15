@@ -24,16 +24,4 @@ export default {
     "{size} are kept in Trash ({count} item). Empty it to reclaim this space immediately.",
   "home.rec.trashLarge.description_other":
     "{size} are kept in Trash ({count} items). Empty it to reclaim this space immediately.",
-  "home.analysis.title": "Smart analysis",
-  "home.analysis.analyzingNamed": "Analyzing “{name}”… ({count} remaining)",
-  "home.analysis.analyzingQueue": "Analyzing {count} pending…",
-  "home.analysis.done": "{count} analyzed",
-  "home.analysis.pause": "Pause",
-  "home.analysis.clear": "Clear",
-  "home.analysis.running": "{count} running",
-  "home.analysis.queued": "{count} queued",
-  "home.analysis.analyzed": "{count} analyzed",
-  "home.analysis.skipped": "{count} already known",
-  "home.analysis.failed": "{count} failed",
-  "home.analysis.paused": "Paused",
 } as const;

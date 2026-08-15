@@ -24,16 +24,4 @@ export default {
     "{size} sont conservés dans la Corbeille ({count} élément). Videz-la pour récupérer immédiatement cet espace.",
   "home.rec.trashLarge.description_other":
     "{size} sont conservés dans la Corbeille ({count} éléments). Videz-la pour récupérer immédiatement cet espace.",
-  "home.analysis.title": "Analyse intelligente",
-  "home.analysis.analyzingNamed": "Analyse de « {name} »… ({count} restant)",
-  "home.analysis.analyzingQueue": "Analyse de {count} en attente…",
-  "home.analysis.done": "{count} analysé",
-  "home.analysis.pause": "Suspendre",
-  "home.analysis.clear": "Effacer",
-  "home.analysis.running": "{count} en cours",
-  "home.analysis.queued": "{count} en attente",
-  "home.analysis.analyzed": "{count} analysés",
-  "home.analysis.skipped": "{count} déjà connus",
-  "home.analysis.failed": "{count} en échec",
-  "home.analysis.paused": "Suspendu",
 } as const;

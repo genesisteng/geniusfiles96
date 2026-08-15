@@ -112,22 +112,6 @@ export default {
   "assistant.diag.internal":
     "Processing was interrupted before the final response. Completed steps are kept — try again to resume.",
 
-  "assistant.analysis.title": "Smart analysis",
-  "assistant.analysis.resumeAria": "Resume",
-  "assistant.analysis.pauseAria": "Pause",
-  "assistant.analysis.clear": "Clear",
-  "assistant.analysis.progressNamed_one": "Analyzing “{name}”… ({count} remaining)",
-  "assistant.analysis.progressNamed_other": "Analyzing “{name}”… ({count} remaining)",
-  "assistant.analysis.queued": "Analyzing {files} in queue…",
-  "assistant.analysis.done_one": "{count} file analyzed",
-  "assistant.analysis.done_other": "{count} files analyzed",
-  "assistant.analysis.statRunning": "{count} running",
-  "assistant.analysis.statQueued": "{count} queued",
-  "assistant.analysis.statDone": "{count} analyzed",
-  "assistant.analysis.statSkipped": "{count} already known",
-  "assistant.analysis.statFailed": "{count} failed",
-  "assistant.analysis.statPaused": "Paused",
-
   // Ajouts génération automatique (i18n complet)
   "assistant.executeReellementUneCommandeSurLe":
     "ACTUALLY runs a command on GeniusFiles' local file engine (real Android APIs, real files). This is the only allowed channel to act on storage: list, search, analyse, read properties, create a folder, rename, move, copy, delete, tidy, compress, extract, share, sort, filter. Call this tool immediately as soon as an order is given, without asking for confirmation — except for permanent deletion or overwriting data. NEVER invent a result: only this tool's output reflects the real state of storage.",
