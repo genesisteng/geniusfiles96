@@ -710,9 +710,26 @@ async function runTransferEntries(
 ): Promise<OperationResult> {
   const failed: OperationResult["failed"] = [];
   let succeeded = 0;
+  let skipped = 0;
+  let userCancelled = false;
   /** Décisions d'écrasement validées par l'utilisateur (jamais implicites). */
   const overwriteNames = new Set(opts.overwrite ?? []);
   const mayOverwrite = (name: string) => overwriteNames.has(name);
+  /** Une seule question par élément racine, quel que soit le nombre de fichiers. */
+  const decided = new Map<string, "overwrite" | "skip" | "cancel">();
+  const askConflict = async (item: {
+    name: string;
+    isDirectory: boolean;
+  }): Promise<"overwrite" | "skip" | "cancel" | "none"> => {
+    if (!opts.onConflict) return "none";
+    const known = decided.get(item.name);
+    if (known) return known;
+    const choice = await opts.onConflict(item);
+    decided.set(item.name, choice);
+    if (choice === "overwrite") overwriteNames.add(item.name);
+    if (choice === "cancel") userCancelled = true;
+    return choice;
+  };
 
   if (!isAndroidNative()) {
     // Mock — moves and copies at once, ignoring progress detail.
@@ -725,6 +742,23 @@ async function runTransferEntries(
         cancelled: false,
       };
     }
+    // Conflit tardif (élément apparu depuis la détection groupée) :
+    // l'utilisateur décide avant toute écriture.
+    const existingNames = new Set((mockResolve(destination)?.children ?? []).map((c) => c.name));
+    const skippedNames = new Set<string>();
+    for (const e of entries) {
+      if (!existingNames.has(e.name) || mayOverwrite(e.name)) continue;
+      const choice = await askConflict(e);
+      if (choice === "cancel")
+        return { ok: false, succeeded: 0, failed: [], cancelled: true, skipped };
+      if (choice === "skip") {
+        skippedNames.add(e.name);
+        skipped++;
+      }
+    }
+    if (skippedNames.size) entries = entries.filter((e) => !skippedNames.has(e.name));
+    if (entries.length === 0)
+      return { ok: true, succeeded: 0, failed: [], cancelled: false, skipped };
     mockMutate(source, (srcNode) => {
       if (!srcNode.children) return null;
       const names = new Set(entries.map((e) => e.name));
