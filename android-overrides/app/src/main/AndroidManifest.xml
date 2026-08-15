@@ -13,7 +13,10 @@
     - READ/WRITE_EXTERNAL_STORAGE : legacy storage compat (Android ≤ 10).
     - FOREGROUND_SERVICE / POST_NOTIFICATIONS : long-running copy/move ops.
     - INTERNET / ACCESS_NETWORK_STATE : assistant IA.
-    - CAMERA : numérisation de documents.
+    Audit H13 : aucune autorisation CAMERA n'est déclarée. Le scanner de
+    documents passe par un `<input capture="environment">` du WebView, qui
+    délègue la prise de vue à l'appareil photo du système ; déclarer CAMERA
+    sans la demander à l'exécution ferait au contraire échouer la capture.
 
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
