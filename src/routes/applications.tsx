@@ -775,12 +775,14 @@ function AppDetailsSheet({
   };
 
   const handleShare = async () => {
-    const text =
-      `${app.label}\n` +
-      `Version : ${app.versionName} (${app.versionCode})\n` +
-      `Taille : ${formatSize(app.totalBytes || app.apkSize)}\n` +
-      `Installée le : ${formatDate(app.firstInstallTime)}\n` +
-      `Mise à jour le : ${formatDate(app.lastUpdateTime)}`;
+    const text = t("organize.apps.share.template", {
+      name: app.label,
+      version: app.versionName,
+      code: app.versionCode,
+      size: formatSize(app.totalBytes || app.apkSize),
+      installed: formatDate(app.firstInstallTime),
+      updated: formatDate(app.lastUpdateTime),
+    });
     const ok = await shareAppInfo(text);
     if (!ok)
       toast.error(t("organize.apps.toast.shareFailed.title"), {
