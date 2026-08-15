@@ -24,11 +24,7 @@ import { beginJob, finishJob, updateJob } from "@/lib/jobs/journal";
 import { dispatchFsPatch } from "@/lib/index/patches";
 import { chunks, runQueued, tick } from "./op-queue";
 import { namesStillPresent, nameExists } from "./verify";
-import {
-  checkEntryName,
-  checkOperationPath,
-  checkOperationTarget,
-} from "@/lib/security/paths";
+import { checkEntryName, checkOperationPath, checkOperationTarget } from "@/lib/security/paths";
 import { t } from "@/lib/i18n";
 
 function dispatchStorageChanged() {
@@ -1212,9 +1208,7 @@ export async function shareEntries(
   if (!parentGuard.ok) return { ok: false, error: parentGuard.reason };
   // Un partage ne transmet que des fichiers réellement ciblés, jamais un
   // dossier entier ni une entrée dont le nom sort de l'emplacement.
-  const files = entries.filter(
-    (e) => !e.isDirectory && checkOperationTarget(parent, e.name).ok,
-  );
+  const files = entries.filter((e) => !e.isDirectory && checkOperationTarget(parent, e.name).ok);
   if (files.length === 0)
     return {
       ok: false,

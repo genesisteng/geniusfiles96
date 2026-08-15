@@ -25,7 +25,14 @@ import { t } from "@/lib/i18n";
 /** Dossier physique du coffre-fort (masqué par un point). */
 export const VAULT_DIR_NAME = ".GeniusFilesVault";
 
-const CONTROL_CHARS = /[\u0000-\u001f\u007f]/;
+/** Vrai si la chaîne contient un caractère de contrôle (invisible). */
+function hasControlChar(value: string): boolean {
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i);
+    if (code < 0x20 || code === 0x7f) return true;
+  }
+  return false;
+}
 const RESERVED_SEGMENTS = new Set(["", ".", ".."]);
 
 /** Répertoires que l'application ne doit jamais modifier ni exposer. */
@@ -42,7 +49,7 @@ export function isSafeSegment(segment: unknown): boolean {
   if (RESERVED_SEGMENTS.has(s)) return false;
   if (s.length > 255) return false;
   if (s.includes("/") || s.includes("\\")) return false;
-  if (CONTROL_CHARS.test(s)) return false;
+  if (hasControlChar(s)) return false;
   return true;
 }
 
@@ -75,12 +82,13 @@ export function isProtectedLocation(absolute: string): boolean {
  * fichier entrant), seulement les chemins malformés ou protégés.
  */
 export function checkOperationPath(path: unknown): PathCheck {
-  if (!path || typeof path !== "object") return { ok: false, reason: t("system.security.invalidPath") };
+  if (!path || typeof path !== "object")
+    return { ok: false, reason: t("system.security.invalidPath") };
   const ref = path as PathRef;
   if (typeof ref.rootId !== "string" || !ref.rootId) {
     return { ok: false, reason: t("system.security.invalidPath") };
   }
-  if (CONTROL_CHARS.test(ref.rootId)) return { ok: false, reason: t("system.security.invalidPath") };
+  if (hasControlChar(ref.rootId)) return { ok: false, reason: t("system.security.invalidPath") };
   const segments = ref.segments;
   if (!Array.isArray(segments)) return { ok: false, reason: t("system.security.invalidPath") };
   for (const segment of segments) {

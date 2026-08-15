@@ -253,5 +253,6 @@ export default {
   "system.security.invalidName": "Nom invalide — opération refusée.",
   "system.security.untrustedRoot": "Stockage non autorisé pour cette opération.",
   "system.security.tooManyItems": "Trop d'éléments pour une seule opération ({count} maximum).",
-  "system.security.vaultProtected": "Les fichiers du coffre-fort ne sont pas accessibles depuis cette fonctionnalité.",
+  "system.security.vaultProtected":
+    "Les fichiers du coffre-fort ne sont pas accessibles depuis cette fonctionnalité.",
 } as const;

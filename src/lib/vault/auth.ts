@@ -343,7 +343,6 @@ export async function verifySecret(secret: string): Promise<boolean> {
   return true;
 }
 
-
 export async function changeSecret(
   currentSecret: string,
   method: VaultAuthMethod,

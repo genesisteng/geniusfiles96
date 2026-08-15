@@ -79,7 +79,6 @@ function bindVisibilityOnce() {
   window.addEventListener("gf:vault-preferences-changed", scheduleAutoLock);
 }
 
-
 export function isVaultUnlocked(): boolean {
   return unlocked;
 }

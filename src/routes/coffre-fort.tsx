@@ -653,7 +653,6 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
     setError(biometricStatusMessage(r.status));
   };
 
-
   return (
     <VaultFullScreen>
       <div className="flex min-h-full flex-col items-center justify-center gap-5 py-6 text-center">
@@ -692,7 +691,10 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
             />
             {error ? <p className="mt-2 text-[12px] text-destructive">{error}</p> : null}
             <div className="mt-3">
-              <PrimaryButton onClick={() => void attempt(secret)} disabled={busy || lockedOut || !secret}>
+              <PrimaryButton
+                onClick={() => void attempt(secret)}
+                disabled={busy || lockedOut || !secret}
+              >
                 {busy ? t("vault.lock.verifying") : t("vault.lock.unlock")}
               </PrimaryButton>
             </div>

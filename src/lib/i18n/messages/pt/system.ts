@@ -235,5 +235,6 @@ export default {
   "system.security.invalidName": "Nome inválido — operação recusada.",
   "system.security.untrustedRoot": "Armazenamento não autorizado para esta operação.",
   "system.security.tooManyItems": "Demasiados itens para uma só operação ({count} no máximo).",
-  "system.security.vaultProtected": "Os ficheiros do cofre não são acessíveis a partir desta funcionalidade.",
+  "system.security.vaultProtected":
+    "Os ficheiros do cofre não são acessíveis a partir desta funcionalidade.",
 } as const;

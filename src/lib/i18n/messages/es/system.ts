@@ -238,5 +238,6 @@ export default {
   "system.security.invalidName": "Nombre no válido: operación rechazada.",
   "system.security.untrustedRoot": "Almacenamiento no permitido para esta operación.",
   "system.security.tooManyItems": "Demasiados elementos para una sola operación ({count} máximo).",
-  "system.security.vaultProtected": "No se puede acceder a los archivos de la caja fuerte desde esta función.",
+  "system.security.vaultProtected":
+    "No se puede acceder a los archivos de la caja fuerte desde esta función.",
 } as const;
