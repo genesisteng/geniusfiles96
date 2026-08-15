@@ -1402,7 +1402,7 @@ export async function filesToPdf(
         results.push({ source: src, output: undefined });
         continue;
       } else {
-        results.push({ source: src, error: `Format non supporté (.${ext})` });
+        results.push({ source: src, error: t("pdf.convert.formatUnsupported", { ext }) });
         continue;
       }
       if (out) {
