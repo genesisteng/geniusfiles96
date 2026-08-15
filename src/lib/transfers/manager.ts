@@ -259,7 +259,7 @@ async function begin(
     ensureNativeBridge();
     void startNativeTask({
       id: task.id,
-      mode,
+      mode: task.mode,
       sources,
       destination: toAbsolutePath(destination),
       title: task.title,
