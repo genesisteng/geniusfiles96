@@ -435,6 +435,9 @@ async function run(
 export function summaryMessage(task: TransferTask): string {
   const verb = task.mode === "copy" ? t("ops.transfer.verbCopied") : t("ops.transfer.verbMoved");
   const parts = [t("ops.transfer.summary", { count: task.succeeded, verb })];
+  if (task.overwritten > 0)
+    parts.push(t("ops.transfer.overwrittenCount", { count: task.overwritten }));
+  if (task.skipped > 0) parts.push(t("ops.transfer.skippedCount", { count: task.skipped }));
   if (task.failures.length)
     parts.push(t("ops.transfer.failuresCount", { count: task.failures.length }));
   if (task.bytes > 0) parts.push(formatSize(task.bytes));
