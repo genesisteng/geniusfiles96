@@ -90,6 +90,8 @@ export type OperationResult = {
   succeeded: number;
   failed: { name: string; reason: string }[];
   cancelled: boolean;
+  /** Éléments volontairement ignorés par l'utilisateur (conflit). */
+  skipped?: number;
 };
 
 export function createSignal(): OperationSignal & { cancel: () => void } {
@@ -599,6 +601,15 @@ type TransferOptions = {
    * n'a jamais lieu en dehors de cette liste.
    */
   overwrite?: Iterable<string>;
+  /**
+   * Conflit détecté en cours d'exécution (élément apparu entre-temps, ou
+   * fusion de dossier). Le moteur suspend l'élément concerné, attend la
+   * décision, puis reprend. Sans ce rappel, le conflit reste une erreur.
+   */
+  onConflict?: (item: {
+    name: string;
+    isDirectory: boolean;
+  }) => Promise<"overwrite" | "skip" | "cancel">;
 };
 
 /**
