@@ -104,9 +104,19 @@
 
 
 
+
+
+    <!--
+      allowBackup="false" (audit H13) : l'index du coffre-fort et son
+      empreinte de déverrouillage vivent dans les données privées de
+      l'application. Autoriser la sauvegarde automatique les copierait hors
+      de l'appareil ; le coffre-fort doit rester strictement local.
+    -->
     <application
         android:name="app.geniusfiles.mobile.GeniusFilesApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
