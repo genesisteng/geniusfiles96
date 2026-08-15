@@ -794,7 +794,9 @@ export function FilesPage() {
               destLabel,
             );
             const extra =
-              task.skipped > 0 ? ` · ${t("ops.transfer.skippedCount", { count: task.skipped })}` : "";
+              task.skipped > 0
+                ? ` · ${t("ops.transfer.skippedCount", { count: task.skipped })}`
+                : "";
             toast.success(summary.title, { description: `${summary.detail}${extra}` });
           } else {
             toast.error(
