@@ -100,7 +100,11 @@ export function checkOperationPath(path: unknown): PathCheck {
   } catch {
     return { ok: false, reason: t("system.security.invalidPath") };
   }
-  if (absolute.includes("..")) return { ok: false, reason: t("system.security.invalidPath") };
+  // Un composant strictement égal à ".." est une évasion ; un nom qui
+  // contient simplement deux points ("notes..v2") reste légitime.
+  if (absolute.split("/").includes("..")) {
+    return { ok: false, reason: t("system.security.invalidPath") };
+  }
   if (isProtectedLocation(absolute)) return { ok: false, reason: t("system.security.blockedPath") };
   return OK;
 }
