@@ -593,6 +593,12 @@ type TransferOptions = {
   mode: "copy" | "move";
   onProgress?: (p: ProgressEvent) => void;
   signal?: OperationSignal;
+  /**
+   * Noms d'éléments (racine de la sélection) que l'utilisateur a
+   * explicitement autorisés à remplacer l'existant. Aucun écrasement
+   * n'a jamais lieu en dehors de cette liste.
+   */
+  overwrite?: Iterable<string>;
 };
 
 /**
@@ -610,6 +616,8 @@ async function copyTreeStreaming(
   ctx: {
     signal?: OperationSignal;
     failed: OperationResult["failed"];
+    /** Fusion avec remplacement des fichiers déjà présents. */
+    overwrite?: boolean;
     onFile: (size: number, name: string) => void;
   },
 ): Promise<void> {
@@ -634,7 +642,7 @@ async function copyTreeStreaming(
         continue;
       }
       try {
-        await p.copyFile({ source: e.path, destination: target, overwrite: false });
+        await p.copyFile({ source: e.path, destination: target, overwrite: ctx.overwrite ?? false });
         ctx.onFile(e.size ?? 0, e.name);
       } catch (err) {
         ctx.failed.push({ name: e.name, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
