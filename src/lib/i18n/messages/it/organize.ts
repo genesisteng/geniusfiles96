@@ -290,7 +290,7 @@ export default {
   "organize.apps.toast.uninstallFailed.desc":
     "Questa app non può essere rimossa da GeniusFiles. Prova dalle impostazioni di Android.",
   "organize.apps.share.template":
-    "{name} Versione: {version} ({code}) Dimensione: {size} Installata il: {installed} Aggiornata il: {updated}",
+    "{name}\nVersione: {version} ({code})\nDimensione: {size}\nInstallata il: {installed}\nAggiornata il: {updated}",
   "organize.apps.backupUnavailable": "Non disponibile su questa piattaforma",
   "organize.capturesDEcran": "Screenshot",
   "organize.documentsNumerises": "Documenti scansionati",

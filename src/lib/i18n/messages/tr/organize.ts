@@ -262,7 +262,7 @@ export default {
   "organize.apps.toast.uninstallFailed.desc":
     "Bu uygulama GeniusFiles üzerinden kaldırılamıyor. Android ayarlarından deneyin.",
   "organize.apps.share.template":
-    "{name} Sürüm: {version} ({code}) Boyut: {size} Yükleme tarihi: {installed} Güncelleme tarihi: {updated}",
+    "{name}\nSürüm: {version} ({code})\nBoyut: {size}\nYükleme tarihi: {installed}\nGüncelleme tarihi: {updated}",
   "organize.apps.backupUnavailable": "Yedekleme kullanılamıyor",
   "organize.capturesDEcran": "Ekran görüntüleri",
   "organize.documentsNumerises": "Taranan belgeler",
