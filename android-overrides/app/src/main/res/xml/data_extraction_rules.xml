@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Audit H13 — aucune donnée GeniusFiles ne quitte l'appareil.
+
+  L'index du coffre-fort, son empreinte de déverrouillage et les préférences
+  vivent dans les données privées de l'application : ni la sauvegarde cloud
+  ni le transfert d'appareil à appareil ne sont autorisés.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

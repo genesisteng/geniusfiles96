@@ -13,7 +13,10 @@
     - READ/WRITE_EXTERNAL_STORAGE : legacy storage compat (Android ≤ 10).
     - FOREGROUND_SERVICE / POST_NOTIFICATIONS : long-running copy/move ops.
     - INTERNET / ACCESS_NETWORK_STATE : assistant IA.
-    - CAMERA : numérisation de documents.
+    Audit H13 : aucune autorisation CAMERA n'est déclarée. Le scanner de
+    documents passe par un `<input capture="environment">` du WebView, qui
+    délègue la prise de vue à l'appareil photo du système ; déclarer CAMERA
+    sans la demander à l'exécution ferait au contraire échouer la capture.
 
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -66,7 +69,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- WAKE_LOCK n'est pas déclarée : aucun PowerManager.WakeLock n'est
+         acquis. Les copies longues et la lecture audio tiennent grâce aux
+         services de premier plan, pas à un verrou de réveil. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Automations: fire notifications at exact times even when the app
@@ -83,8 +88,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Numérisation de documents (scanner PDF) -->
-    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Numérisation de documents (scanner PDF) : la capture est déléguée à
+         l'appareil photo du système via le WebView, aucune autorisation
+         CAMERA n'est donc nécessaire. -->
 
     <!-- Coffre-fort : déverrouillage biométrique (empreinte / visage).
          USE_BIOMETRIC couvre Android 9+, USE_FINGERPRINT reste requis
@@ -97,9 +103,20 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
 
+
+
+
+    <!--
+      allowBackup="false" (audit H13) : l'index du coffre-fort et son
+      empreinte de déverrouillage vivent dans les données privées de
+      l'application. Autoriser la sauvegarde automatique les copierait hors
+      de l'appareil ; le coffre-fort doit rester strictement local.
+    -->
     <application
         android:name="app.geniusfiles.mobile.GeniusFilesApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
