@@ -42,4 +42,3 @@ export function whenOnboardingDone(cb: () => void): () => void {
   listeners.add(cb);
   return () => listeners.delete(cb);
 }
-

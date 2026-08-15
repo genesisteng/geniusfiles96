@@ -82,7 +82,6 @@ export function StorageAccessDialog() {
     };
   }, []);
 
-
   const onAllow = async () => {
     if (busy) return;
     setBusy(true);
