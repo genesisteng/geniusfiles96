@@ -232,4 +232,10 @@ export default {
   "system.io.writeFailed": "Scrittura non riuscita — {reason}",
   "system.engine.noRequestedStorageAvailable":
     "Nessuno degli archivi richiesti è disponibile: {details}",
+  "system.security.blockedPath": "Posizione protetta — operazione rifiutata.",
+  "system.security.invalidPath": "Percorso non valido — operazione rifiutata.",
+  "system.security.invalidName": "Nome non valido — operazione rifiutata.",
+  "system.security.untrustedRoot": "Archiviazione non consentita per questa operazione.",
+  "system.security.tooManyItems": "Troppi elementi per una sola operazione (massimo {count}).",
+  "system.security.vaultProtected": "I file della cassaforte non sono accessibili da questa funzione.",
 } as const;

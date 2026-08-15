@@ -196,4 +196,5 @@ export default {
   "vault.error.fileNotFound": "Datei nicht gefunden",
   "vault.error.originUnknown": "Ursprünglicher Speicherort unbekannt",
   "vault.error.destNotFound": "Zielordner nicht gefunden",
+  "vault.lock.lockedOut": "Zu viele Versuche. Versuchen Sie es in {seconds} s erneut.",
 } as const;

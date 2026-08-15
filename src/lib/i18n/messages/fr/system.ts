@@ -248,4 +248,10 @@ export default {
   "system.io.writeFailed": "Écriture impossible — {reason}",
   "system.engine.noRequestedStorageAvailable":
     "Aucun des stockages demandés n'est disponible : {details}",
+  "system.security.blockedPath": "Emplacement protégé — opération refusée.",
+  "system.security.invalidPath": "Chemin invalide — opération refusée.",
+  "system.security.invalidName": "Nom invalide — opération refusée.",
+  "system.security.untrustedRoot": "Stockage non autorisé pour cette opération.",
+  "system.security.tooManyItems": "Trop d'éléments pour une seule opération ({count} maximum).",
+  "system.security.vaultProtected": "Les fichiers du coffre-fort ne sont pas accessibles depuis cette fonctionnalité.",
 } as const;

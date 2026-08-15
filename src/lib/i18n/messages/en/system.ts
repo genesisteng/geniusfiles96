@@ -235,4 +235,10 @@ export default {
   "system.io.writeFailed": "Cannot write — {reason}",
   "system.engine.noRequestedStorageAvailable":
     "None of the requested storages is available: {details}",
+  "system.security.blockedPath": "Protected location — operation refused.",
+  "system.security.invalidPath": "Invalid path — operation refused.",
+  "system.security.invalidName": "Invalid name — operation refused.",
+  "system.security.untrustedRoot": "Storage not allowed for this operation.",
+  "system.security.tooManyItems": "Too many items for a single operation ({count} maximum).",
+  "system.security.vaultProtected": "Vault files cannot be accessed from this feature.",
 } as const;

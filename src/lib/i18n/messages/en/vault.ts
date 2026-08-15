@@ -206,4 +206,5 @@ export default {
   "vault.error.fileNotFound": "File not found",
   "vault.error.originUnknown": "Original location unknown",
   "vault.error.destNotFound": "Destination folder not found",
+  "vault.lock.lockedOut": "Too many attempts. Try again in {seconds} s.",
 } as const;

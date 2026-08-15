@@ -214,4 +214,5 @@ export default {
   "vault.error.fileNotFound": "Archivo no encontrado",
   "vault.error.originUnknown": "Ubicación original desconocida",
   "vault.error.destNotFound": "Carpeta de destino no encontrada",
+  "vault.lock.lockedOut": "Demasiados intentos. Inténtalo de nuevo en {seconds} s.",
 } as const;
