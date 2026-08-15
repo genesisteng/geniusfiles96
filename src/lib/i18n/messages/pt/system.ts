@@ -210,9 +210,9 @@ export default {
   "meta.automations.ogDescription":
     "Assistente guiado, pré-visualização clara e execução real das ações nos seus ficheiros.",
   "meta.assistant.description":
-    "Converse naturalmente com o Genius Ai ou peça-lhe para gerir os seus ficheiros: pesquisa, organização, análise e automatizações.",
+    "Converse naturalmente com o Genius AI ou peça-lhe para gerir os seus ficheiros: pesquisa, organização, análise e automatizações.",
   "meta.assistant.ogDescription":
-    "Converse naturally com o Genius Ai ou peça-lhe para gerir os seus ficheiros.",
+    "Converse naturalmente com o Genius AI ou peça-lhe para gerir os seus ficheiros.",
   "meta.vault.description":
     "Proteja os seus ficheiros confidenciais num espaço privado, bloqueado por PIN, palavra-passe ou biometria.",
   "meta.vault.ogDescription": "Um espaço privado encriptável, bloqueável e totalmente offline.",

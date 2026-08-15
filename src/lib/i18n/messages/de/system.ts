@@ -216,9 +216,9 @@ export default {
   "meta.automations.ogDescription":
     "Ein geführter Assistent, eine klare Vorschau und echte Aktionen für Ihre Dateien.",
   "meta.assistant.description":
-    "Chatten Sie ganz natürlich mit Genius Ai oder lassen Sie Ihre Dateien verwalten: Suche, Sortierung, Analyse und Automatisierungen.",
+    "Chatten Sie ganz natürlich mit Genius AI oder lassen Sie Ihre Dateien verwalten: Suche, Sortierung, Analyse und Automatisierungen.",
   "meta.assistant.ogDescription":
-    "Chatten Sie ganz natürlich mit Genius Ai oder bitten Sie die KI, Ihre Dateien zu verwalten.",
+    "Chatten Sie ganz natürlich mit Genius AI oder bitten Sie die KI, Ihre Dateien zu verwalten.",
   "meta.vault.description":
     "Schützen Sie vertrauliche Dateien in einem privaten Bereich, der per PIN, Passwort oder Biometrie gesperrt ist.",
   "meta.vault.ogDescription":

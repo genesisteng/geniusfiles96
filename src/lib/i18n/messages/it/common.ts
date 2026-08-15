@@ -8,7 +8,7 @@ export default {
   "app.tagline": "Gestore file intelligente assistito da IA",
 
   "nav.home": "Home",
-  "nav.assistant": "Genius Ai",
+  "nav.assistant": "Genius AI",
   "nav.automations": "Automazioni",
   "nav.settings": "Impostazioni",
 
