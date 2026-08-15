@@ -164,8 +164,8 @@ function Slide({ step, active, reduced }: { step: number; active: boolean; reduc
     >
       <div
         className={cn(
-          "flex min-h-0 flex-1 items-center justify-center py-2",
-          dense ? "max-h-[26vh] basis-[26vh]" : "max-h-[42vh] basis-[42vh]",
+          "flex min-h-0 items-center justify-center py-2",
+          dense ? "min-h-[12vh] max-h-[28vh] flex-[1_1_0%]" : "max-h-[42vh] flex-[1_1_42vh]",
         )}
       >
         <Illustration step={step} priority={step <= 2} />
