@@ -972,15 +972,34 @@ async function runTransferEntries(
     // atomique — instantané même pour un dossier énorme.
     if (opts.mode === "move") {
       let renamed = false;
-      const replace = mayOverwrite(plan.entry.name);
+      let replace = mayOverwrite(plan.entry.name);
       try {
         await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: replace });
         renamed = true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         if (/EXISTS/i.test(msg) && !replace) {
-          failed.push({ name: plan.entry.name, reason: t("ops.error.alreadyExistsAtDestination") });
-          continue;
+          // Un doublon n'est pas une erreur : l'utilisateur tranche.
+          const choice = await askConflict(plan.entry);
+          if (choice === "cancel") break outer;
+          if (choice === "skip") {
+            skipped++;
+            continue;
+          }
+          if (choice === "none") {
+            failed.push({
+              name: plan.entry.name,
+              reason: t("ops.error.alreadyExistsAtDestination"),
+            });
+            continue;
+          }
+          replace = true;
+          try {
+            await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: true });
+            renamed = true;
+          } catch {
+            /* repli sur copie + suppression ci-dessous */
+          }
         }
         // Volumes différents, ou dossier existant à fusionner : repli sur
         // copie (avec remplacement fichier par fichier) puis suppression.
@@ -1003,16 +1022,25 @@ async function runTransferEntries(
     if (plan.bulk) {
       // Trop volumineux pour un plan détaillé : copie en flux, empreinte
       // mémoire constante, progression réelle fichier par fichier.
-      await copyTreeStreaming(p, srcRoot, dstRoot, {
+      const outcome = await copyTreeStreaming(p, srcRoot, dstRoot, {
         signal: opts.signal,
         failed,
         overwrite: mayOverwrite(plan.entry.name),
+        onExists: async () => {
+          const choice = await askConflict(plan.entry);
+          return choice === "none" ? "skip" : choice;
+        },
         onFile: (size, name) => {
           bytesDone += size;
           completed++;
           emit(name);
         },
       });
+      if (outcome === "cancel") break outer;
+      if (outcome === "skip") {
+        skipped++;
+        continue;
+      }
     } else {
       // Squelette de dossiers.
       for (const relDir of plan.dirs) {
@@ -1024,6 +1052,8 @@ async function runTransferEntries(
         }
       }
       let done = 0;
+      let replaceFiles = mayOverwrite(plan.entry.name);
+      let skipEntry = false;
       for (const file of plan.files) {
         if (opts.signal?.cancelled) break outer;
         const rel = file.relative;
@@ -1031,17 +1061,45 @@ async function runTransferEntries(
           await p.copyFile({
             source: file.source,
             destination: joinAbs(dstAbs, rel),
-            overwrite: mayOverwrite(plan.entry.name),
+            overwrite: replaceFiles,
           });
           bytesDone += file.size;
           completed++;
           emit(rel.split("/").pop() ?? rel);
         } catch (err) {
-          failed.push({ name: rel, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
+          const msg = err instanceof Error ? err.message : String(err);
+          if (/EXISTS/i.test(msg) && !replaceFiles) {
+            const choice = await askConflict(plan.entry);
+            if (choice === "cancel") break outer;
+            if (choice === "skip" || choice === "none") {
+              skipped++;
+              skipEntry = true;
+              break;
+            }
+            replaceFiles = true;
+            try {
+              await p.copyFile({
+                source: file.source,
+                destination: joinAbs(dstAbs, rel),
+                overwrite: true,
+              });
+              bytesDone += file.size;
+              completed++;
+              emit(rel.split("/").pop() ?? rel);
+            } catch (retryErr) {
+              failed.push({
+                name: rel,
+                reason: humanizeIoError(retryErr, t("ops.error.copyFailed")),
+              });
+            }
+          } else {
+            failed.push({ name: rel, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
+          }
         }
         // Respiration périodique : le fil principal reste fluide.
         if (++done % 24 === 0) await tick();
       }
+      if (skipEntry) continue;
       completed += plan.dirs.length;
     }
     if (opts.signal?.cancelled) break outer;
@@ -1065,7 +1123,7 @@ async function runTransferEntries(
     await tick();
   }
 
-  const cancelled = Boolean(opts.signal?.cancelled);
+  const cancelled = Boolean(opts.signal?.cancelled) || userCancelled;
   recordOperation({
     kind: opts.mode,
     summary: t(opts.mode === "copy" ? "ops.transfer.copySummary" : "ops.transfer.moveSummary", {
@@ -1084,7 +1142,7 @@ async function runTransferEntries(
     failed.length ? t("ops.transfer.failuresCount", { count: failed.length }) : undefined,
   );
   if (succeeded > 0) dispatchStorageChanged();
-  return { ok: failed.length === 0 && !cancelled, succeeded, failed, cancelled };
+  return { ok: failed.length === 0 && !cancelled, succeeded, failed, cancelled, skipped };
 }
 
 /* ---------- share ---------- */
