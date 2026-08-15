@@ -29,6 +29,7 @@ import {
 import type { PathRef } from "./types";
 import { toAbsolutePath, mockResolve, type MockNode } from "./fs";
 import { recordOperation } from "./history";
+import { t } from "@/lib/i18n";
 import { loadTrashRetention, markTrashPurged, loadTrashLastPurgeAt } from "./preferences";
 
 export type TrashItem = {

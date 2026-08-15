@@ -16,6 +16,7 @@ import {
 import { runCleanup } from "@/lib/cleaner/deleter";
 import type { CleanItem } from "@/lib/cleaner/types";
 import { finishJob, updateJob, type JobRecord } from "./journal";
+import { t } from "@/lib/i18n";
 
 export type TransferPayload = {
   source: PathRef;
