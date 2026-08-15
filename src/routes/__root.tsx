@@ -20,6 +20,7 @@ import { PickLayer } from "@/components/files/PickLayer";
 import { startAutomationScheduler } from "../lib/automations/scheduler";
 import { startMediaIndexer } from "../lib/files/categories";
 import { SplashOverlay, SPLASH_ART_SRCSET } from "../components/brand/SplashOverlay";
+import { OnboardingOverlay } from "../components/onboarding/OnboardingOverlay";
 import { markStartupSignal, onStartupReady } from "../lib/startup/boot";
 import { installNativeBehaviors } from "../lib/native/web-behaviors";
 import { prefetchRoots } from "../lib/files/fs";
