@@ -251,18 +251,96 @@ export async function setupVault(
   return cred;
 }
 
+/* ---------- Anti-force brute ---------- */
+
+const LOCKOUT_KEY = "gf.vault.lockout";
+/** Tentatives tolérées avant la première temporisation. */
+const FREE_ATTEMPTS = 5;
+/** Palier initial, doublé à chaque échec supplémentaire. */
+const BASE_DELAY_MS = 30_000;
+const MAX_DELAY_MS = 15 * 60_000;
+
+type LockoutState = { failures: number; until: number };
+
+function readLockout(): LockoutState {
+  if (typeof window === "undefined") return { failures: 0, until: 0 };
+  try {
+    const raw = window.localStorage.getItem(LOCKOUT_KEY);
+    if (!raw) return { failures: 0, until: 0 };
+    const parsed = JSON.parse(raw) as Partial<LockoutState>;
+    return {
+      failures: Number(parsed.failures) || 0,
+      until: Number(parsed.until) || 0,
+    };
+  } catch {
+    return { failures: 0, until: 0 };
+  }
+}
+
+function writeLockout(state: LockoutState) {
+  if (typeof window === "undefined") return;
+  try {
+    if (state.failures === 0) window.localStorage.removeItem(LOCKOUT_KEY);
+    else window.localStorage.setItem(LOCKOUT_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * État de temporisation du coffre-fort. Persisté : redémarrer
+ * l'application ou revenir sur l'écran ne remet pas le compteur à zéro.
+ */
+export function getVaultLockout(): { failures: number; remainingMs: number } {
+  const state = readLockout();
+  return { failures: state.failures, remainingMs: Math.max(0, state.until - Date.now()) };
+}
+
+/** Remet le compteur à zéro après un déverrouillage réussi. */
+export function clearVaultLockout(): void {
+  writeLockout({ failures: 0, until: 0 });
+}
+
+/** Enregistre un échec et calcule la prochaine temporisation. */
+export function recordVaultFailure(): { remainingMs: number } {
+  const state = readLockout();
+  const failures = state.failures + 1;
+  const over = failures - FREE_ATTEMPTS;
+  const delay = over > 0 ? Math.min(MAX_DELAY_MS, BASE_DELAY_MS * 2 ** (over - 1)) : 0;
+  const until = delay > 0 ? Date.now() + delay : 0;
+  writeLockout({ failures, until });
+  return { remainingMs: delay };
+}
+
+/**
+ * Vérifie le code du coffre-fort.
+ *
+ * Une temporisation persistante et croissante s'applique au-delà de
+ * cinq tentatives : la force brute d'un PIN à 4 chiffres devient
+ * impraticable, y compris en relançant l'application entre deux essais.
+ */
 export async function verifySecret(secret: string): Promise<boolean> {
   const cred = safeGet();
   if (!cred) return false;
+  if (getVaultLockout().remainingMs > 0) return false;
   const hash = await deriveHash(secret, cred.salt, cred.iterations);
   // constant-time-ish compare
-  if (hash.length !== cred.hash.length) return false;
+  if (hash.length !== cred.hash.length) {
+    recordVaultFailure();
+    return false;
+  }
   let mismatch = 0;
   for (let i = 0; i < hash.length; i++) {
     mismatch |= hash.charCodeAt(i) ^ cred.hash.charCodeAt(i);
   }
-  return mismatch === 0;
+  if (mismatch !== 0) {
+    recordVaultFailure();
+    return false;
+  }
+  clearVaultLockout();
+  return true;
 }
+
 
 export async function changeSecret(
   currentSecret: string,
