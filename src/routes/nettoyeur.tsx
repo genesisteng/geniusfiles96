@@ -580,9 +580,7 @@ function CleanerPage() {
 function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="min-w-0 rounded-2xl bg-surface-2 px-3 py-2.5">
-      <p className="truncate text-[17px] font-semibold leading-none">
-        {formatNumber(value)}
-      </p>
+      <p className="truncate text-[17px] font-semibold leading-none">{formatNumber(value)}</p>
       <p className="mt-1 text-[11.5px] leading-snug text-muted-foreground">{label}</p>
     </div>
   );
