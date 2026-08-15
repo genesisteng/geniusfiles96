@@ -106,12 +106,12 @@ export const Route = createFileRoute("/categorie/$kind")({
         { title: `${label} — GeniusFiles` },
         {
           name: "description",
-          content: `Tous vos fichiers « ${label} » rassemblés en une vue unique, quel que soit leur emplacement de stockage.`,
+          content: t("files.category.descriptionMeta", { label }),
         },
         { property: "og:title", content: `${label} — GeniusFiles` },
         {
           property: "og:description",
-          content: `Vue virtuelle GeniusFiles regroupant automatiquement vos ${label.toLowerCase()}.`,
+          content: t("files.category.ogDescriptionMeta", { label: label.toLowerCase() }),
         },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
