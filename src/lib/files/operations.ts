@@ -629,13 +629,16 @@ async function copyTreeStreaming(
     failed: OperationResult["failed"];
     /** Fusion avec remplacement des fichiers déjà présents. */
     overwrite?: boolean;
+    /** Décision utilisateur lorsqu'un fichier existe déjà à destination. */
+    onExists?: () => Promise<"overwrite" | "skip" | "cancel">;
     onFile: (size: number, name: string) => void;
   },
-): Promise<void> {
+): Promise<"ok" | "skip" | "cancel"> {
   const stack: { abs: string; dst: string }[] = [{ abs: srcRoot, dst: dstRoot }];
   let processed = 0;
+  let replace = ctx.overwrite ?? false;
   while (stack.length) {
-    if (ctx.signal?.cancelled) return;
+    if (ctx.signal?.cancelled) return "ok";
     const cur = stack.pop()!;
     try {
       await p.createDirectory({ path: cur.dst });
@@ -645,7 +648,7 @@ async function copyTreeStreaming(
     const res = await listNativeDirectory(cur.abs);
     if (!res.ok) continue;
     for (const e of res.listing.entries) {
-      if (ctx.signal?.cancelled) return;
+      if (ctx.signal?.cancelled) return "ok";
       if (e.name.startsWith(".")) continue;
       const target = joinAbs(cur.dst, e.name);
       if (e.isDirectory) {
@@ -656,15 +659,36 @@ async function copyTreeStreaming(
         await p.copyFile({
           source: e.path,
           destination: target,
-          overwrite: ctx.overwrite ?? false,
+          overwrite: replace,
         });
         ctx.onFile(e.size ?? 0, e.name);
       } catch (err) {
-        ctx.failed.push({ name: e.name, reason: humanizeIoError(err, t("ops.error.copyFailed")) });
+        const msg = err instanceof Error ? err.message : String(err);
+        if (/EXISTS/i.test(msg) && !replace && ctx.onExists) {
+          const choice = await ctx.onExists();
+          if (choice === "cancel") return "cancel";
+          if (choice === "skip") return "skip";
+          replace = true;
+          try {
+            await p.copyFile({ source: e.path, destination: target, overwrite: true });
+            ctx.onFile(e.size ?? 0, e.name);
+          } catch (retryErr) {
+            ctx.failed.push({
+              name: e.name,
+              reason: humanizeIoError(retryErr, t("ops.error.copyFailed")),
+            });
+          }
+        } else {
+          ctx.failed.push({
+            name: e.name,
+            reason: humanizeIoError(err, t("ops.error.copyFailed")),
+          });
+        }
       }
       if (++processed % 24 === 0) await tick();
     }
   }
+  return "ok";
 }
 
 export async function transferEntries(
