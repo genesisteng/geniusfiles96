@@ -499,10 +499,10 @@ export async function runAutomation(
   if (!opts.simulate) {
     recordRun(automation.id);
     markStopped(automation.id);
-    const when = new Date(record.finishedAt).toLocaleString("fr-FR", {
+    const when = new Intl.DateTimeFormat(localeTag(), {
       dateStyle: "short",
       timeStyle: "short",
-    });
+    }).format(new Date(record.finishedAt));
     const actionsList = results.map((r) => r.label).join(", ") || t("automations.api.actions.none");
     const notifId = stableNotifId(automation.id);
     if (status === "ok") {

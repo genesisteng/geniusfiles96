@@ -188,8 +188,9 @@ export function formatDay(ts: number): string {
   const d = new Date(ts);
   const today = new Date();
   const sameDay = d.toDateString() === today.toDateString();
-  if (sameDay) return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  if (sameDay)
+    return new Intl.DateTimeFormat(localeTag(), { hour: "2-digit", minute: "2-digit" }).format(d);
   const yesterday = new Date(today.getTime() - 86400000);
-  if (d.toDateString() === yesterday.toDateString()) return "Hier";
-  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+  if (d.toDateString() === yesterday.toDateString()) return t("time.yesterday");
+  return new Intl.DateTimeFormat(localeTag(), { day: "2-digit", month: "short" }).format(d);
 }
