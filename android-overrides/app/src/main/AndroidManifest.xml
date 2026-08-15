@@ -69,7 +69,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- WAKE_LOCK n'est pas déclarée : aucun PowerManager.WakeLock n'est
+         acquis. Les copies longues et la lecture audio tiennent grâce aux
+         services de premier plan, pas à un verrou de réveil. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Automations: fire notifications at exact times even when the app
