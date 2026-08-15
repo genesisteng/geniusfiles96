@@ -88,8 +88,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Numérisation de documents (scanner PDF) -->
-    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Numérisation de documents (scanner PDF) : la capture est déléguée à
+         l'appareil photo du système via le WebView, aucune autorisation
+         CAMERA n'est donc nécessaire. -->
 
     <!-- Coffre-fort : déverrouillage biométrique (empreinte / visage).
          USE_BIOMETRIC couvre Android 9+, USE_FINGERPRINT reste requis
