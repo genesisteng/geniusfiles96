@@ -5,11 +5,32 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import pkg from "./package.json" with { type: "json" };
+
+// GENIUSFILES_MOBILE=1 switches the nitro preset to `node-server` so the
+// mobile prerender step (scripts/build-mobile.mjs) can run the built server
+// under Node and capture the SSR HTML for `/`. The default Cloudflare preset
+// is preserved for the standard Lovable/hosted build.
+const IS_MOBILE_BUILD = process.env.GENIUSFILES_MOBILE === "1";
 
 export default defineConfig({
+  // Source unique de la version affichée dans l'application.
+  vite: {
+    define: { __APP_VERSION__: JSON.stringify(pkg.version) },
+  },
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
     server: { entry: "server" },
   },
+  ...(IS_MOBILE_BUILD
+    ? {
+        nitro: {
+          preset: "node-server",
+          output: {
+            dir: "dist",
+            serverDir: "dist/server",
+            publicDir: "dist/client",
+          },
+        },
+      }
+    : {}),
 });
