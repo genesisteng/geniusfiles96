@@ -355,7 +355,10 @@ export async function createArchive(opts: CreateOptions): Promise<CreateResult> 
       dispatchStorageChanged();
       recordOperation({
         kind: "archive.create",
-        summary: `Archive « ${finalName} » créée (${opts.entries.length} élément(s))`,
+        summary: t("ops.archive.createSummary", {
+          name: finalName,
+          count: opts.entries.length,
+        }),
         source: opts.parent,
         destination: opts.destination,
         names: [finalName],
@@ -417,7 +420,10 @@ export async function createArchive(opts: CreateOptions): Promise<CreateResult> 
   dispatchStorageChanged();
   recordOperation({
     kind: "archive.create",
-    summary: `Archive « ${finalName} » créée (${opts.entries.length} élément(s))`,
+    summary: t("ops.archive.createSummary", {
+          name: finalName,
+          count: opts.entries.length,
+        }),
     source: opts.parent,
     destination: opts.destination,
     names: [finalName],
@@ -503,7 +509,7 @@ export async function extractArchive(opts: ExtractOptions): Promise<ExtractResul
       dispatchStorageChanged();
       recordOperation({
         kind: "archive.extract",
-        summary: `Extraction de « ${opts.entry.name} » (${res.completed} élément(s))`,
+        summary: t("ops.archive.extractSummary", { name: opts.entry.name, count: res.completed }),
         source: opts.parent,
         destination: opts.destination,
         names: [opts.entry.name],
@@ -565,7 +571,7 @@ export async function extractArchive(opts: ExtractOptions): Promise<ExtractResul
   dispatchStorageChanged();
   recordOperation({
     kind: "archive.extract",
-    summary: `Extraction de « ${opts.entry.name} » (${total} élément(s))`,
+    summary: t("ops.archive.extractSummary", { name: opts.entry.name, count: total }),
     source: opts.parent,
     destination: opts.destination,
     names: [opts.entry.name],

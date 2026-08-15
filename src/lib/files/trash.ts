@@ -247,9 +247,10 @@ export async function restoreItems(
     recordOperation({
       kind: "copy",
       summary:
-        res.restored.length === 1
-          ? `Restauré « ${items.find((i) => i.id === res.restored[0].id)?.name ?? ""} »`
-          : `${res.restored.length} éléments restaurés depuis la Corbeille`,
+        t("ops.trash.restoreSummary", {
+          count: res.restored.length,
+          name: items.find((i) => i.id === res.restored[0].id)?.name ?? "",
+        }),
       names: items.map((i) => i.name),
       succeeded: res.restored.length,
       failed: failed.length,
@@ -311,9 +312,7 @@ export async function restoreItems(
   recordOperation({
     kind: "copy",
     summary:
-      restored === 1
-        ? `Restauré « ${items[0].name} »`
-        : `${restored} éléments restaurés depuis la Corbeille`,
+      t("ops.trash.restoreSummary", { count: restored, name: items[0].name }),
     names: items.map((i) => i.name),
     succeeded: restored,
     failed: failed.length,
@@ -335,9 +334,10 @@ export async function permanentDelete(items: TrashItem[]): Promise<{
       recordOperation({
         kind: "delete",
         summary:
-          res.deleted.length === 1
-            ? `Suppression définitive de « ${items[0].name} »`
-            : `${res.deleted.length} éléments supprimés définitivement`,
+          t("ops.trash.permanentDeleteSummary", {
+            count: res.deleted.length,
+            name: items[0].name,
+          }),
         names: items.map((i) => i.name),
         succeeded: res.deleted.length,
         failed: res.failed.length,
@@ -354,9 +354,7 @@ export async function permanentDelete(items: TrashItem[]): Promise<{
   recordOperation({
     kind: "delete",
     summary:
-      items.length === 1
-        ? `Suppression définitive de « ${items[0].name} »`
-        : `${items.length} éléments supprimés définitivement`,
+      t("ops.trash.permanentDeleteSummary", { count: items.length, name: items[0].name }),
     names: items.map((i) => i.name),
     succeeded: items.length,
     failed: 0,
@@ -373,7 +371,7 @@ export async function emptyTrash(): Promise<{ deleted: number; failed: number }>
       const res = await p.emptyTrash();
       recordOperation({
         kind: "delete",
-        summary: `Corbeille vidée (${res.deleted})`,
+        summary: t("ops.trash.emptiedSummary", { count: res.deleted }),
         names: [],
         succeeded: res.deleted,
         failed: res.failed,
@@ -388,7 +386,7 @@ export async function emptyTrash(): Promise<{ deleted: number; failed: number }>
   writeMock([]);
   recordOperation({
     kind: "delete",
-    summary: `Corbeille vidée (${count})`,
+    summary: t("ops.trash.emptiedSummary", { count }),
     names: [],
     succeeded: count,
     failed: 0,

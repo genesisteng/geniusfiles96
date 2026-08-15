@@ -177,7 +177,7 @@ export function startTransfer(input: StartTransferInput): string {
     id,
     mode,
     status: "running",
-    title: all.length === 1 ? all[0].name : `${all.length} éléments`,
+    title: all.length === 1 ? all[0].name : t("count.items", { count: all.length }),
     sourceLabel: groups[0] ? labelOf(groups[0].parent) : "—",
     destLabel: labelOf(destination),
     destination,
@@ -370,11 +370,12 @@ async function run(
 
 export function summaryMessage(task: TransferTask): string {
   const verb = task.mode === "copy" ? t("ops.transfer.verbCopied") : t("ops.transfer.verbMoved");
-  const parts = [`${task.succeeded} élément(s) ${verb}`];
-  if (task.failures.length) parts.push(`${task.failures.length} échec(s)`);
+  const parts = [t("ops.transfer.summary", { count: task.succeeded, verb })];
+  if (task.failures.length)
+    parts.push(t("ops.transfer.failuresCount", { count: task.failures.length }));
   if (task.bytes > 0) parts.push(formatSize(task.bytes));
   const secs = Math.max(1, Math.round(((task.endedAt ?? Date.now()) - task.startedAt) / 1000));
-  parts.push(`en ${formatEta(secs * 1000)}`);
+  parts.push(t("ops.transfer.duration", { time: formatEta(secs * 1000) }));
   return parts.join(" · ");
 }
 

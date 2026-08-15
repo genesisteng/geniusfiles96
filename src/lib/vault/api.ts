@@ -355,7 +355,7 @@ export async function addFromPublic(
   }
 
   if (added > 0) {
-    appendAccessLog({ action: "add", detail: `${added} élément${added > 1 ? "s" : ""}` });
+    appendAccessLog({ action: "add", detail: t("count.items", { count: added }) });
     recordOperation({
       kind: "move",
       summary: t("vault.log.add", { count: added, name: sources[0]?.name ?? "" }),
@@ -484,7 +484,7 @@ export async function restoreItems(
     removeItemsFromIndex(restoredIds);
     appendAccessLog({
       action: "restore",
-      detail: `${restoredIds.length} élément${restoredIds.length > 1 ? "s" : ""}`,
+      detail: t("count.items", { count: restoredIds.length }),
     });
     recordOperation({
       kind: "copy",
@@ -527,7 +527,7 @@ export async function permanentDelete(items: VaultItem[]): Promise<VaultDeleteRe
     removeItemsFromIndex(deleted);
     appendAccessLog({
       action: "delete",
-      detail: `${deleted.length} élément${deleted.length > 1 ? "s" : ""}`,
+      detail: t("count.items", { count: deleted.length }),
     });
     recordOperation({
       kind: "delete",

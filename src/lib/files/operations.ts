@@ -442,7 +442,7 @@ async function runDelete(
     total > 8
       ? beginJob({
           kind: "delete",
-          title: total === 1 ? targets[0].name : `${total} éléments`,
+          title: total === 1 ? targets[0].name : t("count.items", { count: total }),
           total,
           totalBytes,
           payload: { parent, entries: targets },
@@ -576,7 +576,7 @@ async function runDelete(
     finishJob(
       jobId,
       cancelled ? "cancelled" : failed.length === 0 ? "done" : "failed",
-      failed.length ? `${failed.length} échec(s)` : undefined,
+      failed.length ? t("ops.transfer.failuresCount", { count: failed.length }) : undefined,
     );
   }
   return { ok: failed.length === 0 && !cancelled, succeeded, failed, cancelled };
@@ -785,7 +785,7 @@ async function runTransferEntries(
   // Journal — enables resume if the process is killed mid-transfer.
   const jobId = beginJob({
     kind: opts.mode,
-    title: entries.length === 1 ? entries[0].name : `${entries.length} éléments`,
+    title: entries.length === 1 ? entries[0].name : t("count.items", { count: entries.length }),
     total: grandTotalItems,
     totalBytes: grandTotalBytes,
     payload: { source, destination, entries, mode: opts.mode },
@@ -992,7 +992,7 @@ async function runTransferEntries(
   finishJob(
     jobId,
     cancelled ? "cancelled" : failed.length === 0 ? "done" : "failed",
-    failed.length ? `${failed.length} échec(s)` : undefined,
+    failed.length ? t("ops.transfer.failuresCount", { count: failed.length }) : undefined,
   );
   if (succeeded > 0) dispatchStorageChanged();
   return { ok: failed.length === 0 && !cancelled, succeeded, failed, cancelled };
