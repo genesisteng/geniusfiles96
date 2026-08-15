@@ -8,9 +8,11 @@ export default {
   "onboarding.progress": "Passo {current} de {total}",
   "onboarding.goToStep": "Ir para o passo {step}",
   "onboarding.s1.title": "Bem-vindo ao GeniusFiles",
-  "onboarding.s1.desc": "Muito mais do que um gestor de ficheiros. Gira, explore, proteja, edite e automatize os seus ficheiros numa única aplicação.",
+  "onboarding.s1.desc":
+    "Muito mais do que um gestor de ficheiros. Gira, explore, proteja, edite e automatize os seus ficheiros numa única aplicação.",
   "onboarding.s2.title": "Todo o seu armazenamento, finalmente controlado.",
-  "onboarding.s2.desc": "Encontre os seus ficheiros rapidamente e trate deles sem complicações: copiar, mover, procurar, partilhar, renomear e organizar.",
+  "onboarding.s2.desc":
+    "Encontre os seus ficheiros rapidamente e trate deles sem complicações: copiar, mover, procurar, partilhar, renomear e organizar.",
   "onboarding.s2.tags": "Rápido • Simples • Potente",
   "onboarding.s3.title": "Os seus ficheiros. As suas ferramentas. Num só lugar.",
   "onboarding.s3.desc": "Abra, leia e edite os seus conteúdos sem trocar de aplicação.",
@@ -28,7 +30,8 @@ export default {
   "onboarding.s4.item1.title": "Cofre",
   "onboarding.s4.item1.desc": "Guarde os ficheiros sensíveis num espaço protegido.",
   "onboarding.s4.item2.title": "Reciclagem",
-  "onboarding.s4.item2.desc": "Recupere facilmente ficheiros apagados ou elimine-os definitivamente.",
+  "onboarding.s4.item2.desc":
+    "Recupere facilmente ficheiros apagados ou elimine-os definitivamente.",
   "onboarding.s4.footer": "O GeniusFiles ajuda-o a manter o controlo dos seus dados.",
   "onboarding.s5.title": "O seu gestor fica inteligente.",
   "onboarding.s5.desc": "Com o Genius AI, gira os seus ficheiros usando apenas as suas palavras.",

@@ -8,9 +8,11 @@ export default {
   "onboarding.progress": "Étape {current} sur {total}",
   "onboarding.goToStep": "Aller à l'étape {step}",
   "onboarding.s1.title": "Bienvenue dans GeniusFiles",
-  "onboarding.s1.desc": "Bien plus qu’un gestionnaire de fichiers. Gérez, explorez, protégez, modifiez et automatisez vos fichiers depuis une seule application.",
+  "onboarding.s1.desc":
+    "Bien plus qu’un gestionnaire de fichiers. Gérez, explorez, protégez, modifiez et automatisez vos fichiers depuis une seule application.",
   "onboarding.s2.title": "Tout votre stockage. Enfin maîtrisé.",
-  "onboarding.s2.desc": "Retrouvez vos fichiers rapidement et gérez-les sans complication. Copiez, déplacez, recherchez, partagez, renommez et organisez vos fichiers avec fluidité.",
+  "onboarding.s2.desc":
+    "Retrouvez vos fichiers rapidement et gérez-les sans complication. Copiez, déplacez, recherchez, partagez, renommez et organisez vos fichiers avec fluidité.",
   "onboarding.s2.tags": "Rapide • Simple • Puissant",
   "onboarding.s3.title": "Vos fichiers. Vos outils. Un seul endroit.",
   "onboarding.s3.desc": "Ouvrez, lisez et modifiez vos contenus sans multiplier les applications.",
@@ -28,7 +30,8 @@ export default {
   "onboarding.s4.item1.title": "Coffre-fort",
   "onboarding.s4.item1.desc": "Gardez vos fichiers sensibles à l’abri dans un espace protégé.",
   "onboarding.s4.item2.title": "Corbeille",
-  "onboarding.s4.item2.desc": "Récupérez facilement les fichiers supprimés ou supprimez-les définitivement.",
+  "onboarding.s4.item2.desc":
+    "Récupérez facilement les fichiers supprimés ou supprimez-les définitivement.",
   "onboarding.s4.footer": "GeniusFiles vous aide à garder le contrôle de vos données.",
   "onboarding.s5.title": "Votre gestionnaire devient intelligent.",
   "onboarding.s5.desc": "Avec Genius AI, gérez vos fichiers simplement en utilisant vos mots.",

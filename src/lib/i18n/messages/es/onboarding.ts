@@ -8,9 +8,11 @@ export default {
   "onboarding.progress": "Paso {current} de {total}",
   "onboarding.goToStep": "Ir al paso {step}",
   "onboarding.s1.title": "Bienvenido a GeniusFiles",
-  "onboarding.s1.desc": "Mucho más que un gestor de archivos. Gestiona, explora, protege, edita y automatiza tus archivos desde una sola aplicación.",
+  "onboarding.s1.desc":
+    "Mucho más que un gestor de archivos. Gestiona, explora, protege, edita y automatiza tus archivos desde una sola aplicación.",
   "onboarding.s2.title": "Todo tu almacenamiento, por fin bajo control.",
-  "onboarding.s2.desc": "Encuentra tus archivos al instante y gestiónalos sin complicaciones. Copia, mueve, busca, comparte, renombra y organiza con total fluidez.",
+  "onboarding.s2.desc":
+    "Encuentra tus archivos al instante y gestiónalos sin complicaciones. Copia, mueve, busca, comparte, renombra y organiza con total fluidez.",
   "onboarding.s2.tags": "Rápido • Simple • Potente",
   "onboarding.s3.title": "Tus archivos. Tus herramientas. Un solo lugar.",
   "onboarding.s3.desc": "Abre, lee y edita tus contenidos sin cambiar de aplicación.",
@@ -28,7 +30,8 @@ export default {
   "onboarding.s4.item1.title": "Caja fuerte",
   "onboarding.s4.item1.desc": "Guarda tus archivos sensibles en un espacio protegido.",
   "onboarding.s4.item2.title": "Papelera",
-  "onboarding.s4.item2.desc": "Recupera fácilmente los archivos eliminados o bórralos definitivamente.",
+  "onboarding.s4.item2.desc":
+    "Recupera fácilmente los archivos eliminados o bórralos definitivamente.",
   "onboarding.s4.footer": "GeniusFiles te ayuda a mantener el control de tus datos.",
   "onboarding.s5.title": "Tu gestor se vuelve inteligente.",
   "onboarding.s5.desc": "Con Genius AI, gestiona tus archivos simplemente con tus palabras.",

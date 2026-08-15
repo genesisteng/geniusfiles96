@@ -8,9 +8,11 @@ export default {
   "onboarding.progress": "Passo {current} di {total}",
   "onboarding.goToStep": "Vai al passo {step}",
   "onboarding.s1.title": "Benvenuto in GeniusFiles",
-  "onboarding.s1.desc": "Molto più di un gestore di file. Gestisci, esplora, proteggi, modifica e automatizza i tuoi file da un'unica applicazione.",
+  "onboarding.s1.desc":
+    "Molto più di un gestore di file. Gestisci, esplora, proteggi, modifica e automatizza i tuoi file da un'unica applicazione.",
   "onboarding.s2.title": "Tutta la tua memoria, finalmente sotto controllo.",
-  "onboarding.s2.desc": "Trova i file in un attimo e gestiscili senza complicazioni: copia, sposta, cerca, condividi, rinomina e organizza con fluidità.",
+  "onboarding.s2.desc":
+    "Trova i file in un attimo e gestiscili senza complicazioni: copia, sposta, cerca, condividi, rinomina e organizza con fluidità.",
   "onboarding.s2.tags": "Veloce • Semplice • Potente",
   "onboarding.s3.title": "I tuoi file. I tuoi strumenti. In un solo posto.",
   "onboarding.s3.desc": "Apri, leggi e modifica i tuoi contenuti senza cambiare app.",

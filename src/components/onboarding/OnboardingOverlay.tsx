@@ -224,10 +224,7 @@ export function OnboardingOverlay() {
   );
 
   const last = index === TOTAL - 1;
-  const cta = useMemo(
-    () => (last ? t("onboarding.start") : t("onboarding.continue")),
-    [last, t],
-  );
+  const cta = useMemo(() => (last ? t("onboarding.start") : t("onboarding.continue")), [last, t]);
 
   if (!open) return null;
 

@@ -8,9 +8,11 @@ export default {
   "onboarding.progress": "Adım {current} / {total}",
   "onboarding.goToStep": "{step}. adıma git",
   "onboarding.s1.title": "GeniusFiles'a hoş geldiniz",
-  "onboarding.s1.desc": "Bir dosya yöneticisinden çok daha fazlası. Dosyalarınızı tek bir uygulamadan yönetin, keşfedin, koruyun, düzenleyin ve otomatikleştirin.",
+  "onboarding.s1.desc":
+    "Bir dosya yöneticisinden çok daha fazlası. Dosyalarınızı tek bir uygulamadan yönetin, keşfedin, koruyun, düzenleyin ve otomatikleştirin.",
   "onboarding.s2.title": "Tüm depolamanız, sonunda kontrol altında.",
-  "onboarding.s2.desc": "Dosyalarınızı hızla bulun ve zahmetsizce yönetin: kopyalayın, taşıyın, arayın, paylaşın, yeniden adlandırın ve düzenleyin.",
+  "onboarding.s2.desc":
+    "Dosyalarınızı hızla bulun ve zahmetsizce yönetin: kopyalayın, taşıyın, arayın, paylaşın, yeniden adlandırın ve düzenleyin.",
   "onboarding.s2.tags": "Hızlı • Basit • Güçlü",
   "onboarding.s3.title": "Dosyalarınız. Araçlarınız. Tek yerde.",
   "onboarding.s3.desc": "İçeriklerinizi uygulama değiştirmeden açın, okuyun ve düzenleyin.",

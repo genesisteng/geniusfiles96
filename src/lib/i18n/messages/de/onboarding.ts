@@ -8,9 +8,11 @@ export default {
   "onboarding.progress": "Schritt {current} von {total}",
   "onboarding.goToStep": "Zu Schritt {step}",
   "onboarding.s1.title": "Willkommen bei GeniusFiles",
-  "onboarding.s1.desc": "Weit mehr als ein Dateimanager. Verwalten, entdecken, schützen, bearbeiten und automatisieren Sie Ihre Dateien in einer einzigen App.",
+  "onboarding.s1.desc":
+    "Weit mehr als ein Dateimanager. Verwalten, entdecken, schützen, bearbeiten und automatisieren Sie Ihre Dateien in einer einzigen App.",
   "onboarding.s2.title": "Ihr Speicher – endlich im Griff.",
-  "onboarding.s2.desc": "Finden Sie Dateien schnell und verwalten Sie sie ohne Umwege: kopieren, verschieben, suchen, teilen, umbenennen und ordnen.",
+  "onboarding.s2.desc":
+    "Finden Sie Dateien schnell und verwalten Sie sie ohne Umwege: kopieren, verschieben, suchen, teilen, umbenennen und ordnen.",
   "onboarding.s2.tags": "Schnell • Einfach • Stark",
   "onboarding.s3.title": "Ihre Dateien. Ihre Werkzeuge. Ein Ort.",
   "onboarding.s3.desc": "Öffnen, lesen und bearbeiten Sie Inhalte, ohne die App zu wechseln.",
@@ -28,7 +30,8 @@ export default {
   "onboarding.s4.item1.title": "Tresor",
   "onboarding.s4.item1.desc": "Sensible Dateien in einem geschützten Bereich ablegen.",
   "onboarding.s4.item2.title": "Papierkorb",
-  "onboarding.s4.item2.desc": "Gelöschte Dateien einfach wiederherstellen oder endgültig entfernen.",
+  "onboarding.s4.item2.desc":
+    "Gelöschte Dateien einfach wiederherstellen oder endgültig entfernen.",
   "onboarding.s4.footer": "GeniusFiles hilft Ihnen, die Kontrolle über Ihre Daten zu behalten.",
   "onboarding.s5.title": "Ihr Dateimanager wird intelligent.",
   "onboarding.s5.desc": "Mit Genius AI verwalten Sie Ihre Dateien einfach in Ihren eigenen Worten.",
