@@ -671,6 +671,9 @@ async function runTransferEntries(
 ): Promise<OperationResult> {
   const failed: OperationResult["failed"] = [];
   let succeeded = 0;
+  /** Décisions d'écrasement validées par l'utilisateur (jamais implicites). */
+  const overwriteNames = new Set(opts.overwrite ?? []);
+  const mayOverwrite = (name: string) => overwriteNames.has(name);
 
   if (!isAndroidNative()) {
     // Mock — moves and copies at once, ignoring progress detail.
@@ -692,11 +695,13 @@ async function runTransferEntries(
       mockMutate(destination, (dstNode) => {
         if (!dstNode.children) dstNode.children = [];
         for (const n of cloned) {
-          if (dstNode.children.some((c) => c.name === n.name)) {
+          const existing = dstNode.children.findIndex((c) => c.name === n.name);
+          if (existing >= 0 && !mayOverwrite(n.name)) {
             failed.push({ name: n.name, reason: t("ops.error.alreadyExists") });
             continue;
           }
-          dstNode.children.push(n);
+          if (existing >= 0) dstNode.children[existing] = n;
+          else dstNode.children.push(n);
           succeeded++;
         }
         return null;
