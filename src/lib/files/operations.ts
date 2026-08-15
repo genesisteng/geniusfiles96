@@ -899,16 +899,18 @@ async function runTransferEntries(
     // atomique — instantané même pour un dossier énorme.
     if (opts.mode === "move") {
       let renamed = false;
+      const replace = mayOverwrite(plan.entry.name);
       try {
-        await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: false });
+        await p.moveFile({ source: srcRoot, destination: dstRoot, overwrite: replace });
         renamed = true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        if (/EXISTS/i.test(msg)) {
+        if (/EXISTS/i.test(msg) && !replace) {
           failed.push({ name: plan.entry.name, reason: t("ops.error.alreadyExistsAtDestination") });
           continue;
         }
-        // Volumes différents → repli sur copie puis suppression.
+        // Volumes différents, ou dossier existant à fusionner : repli sur
+        // copie (avec remplacement fichier par fichier) puis suppression.
       }
       if (renamed) {
         if (await confirmed()) {
@@ -931,6 +933,7 @@ async function runTransferEntries(
       await copyTreeStreaming(p, srcRoot, dstRoot, {
         signal: opts.signal,
         failed,
+        overwrite: mayOverwrite(plan.entry.name),
         onFile: (size, name) => {
           bytesDone += size;
           completed++;
@@ -955,7 +958,7 @@ async function runTransferEntries(
           await p.copyFile({
             source: file.source,
             destination: joinAbs(dstAbs, rel),
-            overwrite: false,
+            overwrite: mayOverwrite(plan.entry.name),
           });
           bytesDone += file.size;
           completed++;
