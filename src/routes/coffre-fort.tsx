@@ -675,7 +675,7 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
           <div className="flex flex-col items-center gap-3">
             <PatternLock
               onComplete={(v) => void attempt(v)}
-              disabled={busy}
+              disabled={busy || lockedOut}
               error={!!error}
               size={272}
             />
@@ -692,7 +692,7 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
             />
             {error ? <p className="mt-2 text-[12px] text-destructive">{error}</p> : null}
             <div className="mt-3">
-              <PrimaryButton onClick={() => void attempt(secret)} disabled={busy || !secret}>
+              <PrimaryButton onClick={() => void attempt(secret)} disabled={busy || lockedOut || !secret}>
                 {busy ? t("vault.lock.verifying") : t("vault.lock.unlock")}
               </PrimaryButton>
             </div>
@@ -709,7 +709,11 @@ function LockScreen({ onUnlocked, onReset }: { onUnlocked: () => void; onReset: 
           </button>
         ) : null}
 
-        {attempts >= 3 ? (
+        {lockedOut ? (
+          <p className="text-[11.5px] font-medium text-destructive">
+            {t("vault.lock.lockedOut", { seconds: Math.ceil(lockedMs / 1000) })}
+          </p>
+        ) : attempts >= 3 ? (
           <p className="text-[11px] text-muted-foreground">
             {t("vault.lock.attempts", { count: attempts })}
           </p>

@@ -217,6 +217,8 @@ export async function verifyBiometric(
 ): Promise<{ ok: boolean; status: BiometricStatus; message?: string }> {
   const plugin = biometricPlugin();
   if (!plugin?.verify) return { ok: false, status: "web" };
+  // La temporisation anti-force brute s'applique aussi au raccourci biométrique.
+  if (getVaultLockout().remainingMs > 0) return { ok: false, status: "lockout" };
   try {
     const r = await plugin.verify({
       title: "GeniusFiles",
@@ -377,4 +379,5 @@ export function setBiometricEnabled(enabled: boolean): void {
  */
 export function resetCredential(): void {
   safeSet(null);
+  clearVaultLockout();
 }
