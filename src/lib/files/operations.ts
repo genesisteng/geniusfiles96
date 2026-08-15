@@ -24,6 +24,11 @@ import { beginJob, finishJob, updateJob } from "@/lib/jobs/journal";
 import { dispatchFsPatch } from "@/lib/index/patches";
 import { chunks, runQueued, tick } from "./op-queue";
 import { namesStillPresent, nameExists } from "./verify";
+import {
+  checkEntryName,
+  checkOperationPath,
+  checkOperationTarget,
+} from "@/lib/security/paths";
 import { t } from "@/lib/i18n";
 
 function dispatchStorageChanged() {
@@ -93,6 +98,36 @@ export type OperationResult = {
   /** Éléments volontairement ignorés par l'utilisateur (conflit). */
   skipped?: number;
 };
+
+/**
+ * Refuse d'un bloc un lot dont le dossier parent ou l'un des noms ciblés
+ * ne passe pas le garde-fou de sécurité. Renvoie `null` quand tout est
+ * légitime — le coût est négligeable devant une opération disque.
+ */
+function refusedTargets(parent: PathRef, entries: FileEntry[]): OperationResult | null {
+  const guard = checkOperationPath(parent);
+  if (!guard.ok) {
+    return {
+      ok: false,
+      succeeded: 0,
+      failed: entries.map((e) => ({ name: e.name, reason: guard.reason })),
+      cancelled: false,
+    };
+  }
+  const failed = entries
+    .map((e) => ({ entry: e, check: checkOperationTarget(parent, e.name) }))
+    .filter((r) => !r.check.ok);
+  if (failed.length === 0) return null;
+  return {
+    ok: false,
+    succeeded: 0,
+    failed: failed.map((r) => ({
+      name: r.entry.name,
+      reason: r.check.ok ? "" : r.check.reason,
+    })),
+    cancelled: false,
+  };
+}
 
 export function createSignal(): OperationSignal & { cancel: () => void } {
   const s = { cancelled: false, onCancel: () => {} } as OperationSignal & { cancel: () => void };
@@ -227,6 +262,11 @@ export async function createDirectory(
 ): Promise<{ ok: boolean; error?: string }> {
   const clean = name.trim();
   if (!clean || /[\\/]/.test(clean)) return { ok: false, error: t("ops.error.invalidName") };
+  // Garde-fou central : ni sortie du dossier, ni emplacement protégé.
+  const guard = checkOperationPath(parent);
+  if (!guard.ok) return { ok: false, error: guard.reason };
+  const nameGuard = checkEntryName(clean);
+  if (!nameGuard.ok) return { ok: false, error: nameGuard.reason };
   if (isAndroidNative()) {
     const p = nativePlugin();
     if (!p) return { ok: false, error: t("ops.error.pluginUnavailable") };
@@ -296,6 +336,10 @@ export async function renameEntry(
 ): Promise<{ ok: boolean; error?: string }> {
   const clean = newName.trim();
   if (!clean || /[\\/]/.test(clean)) return { ok: false, error: t("ops.error.invalidName") };
+  const guard = checkOperationTarget(parent, entry.name);
+  if (!guard.ok) return { ok: false, error: guard.reason };
+  const nameGuard = checkEntryName(clean);
+  if (!nameGuard.ok) return { ok: false, error: nameGuard.reason };
   if (clean === entry.name) return { ok: true };
   if (isAndroidNative()) {
     const p = nativePlugin();
@@ -389,6 +433,8 @@ export async function deleteEntries(
 ): Promise<OperationResult> {
   const targets = uniqueEntries(entries);
   if (targets.length === 0) return { ok: true, succeeded: 0, failed: [], cancelled: false };
+  const refused = refusedTargets(parent, targets);
+  if (refused) return refused;
   // Concurrence bornée : une suppression massive ne peut pas saturer
   // l'appareil pendant qu'une copie tourne déjà.
   return runQueued(() => runDelete(parent, targets, opts));
@@ -699,6 +745,17 @@ export async function transferEntries(
 ): Promise<OperationResult> {
   const targets = uniqueEntries(entries);
   if (targets.length === 0) return { ok: true, succeeded: 0, failed: [], cancelled: false };
+  const refusedSource = refusedTargets(source, targets);
+  if (refusedSource) return refusedSource;
+  const destGuard = checkOperationPath(destination);
+  if (!destGuard.ok) {
+    return {
+      ok: false,
+      succeeded: 0,
+      failed: targets.map((e) => ({ name: e.name, reason: destGuard.reason })),
+      cancelled: false,
+    };
+  }
   return runQueued(() => runTransferEntries(source, targets, destination, opts));
 }
 
@@ -1151,7 +1208,13 @@ export async function shareEntries(
   parent: PathRef,
   entries: FileEntry[],
 ): Promise<{ ok: boolean; error?: string }> {
-  const files = entries.filter((e) => !e.isDirectory);
+  const parentGuard = checkOperationPath(parent);
+  if (!parentGuard.ok) return { ok: false, error: parentGuard.reason };
+  // Un partage ne transmet que des fichiers réellement ciblés, jamais un
+  // dossier entier ni une entrée dont le nom sort de l'emplacement.
+  const files = entries.filter(
+    (e) => !e.isDirectory && checkOperationTarget(parent, e.name).ok,
+  );
   if (files.length === 0)
     return {
       ok: false,
