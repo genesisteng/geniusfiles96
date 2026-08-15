@@ -642,7 +642,11 @@ async function copyTreeStreaming(
         continue;
       }
       try {
-        await p.copyFile({ source: e.path, destination: target, overwrite: ctx.overwrite ?? false });
+        await p.copyFile({
+          source: e.path,
+          destination: target,
+          overwrite: ctx.overwrite ?? false,
+        });
         ctx.onFile(e.size ?? 0, e.name);
       } catch (err) {
         ctx.failed.push({ name: e.name, reason: humanizeIoError(err, t("ops.error.copyFailed")) });

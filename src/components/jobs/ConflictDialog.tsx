@@ -67,9 +67,7 @@ export function ConflictDialog() {
               {t("ops.conflict.title")}
             </p>
             <p className="text-[14px] leading-relaxed text-muted-foreground">
-              {prompt?.isDirectory
-                ? t("ops.conflict.folderExists")
-                : t("ops.conflict.fileExists")}
+              {prompt?.isDirectory ? t("ops.conflict.folderExists") : t("ops.conflict.fileExists")}
             </p>
           </div>
         </div>

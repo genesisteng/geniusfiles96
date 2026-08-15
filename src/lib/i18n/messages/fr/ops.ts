@@ -211,7 +211,8 @@ export default {
   "ops.conflict.skip": "Ignorer",
   "ops.conflict.cancel": "Annuler",
   "ops.conflict.notifyTitle": "Décision requise",
-  "ops.conflict.notifyBody": "Un élément existe déjà à destination. Ouvrez GeniusFiles pour choisir.",
+  "ops.conflict.notifyBody":
+    "Un élément existe déjà à destination. Ouvrez GeniusFiles pour choisir.",
   "ops.transfer.skippedCount": "{count} ignoré(s)",
   "ops.transfer.overwrittenCount": "{count} remplacé(s)",
 } as const;
