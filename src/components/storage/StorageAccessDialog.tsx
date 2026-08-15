@@ -34,27 +34,37 @@ export function StorageAccessDialog() {
   const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    const stop = startStorageAccessWatch();
+    let stop: (() => void) | null = null;
     let timer: number | undefined;
+    let offStartup: (() => void) | null = null;
+    let unsub: (() => void) | null = null;
+    let onboardingDone = false;
 
-    // Première demande : après le démarrage, une seule fois.
-    const off = onStartupReady(() => {
-      timer = window.setTimeout(() => {
-        if (!isStorageAccessGranted() && !isStorageAccessDeferred()) setOpen(true);
-      }, FIRST_PROMPT_DELAY_MS);
-    });
+    // Rien ne démarre tant que l'onboarding n'est pas terminé : aucune
+    // vérification ni demande d'accès pendant les 6 écrans.
+    const offOnboarding = whenOnboardingDone(() => {
+      onboardingDone = true;
+      stop = startStorageAccessWatch();
 
-    // Fermeture automatique dès que l'accès est réellement accordé.
-    const unsub = subscribeStorageAccess(() => {
-      if (isStorageAccessGranted()) {
-        setOpen(false);
-        setNotice(null);
-        setBusy(false);
-      }
+      // Première demande : après l'affichage de l'accueil, une seule fois.
+      offStartup = onStartupReady(() => {
+        timer = window.setTimeout(() => {
+          if (!isStorageAccessGranted() && !isStorageAccessDeferred()) setOpen(true);
+        }, FIRST_PROMPT_DELAY_MS);
+      });
+
+      // Fermeture automatique dès que l'accès est réellement accordé.
+      unsub = subscribeStorageAccess(() => {
+        if (isStorageAccessGranted()) {
+          setOpen(false);
+          setNotice(null);
+          setBusy(false);
+        }
+      });
     });
 
     const onAsk = (e: Event) => {
-      if (isStorageAccessGranted()) return;
+      if (!onboardingDone || isStorageAccessGranted()) return;
       const detail = (e as CustomEvent<{ reason?: string }>).detail;
       setReason(detail?.reason ?? null);
       setOpen(true);
@@ -62,13 +72,15 @@ export function StorageAccessDialog() {
     window.addEventListener("gf:ask-storage-access", onAsk);
 
     return () => {
-      off();
-      unsub();
-      stop();
+      offOnboarding();
+      offStartup?.();
+      unsub?.();
+      stop?.();
       window.removeEventListener("gf:ask-storage-access", onAsk);
       if (timer !== undefined) window.clearTimeout(timer);
     };
   }, []);
+
 
   const onAllow = async () => {
     if (busy) return;
