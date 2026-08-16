@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Execution engine for automations.
  *
@@ -461,6 +462,10 @@ export async function runAutomation(
   opts: RunOptions,
 ): Promise<ExecutionRecord> {
   const startedAt = Date.now();
+  // Mesure d'usage : exécution d'automatisation — ni nom, ni chemin.
+  if (!opts.simulate) {
+    trackEvent("automation", { action: "run", count: automation.actions.length });
+  }
   const results: ExecutionActionResult[] = [];
   const errors: string[] = [];
   if (!opts.simulate) markRunning(automation.id);

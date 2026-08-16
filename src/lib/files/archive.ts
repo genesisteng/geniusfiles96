@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Archive module — creation, listing and extraction.
  *
@@ -301,7 +302,7 @@ export type CreateResult = {
   error?: string;
 };
 
-export async function createArchive(opts: CreateOptions): Promise<CreateResult> {
+async function createArchiveImpl(opts: CreateOptions): Promise<CreateResult> {
   const finalName = ensureExtension(opts.archiveName.trim(), opts.format);
   if (!finalName) return { ok: false, cancelled: false, error: t("ops.error.invalidName") };
   // Source, destination et nom d'archive sont validés avant tout accès disque.
@@ -467,7 +468,7 @@ export type ExtractResult = {
   error?: string;
 };
 
-export async function extractArchive(opts: ExtractOptions): Promise<ExtractResult> {
+async function extractArchiveImpl(opts: ExtractOptions): Promise<ExtractResult> {
   if (!canReadArchive(opts.entry))
     return { ok: false, cancelled: false, error: t("system.io.unsupportedFormat") };
   // L'extraction est le vecteur classique d'évasion de dossier : la source,
@@ -648,3 +649,26 @@ function dispatchStorageChanged() {
 
 // Re-export for the UI which builds trees from mock listings too.
 export { mockResolve };
+
+/* Mesure d'usage : compression / extraction, format et issue seulement. */
+
+export async function createArchive(opts: CreateOptions): Promise<CreateResult> {
+  const res = await createArchiveImpl(opts);
+  trackEvent("file_action", {
+    action: "compress",
+    tool: opts.format,
+    result: res.cancelled ? "cancelled" : res.ok ? "success" : "failure",
+    count: opts.entries.length,
+  });
+  return res;
+}
+
+export async function extractArchive(opts: ExtractOptions): Promise<ExtractResult> {
+  const res = await extractArchiveImpl(opts);
+  trackEvent("file_action", {
+    action: "extract",
+    result: res.cancelled ? "cancelled" : res.ok ? "success" : "failure",
+    count: res.completed ?? 0,
+  });
+  return res;
+}

@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Coffre-fort — high-level API used by the UI.
  *
@@ -239,7 +240,7 @@ export type AddOptions = {
   signal?: { cancelled: boolean };
 };
 
-export async function addFromPublic(
+async function addFromPublicImpl(
   sources: PublicSource[],
   opts: AddOptions,
 ): Promise<VaultAddResult> {
@@ -377,7 +378,7 @@ export type RestoreOptions = {
   onProgress?: (p: VaultProgress) => void;
 };
 
-export async function restoreItems(
+async function restoreItemsImpl(
   items: VaultItem[],
   opts: RestoreOptions = {},
 ): Promise<VaultRestoreResult> {
@@ -500,7 +501,7 @@ export async function restoreItems(
 
 /* ---------------- permanent delete ---------------- */
 
-export async function permanentDelete(items: VaultItem[]): Promise<VaultDeleteResult> {
+async function permanentDeleteImpl(items: VaultItem[]): Promise<VaultDeleteResult> {
   const failed: string[] = [];
   const deleted: string[] = [];
   for (const it of items) {
@@ -597,4 +598,43 @@ export async function wipeVault(): Promise<void> {
 /** Small helper so callers can surface a toast without importing sonner. */
 export function toastError(msg: string): void {
   toast.error(msg);
+}
+
+/* Mesure d'usage du coffre-fort : uniquement le type d'opération, son
+   issue et un volume arrondi. Aucun nom, chemin ni contenu protégé. */
+
+export async function addFromPublic(
+  sources: PublicSource[],
+  opts: AddOptions,
+): Promise<VaultAddResult> {
+  const res = await addFromPublicImpl(sources, opts);
+  trackEvent("vault_action", {
+    action: "add",
+    result: res.failed.length === 0 ? "success" : res.added > 0 ? "partial" : "failure",
+    count: res.added,
+  });
+  return res;
+}
+
+export async function restoreItems(
+  items: VaultItem[],
+  opts: RestoreOptions = {},
+): Promise<VaultRestoreResult> {
+  const res = await restoreItemsImpl(items, opts);
+  trackEvent("vault_action", {
+    action: "restore",
+    result: res.failed.length === 0 ? "success" : "partial",
+    count: items.length - res.failed.length,
+  });
+  return res;
+}
+
+export async function permanentDelete(items: VaultItem[]): Promise<VaultDeleteResult> {
+  const res = await permanentDeleteImpl(items);
+  trackEvent("vault_action", {
+    action: "delete_permanent",
+    result: res.failed.length === 0 ? "success" : "partial",
+    count: items.length - res.failed.length,
+  });
+  return res;
 }

@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * GeniusFiles search engine — streaming, cancellable, provider-based.
  *
@@ -314,6 +315,9 @@ export type RunSearchOptions = {
  * even when thousands of matches stream in.
  */
 export function runSearch(opts: RunSearchOptions): { abort: () => void; done: Promise<void> } {
+  // Mesure d'usage : seul le fait qu'une recherche a été lancée est
+  // enregistré — jamais la requête, ni les résultats, ni les chemins.
+  trackEvent("search_run", { action: "run" });
   const controller = new AbortController();
   const filters = opts.filters ?? DEFAULT_FILTERS;
   const tokens = tokenize(opts.query);
