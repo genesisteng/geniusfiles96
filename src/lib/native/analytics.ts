@@ -100,6 +100,7 @@ export function installAnalytics(): void {
   void p.setUserProperty({ name: "app_language", value: language }).catch(() => {});
   void p.setUserProperty({ name: "app_version", value: __APP_VERSION__ }).catch(() => {});
   trackScreen(window.location.pathname);
+  trackEvent("app_open");
 }
 
 /* ────────────────────────────────────────────────────────────────
