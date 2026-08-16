@@ -57,11 +57,7 @@ import {
 import { clearThumbnailCache } from "@/lib/native/thumbnails";
 import { sweepTempFiles } from "@/lib/native/temp-sweep";
 /* ⚠️ TEMPORAIRE — validation Crashlytics, à retirer après le test. */
-import {
-  isCrashTestAvailable,
-  sendTestNonFatal,
-  triggerTestCrash,
-} from "@/lib/native/crash-test";
+import { isCrashTestAvailable, sendTestNonFatal, triggerTestCrash } from "@/lib/native/crash-test";
 
 /* Injectée au build depuis `package.json` (voir vite.config.ts). */
 const APP_VERSION = __APP_VERSION__;
