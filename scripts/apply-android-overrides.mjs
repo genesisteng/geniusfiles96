@@ -109,7 +109,10 @@ if (existsSync(rootGradlePath)) {
 // Sans configuration Firebase, le pont Crashlytics ne compile pas : il est
 // retiré du projet généré (l'app garde toutes ses autres fonctionnalités).
 if (!hasFirebase) {
-  await rm(join(pkgDir, "GeniusFilesCrashlyticsPlugin.kt"), { force: true });
+  console.error(
+    "✗ android-overrides/app/google-services.json is required: Crashlytics (stability monitoring) is compiled into the app.",
+  );
+  process.exit(1);
 }
 
 // Patch app/build.gradle: stable debug signing + versionCode/versionName from env.
