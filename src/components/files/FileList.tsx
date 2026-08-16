@@ -190,7 +190,6 @@ export function FileListView({
   );
 }
 
-
 export const FileRow = memo(function FileRow({
   entry,
   parent,

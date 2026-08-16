@@ -372,8 +372,6 @@ function PdfToolsPage() {
       {/* Annonce native (APK Android uniquement) */}
       <NativeAdSlot id="pdf-tools" height={260} className="mt-1" />
 
-
-
       <BottomSheetDefaultsProvider fullScreen>
         <ToolSheet tool={tool} onClose={() => setTool(null)} />
       </BottomSheetDefaultsProvider>

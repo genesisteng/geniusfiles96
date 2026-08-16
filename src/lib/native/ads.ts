@@ -47,7 +47,9 @@ export function areAdsAvailable(): boolean {
 
 /** Prépare le SDK au démarrage (initialisation en tâche de fond côté natif). */
 export function initAds(): void {
-  void plugin()?.initialize().catch(() => undefined);
+  void plugin()
+    ?.initialize()
+    .catch(() => undefined);
 }
 
 /** Positionne (et charge au besoin) l'annonce de l'emplacement donné. */
