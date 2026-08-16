@@ -23,6 +23,7 @@ import { SplashOverlay, SPLASH_ART_SRCSET } from "../components/brand/SplashOver
 import { OnboardingOverlay } from "../components/onboarding/OnboardingOverlay";
 import { markStartupSignal, onStartupReady } from "../lib/startup/boot";
 import { installNativeBehaviors } from "../lib/native/web-behaviors";
+import { installCrashReporting } from "../lib/native/crashlytics";
 import { prefetchRoots } from "../lib/files/fs";
 // Bootstrap personnalisation (thème / densité / animations / barres système).
 import "../lib/personalization/applier";
