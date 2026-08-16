@@ -1235,6 +1235,7 @@ export function FilesPage() {
           selectionMode={selectionMode || pick !== null}
           isSelected={isEntrySelected}
           onToggleSelect={toggleSelect}
+          showAd={pick === null}
         />
       ) : (
         <RootView roots={roots} onOpenRoot={openRoot} pick={pick} />
@@ -1449,6 +1450,7 @@ function DirectoryView({
   selectionMode,
   isSelected,
   onToggleSelect,
+  showAd,
 }: {
   listing: ListingState;
   parent: PathRef;
@@ -1463,6 +1465,8 @@ function DirectoryView({
   selectionMode: boolean;
   isSelected: (e: FileEntry) => boolean;
   onToggleSelect: (e: FileEntry) => void;
+  /** Bannière en fin de liste (jamais pendant une session de sélection). */
+  showAd?: boolean;
 }) {
   return (
     <div className="animate-in-up -mx-4 pt-1">
@@ -1504,6 +1508,14 @@ function DirectoryView({
             onToggleSelect={onToggleSelect}
           />
         )
+      ) : null}
+
+      {/* Publicité en fin de contenu : uniquement quand le dossier a des
+          éléments, jamais sur un écran vide ou en erreur. */}
+      {showAd && listing.status === "ready" && entries.length > 0 ? (
+        <div className="px-4 pt-3">
+          <InlineAdBanner slot="files" />
+        </div>
       ) : null}
     </div>
   );
