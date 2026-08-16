@@ -227,9 +227,10 @@ export async function runEngineTool(toolName: string, rawInput: unknown): Promis
   // le prompt, la réponse, les chemins ni le contenu analysé.
   trackEvent("ai_usage", {
     action: "tool",
-    tool: typeof (rawInput as { type?: unknown })?.type === "string"
-      ? String((rawInput as { type?: unknown }).type)
-      : "unknown",
+    tool:
+      typeof (rawInput as { type?: unknown })?.type === "string"
+        ? String((rawInput as { type?: unknown }).type)
+        : "unknown",
     result: out.ok ? "success" : "failure",
   });
   return out;

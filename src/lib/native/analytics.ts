@@ -22,7 +22,11 @@ import { isNativeRuntime, nativePlatform } from "./platform";
 
 type AnalyticsBridge = {
   logScreenView(options: { screen: string }): Promise<void>;
-  logEvent(options: { name: string; params?: Record<string, string>; count?: number }): Promise<void>;
+  logEvent(options: {
+    name: string;
+    params?: Record<string, string>;
+    count?: number;
+  }): Promise<void>;
   setUserProperty(options: { name: string; value: string }): Promise<void>;
   setEnabled(options: { enabled: boolean }): Promise<void>;
   isAvailable(): Promise<{ available: boolean }>;
@@ -197,7 +201,8 @@ export function trackEvent(name: AnalyticsEvent, params: AnalyticsParams = {}): 
   if (tool) out["tool"] = tool;
   if (kind) out["kind"] = kind;
   if (result) out["result"] = result;
-  const count = typeof params.count === "number" && params.count > 0 ? bucket(params.count) : undefined;
+  const count =
+    typeof params.count === "number" && params.count > 0 ? bucket(params.count) : undefined;
   void p.logEvent({ name, params: out, count }).catch(() => {});
 }
 
