@@ -12,6 +12,8 @@ export default {
   "nav.automations": "Automatisierungen",
   "nav.settings": "Einstellungen",
 
+  "ads.label": "Anzeige",
+
   "action.ok": "OK",
   "action.cancel": "Abbrechen",
   "action.close": "Schließen",

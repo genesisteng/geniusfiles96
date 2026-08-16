@@ -6,6 +6,8 @@ export default {
   "nav.assistant": "Genius AI",
   "nav.automations": "Otomasyonlar",
   "nav.settings": "Ayarlar",
+
+  "ads.label": "Reklam",
   "action.ok": "Tamam",
   "action.cancel": "İptal",
   "action.close": "Kapat",

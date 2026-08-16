@@ -178,6 +178,7 @@ import {
   type ArchiveFormat,
 } from "@/lib/files/archive";
 import { useT, t as translate } from "@/lib/i18n";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -1920,6 +1921,11 @@ function RootView({
           </div>
         </section>
       )}
+
+      {/* Publicité : dernier bloc du contenu, après les outils et avant la
+          navigation. Elle occupe sa propre bande et disparaît totalement
+          si aucune annonce n'est disponible. */}
+      {pick ? null : <InlineAdBanner slot="home" />}
 
       {/* Sélection officielle GeniusFiles, filtrée par éditeur. */}
       <FileSourcePicker
