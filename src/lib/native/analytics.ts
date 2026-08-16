@@ -32,19 +32,24 @@ type AnalyticsBridge = {
   isAvailable(): Promise<{ available: boolean }>;
 };
 
-let bridge: AnalyticsBridge | null | undefined;
+let bridge: AnalyticsBridge | null = null;
 
+/**
+ * Résolution paresseuse du pont. Le résultat n'est mis en cache QUE s'il est
+ * trouvé : au tout premier rendu, `window.Capacitor.Plugins` peut ne pas
+ * encore être peuplé, et mémoriser `null` couperait définitivement la mesure
+ * (symptôme observé : utilisateurs actifs remontés par le SDK, mais aucun
+ * `screen_view` ni événement).
+ */
 function plugin(): AnalyticsBridge | null {
-  if (bridge !== undefined) return bridge;
-  if (!isNativeRuntime() || nativePlatform() !== "android") {
-    bridge = null;
-    return null;
-  }
+  if (bridge) return bridge;
+  if (!isNativeRuntime() || nativePlatform() !== "android") return null;
   const plugins = (window as unknown as { Capacitor?: { Plugins?: Record<string, unknown> } })
     .Capacitor?.Plugins;
   bridge = (plugins?.["GeniusFilesAnalytics"] as AnalyticsBridge | undefined) ?? null;
   return bridge;
 }
+
 
 /**
  * Liste blanche des écrans. Toute route inconnue est agrégée sous `autre` :
