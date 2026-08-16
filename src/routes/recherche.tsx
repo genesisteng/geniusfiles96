@@ -501,6 +501,12 @@ function RecentsAndSuggestions({
           </button>
         ))}
       </div>
+
+      {/* Écran initial : publicité en zone secondaire, tout en bas du
+          contenu, loin du champ de recherche et du clavier. */}
+      <div className="mt-4">
+        <InlineAdBanner slot="search" />
+      </div>
     </>
   );
 }
