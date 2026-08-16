@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-ClxmOghy.js","assets/dist-DE1p5HKj.js"])))=>i.map(i=>d[i]);
+import{n as e}from"./dist-DE1p5HKj.js";import{t}from"./preload-helper-zJ_50EbN.js";var n=e(`Preferences`,{web:()=>t(()=>import(`./web-ClxmOghy.js`).then(e=>new e.PreferencesWeb),__vite__mapDeps([0,1]))});export{n as Preferences};
