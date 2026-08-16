@@ -27,6 +27,22 @@ class GeniusFilesApplication : Application() {
             }
         )
         initCrashlyticsKeys()
+        initMobileAds()
+    }
+
+    /**
+     * SDK Google Mobile Ads (Next-Gen). L'initialisation est faite hors du
+     * thread principal : elle effectue des I/O disque et réseau et
+     * provoquerait sinon un ANR au démarrage.
+     */
+    private fun initMobileAds() {
+        Thread {
+            try {
+                MobileAds.initialize(this)
+            } catch (_: Throwable) {
+                /* Publicité indisponible — l'application reste utilisable */
+            }
+        }.apply { name = "gf-ads-init" }.start()
     }
 
     /**
