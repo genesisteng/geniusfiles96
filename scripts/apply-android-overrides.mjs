@@ -230,7 +230,6 @@ if (existsSync(gradlePath)) {
     console.log("✓ Crashlytics Gradle plugin applied in app/build.gradle.");
   }
 
-
   await writeFile(gradlePath, gradle, "utf8");
   console.log(`✓ build.gradle patched (versionCode=${versionCode}, versionName=${versionName}).`);
 }
