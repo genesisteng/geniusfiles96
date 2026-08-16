@@ -132,13 +132,13 @@ if (existsSync(gradlePath)) {
   // Kotlin inherits 21 and compileReleaseKotlin aborts before compiling.
   if (!gradle.includes("GENIUSFILES_JVM_TARGET")) {
     const jvmTargetBlock = `
-    // GENIUSFILES_JVM_TARGET — keep javac and Kotlin aligned in CI.
+    // GENIUSFILES_JVM_TARGET — keep javac and Kotlin aligned in CI (Capacitor forces 21).
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 `;
     gradle = gradle.replace(/android\s*\{/, (m) => `${m}\n${jvmTargetBlock}`);
@@ -336,10 +336,10 @@ if (!appGradle.includes("org.jetbrains.kotlin.android")) {
 }
 if (
   !appGradle.includes("GENIUSFILES_JVM_TARGET") ||
-  !appGradle.includes("sourceCompatibility JavaVersion.VERSION_17") ||
-  !appGradle.includes('jvmTarget = "17"')
+  !appGradle.includes("sourceCompatibility JavaVersion.VERSION_21") ||
+  !appGradle.includes('jvmTarget = "21"')
 ) {
-  console.error("✗ Android Java and Kotlin compilers must both target JVM 17.");
+  console.error("✗ Android Java and Kotlin compilers must both target JVM 21.");
   process.exit(1);
 }
 if (!existsSync(kotlinMain)) {
