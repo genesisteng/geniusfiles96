@@ -1921,6 +1921,11 @@ function RootView({
         </section>
       )}
 
+      {/* Publicité : dernier bloc du contenu, après les outils et avant la
+          navigation. Elle occupe sa propre bande et disparaît totalement
+          si aucune annonce n'est disponible. */}
+      {pick ? null : <InlineAdBanner slot="home" />}
+
       {/* Sélection officielle GeniusFiles, filtrée par éditeur. */}
       <FileSourcePicker
         open={editorPick !== null}
