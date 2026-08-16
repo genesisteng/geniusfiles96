@@ -32,14 +32,18 @@ type AnalyticsBridge = {
   isAvailable(): Promise<{ available: boolean }>;
 };
 
-let bridge: AnalyticsBridge | null | undefined;
+let bridge: AnalyticsBridge | null = null;
 
+/**
+ * Résolution paresseuse du pont. Le résultat n'est mis en cache QUE s'il est
+ * trouvé : au tout premier rendu, `window.Capacitor.Plugins` peut ne pas
+ * encore être peuplé, et mémoriser `null` couperait définitivement la mesure
+ * (symptôme observé : utilisateurs actifs remontés par le SDK, mais aucun
+ * `screen_view` ni événement).
+ */
 function plugin(): AnalyticsBridge | null {
-  if (bridge !== undefined) return bridge;
-  if (!isNativeRuntime() || nativePlatform() !== "android") {
-    bridge = null;
-    return null;
-  }
+  if (bridge) return bridge;
+  if (!isNativeRuntime() || nativePlatform() !== "android") return null;
   const plugins = (window as unknown as { Capacitor?: { Plugins?: Record<string, unknown> } })
     .Capacitor?.Plugins;
   bridge = (plugins?.["GeniusFilesAnalytics"] as AnalyticsBridge | undefined) ?? null;
@@ -91,20 +95,41 @@ export function trackScreen(pathname: string): void {
 let installed = false;
 
 /**
- * Initialise la mesure : deux propriétés techniques + l'écran courant.
- * Aucun minuteur, aucune I/O, aucun écouteur permanent : coût négligeable.
+ * Initialise la mesure : collecte activée, deux propriétés techniques,
+ * l'écran courant. Si le pont natif n'est pas encore exposé par Capacitor au
+ * premier appel, l'installation est simplement retentée un peu plus tard
+ * (quelques essais espacés, puis abandon) : sans cela l'application ne
+ * remontait que les utilisateurs actifs, sans aucun écran ni événement.
  */
 export function installAnalytics(): void {
   if (installed || typeof window === "undefined") return;
   const p = plugin();
-  if (!p) return;
+  if (!p) {
+    retryInstall();
+    return;
+  }
   installed = true;
 
+  void p.setEnabled({ enabled: true }).catch(() => {});
   const language = (navigator.language || "unknown").slice(0, 12).replace(/[^\w-]/g, "");
   void p.setUserProperty({ name: "app_language", value: language }).catch(() => {});
   void p.setUserProperty({ name: "app_version", value: __APP_VERSION__ }).catch(() => {});
   trackScreen(window.location.pathname);
   trackEvent("app_open");
+}
+
+let retries = 0;
+let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Le pont Capacitor peut être exposé après le premier rendu React. */
+function retryInstall(): void {
+  if (installed || retryTimer !== undefined || retries >= 5) return;
+  if (!isNativeRuntime()) return;
+  retries += 1;
+  retryTimer = setTimeout(() => {
+    retryTimer = undefined;
+    installAnalytics();
+  }, 400 * retries);
 }
 
 /* ────────────────────────────────────────────────────────────────
