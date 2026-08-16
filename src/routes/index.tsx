@@ -89,7 +89,6 @@ import { isPackageEntry } from "@/lib/files/package";
 import { openPackageSheet } from "@/lib/files/package-sheet-store";
 import { openWithSystem } from "@/lib/viewer/openWith";
 import { audioEditorSearch } from "@/lib/audio/routes";
-import { AdBanner } from "@/components/ads/AdBanner";
 import { FileSourcePicker } from "@/components/files/FileSourcePicker";
 import { PhotoEditor } from "@/components/photo/PhotoEditor";
 import { sourceUrlOf } from "@/lib/viewer/source";
@@ -1919,8 +1918,6 @@ function RootView({
               </button>
             ))}
           </div>
-          {/* Bannière AdMob (APK uniquement) — juste sous les outils. */}
-          <AdBanner className="mt-3" />
         </section>
       )}
 

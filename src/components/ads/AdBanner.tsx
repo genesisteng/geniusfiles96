@@ -1,39 +1,44 @@
 /**
- * Emplacement publicitaire ancré en bas de l'écran.
+ * Emplacement publicitaire réutilisable (bannière adaptative AdMob).
  *
- * La bannière native est posée juste au-dessus de la barre de navigation et
- * ne bouge plus pendant le défilement. L'espace qu'elle occupe est réservé
- * dans la mise en page (variable CSS `--gf-ad-h`), donc elle ne recouvre ni
- * le contenu ni la navigation. Sur le web (aperçu Lovable, SSR) rien n'est
- * rendu : aucun espace vide, aucune régression visuelle.
+ * Ce composant n'est posé dans aucun écran pour l'instant : il constitue la
+ * base propre pour les prochains emplacements. Règles appliquées :
+ *  - rien n'est rendu hors APK Android, sur un écran sans publicité
+ *    (coffre-fort…) ou pendant une opération importante ;
+ *  - aucune hauteur n'est réservée tant qu'aucune annonce n'est réellement
+ *    chargée (pas d'espace vide en cas d'échec ou sans connexion) ;
+ *  - la bannière est ancrée au-dessus de la barre de navigation, ne bouge
+ *    pas au défilement, ne recouvre rien et n'intercepte aucun geste ;
+ *  - toute erreur est silencieuse : l'application reste utilisable.
  */
 import { useEffect, useRef, useState } from "react";
 
-import { adsAvailable, removeBanner, showBannerAt } from "@/lib/native/ads";
+import { useAdSlot } from "@/lib/ads/useAdSlot";
+import { TEST_BANNER_UNIT_ID } from "@/lib/ads/policy";
+import { onBannerStatus, removeBanner, showBannerAt } from "@/lib/native/ads";
 
 type Props = {
-  /** Bloc d'annonces AdMob ; par défaut le bloc de test Google. */
+  /** Identifiant logique de l'emplacement (pour la politique par écran). */
+  slot?: string;
+  /** Bloc d'annonces AdMob ; par défaut le bloc de TEST officiel Google. */
   unitId?: string;
   className?: string;
 };
 
-export function AdBanner({ unitId }: Props) {
+export function AdBanner({ slot = "default", unitId = TEST_BANNER_UNIT_ID }: Props) {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const [height, setHeight] = useState(50);
-  const [enabled, setEnabled] = useState(false);
-
-  // Le pont natif n'est pas encore peuplé au tout premier rendu.
-  useEffect(() => {
-    if (adsAvailable()) {
-      setEnabled(true);
-      return;
-    }
-    const timer = window.setTimeout(() => setEnabled(adsAvailable()), 800);
-    return () => window.clearTimeout(timer);
-  }, []);
+  const allowed = useAdSlot(slot);
+  const [height, setHeight] = useState(0);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!allowed) return;
+    return onBannerStatus(({ loaded, height: h }) => {
+      setHeight(loaded && h > 0 ? h : 0);
+    });
+  }, [allowed]);
+
+  useEffect(() => {
+    if (!allowed) return;
     const host = hostRef.current;
     if (!host) return;
 
@@ -47,9 +52,7 @@ export function AdBanner({ unitId }: Props) {
       const key = `${Math.round(rect.left)}:${Math.round(rect.top)}:${Math.round(rect.width)}`;
       if (key === last) return;
       last = key;
-      void showBannerAt({ x: rect.left, y: rect.top, width: rect.width, unitId }).then((h) => {
-        if (!disposed && h > 0) setHeight(h);
-      });
+      void showBannerAt({ x: rect.left, y: rect.top, width: rect.width, unitId });
     };
 
     // Position fixe : seuls un redimensionnement ou un changement de hauteur
@@ -63,25 +66,26 @@ export function AdBanner({ unitId }: Props) {
       disposed = true;
       ro.disconnect();
       window.removeEventListener("resize", sync);
+      setHeight(0);
       void removeBanner();
     };
-  }, [enabled, unitId]);
+  }, [allowed, unitId]);
 
-  // Réserve la hauteur en bas de page pour ne rien recouvrir.
+  // Réserve la hauteur en bas de page uniquement si une annonce est affichée.
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--gf-ad-h", enabled ? `${height}px` : "0px");
+    root.style.setProperty("--gf-ad-h", height > 0 ? `${height}px` : "0px");
     return () => root.style.setProperty("--gf-ad-h", "0px");
-  }, [enabled, height]);
+  }, [height]);
 
-  if (!enabled) return null;
+  if (!allowed) return null;
 
   return (
     <div
       ref={hostRef}
       aria-hidden="true"
       className="pointer-events-none fixed inset-x-0 z-30 mx-auto max-w-[560px] px-4"
-      style={{ bottom: "calc(5.25rem + env(safe-area-inset-bottom))", height }}
+      style={{ bottom: "calc(5.25rem + env(safe-area-inset-bottom))", height: height || 50 }}
     />
   );
 }
