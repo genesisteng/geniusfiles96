@@ -191,6 +191,17 @@ if (existsSync(gradlePath)) {
   // d'AndroidX Biometric, absent du projet généré par `cap add android`.
   // Sans cette dépendance le module ne compile pas et l'APK repart sans
   // biométrie ("non disponible sur cet appareil").
+  // Google Mobile Ads (annonces natives avancées) : absent du projet
+  // généré par `cap add android`. Sans cette dépendance, le plugin
+  // GeniusFilesAdsPlugin ne compile pas.
+  if (!gradle.includes("play-services-ads")) {
+    gradle = gradle.replace(
+      /dependencies\s*\{/,
+      (m) => `${m}\n    implementation "com.google.android.gms:play-services-ads:25.4.0"\n`,
+    );
+    console.log("\u2713 play-services-ads dependency added to app/build.gradle.");
+  }
+
   if (!gradle.includes("androidx.biometric:biometric")) {
     gradle = gradle.replace(
       /dependencies\s*\{/,
