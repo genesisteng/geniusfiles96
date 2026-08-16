@@ -25,6 +25,7 @@ import { markStartupSignal, onStartupReady } from "../lib/startup/boot";
 import { installNativeBehaviors } from "../lib/native/web-behaviors";
 import { installCrashReporting } from "../lib/native/crashlytics";
 import { installAnalytics, trackScreen } from "../lib/native/analytics";
+import { initAds } from "../lib/native/ads";
 import { prefetchRoots } from "../lib/files/fs";
 // Bootstrap personnalisation (thème / densité / animations / barres système).
 import "../lib/personalization/applier";
@@ -293,6 +294,8 @@ function RootComponent() {
   // fournit seul sessions, versions, appareils, langues et pays.
   useEffect(() => {
     installAnalytics();
+    // SDK Google Mobile Ads : initialisé en tâche de fond côté natif.
+    initAds();
     trackScreen(router.state.location.pathname);
     return router.subscribe("onResolved", (event) => {
       trackScreen(event.toLocation.pathname);
