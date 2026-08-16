@@ -24,6 +24,7 @@ import { OnboardingOverlay } from "../components/onboarding/OnboardingOverlay";
 import { markStartupSignal, onStartupReady } from "../lib/startup/boot";
 import { installNativeBehaviors } from "../lib/native/web-behaviors";
 import { installCrashReporting } from "../lib/native/crashlytics";
+import { installAnalytics, trackScreen } from "../lib/native/analytics";
 import { prefetchRoots } from "../lib/files/fs";
 // Bootstrap personnalisation (thème / densité / animations / barres système).
 import "../lib/personalization/applier";
