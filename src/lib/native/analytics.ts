@@ -50,7 +50,6 @@ function plugin(): AnalyticsBridge | null {
   return bridge;
 }
 
-
 /**
  * Liste blanche des écrans. Toute route inconnue est agrégée sous `autre` :
  * il est donc impossible qu'un identifiant, un nom de fichier ou un chemin
@@ -132,7 +131,6 @@ function retryInstall(): void {
     installAnalytics();
   }, 400 * retries);
 }
-
 
 /* ────────────────────────────────────────────────────────────────
    Événements de fonctionnalités
