@@ -33,6 +33,7 @@ class GeniusFilesAdsPlugin : Plugin() {
     private var adView: AdView? = null
     private var loadedUnitId: String? = null
     private var lastWidthDp: Int = 0
+    private var adLoaded: Boolean = false
 
     /** Hauteur (dp) réservée par la bannière adaptative pour cette largeur. */
     private fun adSizeFor(widthDp: Int): AdSize =
@@ -69,6 +70,7 @@ class GeniusFilesAdsPlugin : Plugin() {
                 val needsReload = adView == null || loadedUnitId != unitId || lastWidthDp != widthDp
                 if (needsReload) {
                     releaseAdView()
+                    adLoaded = false
                     val view = AdView(activity)
                     root.addView(view)
                     adView = view
@@ -86,7 +88,10 @@ class GeniusFilesAdsPlugin : Plugin() {
                         lp.leftMargin = (xDp * density).toInt()
                         lp.topMargin = (yDp * density).toInt()
                     }
-                    view.visibility = View.VISIBLE
+                    // Tant qu'aucune annonce n'est chargée, la vue reste
+                    // invisible : aucun cadre vide, aucune interception de
+                    // clic, aucun recouvrement du contenu.
+                    view.visibility = if (adLoaded) View.VISIBLE else View.INVISIBLE
                     view.requestLayout()
                 }
                 call.resolve(JSObject().put("height", heightDp).put("shown", true))
@@ -99,6 +104,24 @@ class GeniusFilesAdsPlugin : Plugin() {
         }
     }
 
+    private fun adSizeHeight(widthDp: Int): Int = try {
+        adSizeFor(widthDp).height
+    } catch (_: Throwable) {
+        50
+    }
+
+    /** Informe la page du résultat du chargement (hauteur réelle à réserver). */
+    private fun notifyStatus(loaded: Boolean, heightDp: Int) {
+        try {
+            notifyListeners(
+                "bannerStatus",
+                JSObject().put("loaded", loaded).put("height", heightDp),
+            )
+        } catch (_: Throwable) {
+            /* pont fermé */
+        }
+    }
+
     private fun loadInto(view: AdView, unitId: String, widthDp: Int) {
         val request = BannerAdRequest.Builder(unitId, adSizeFor(widthDp)).build()
         view.loadAd(
@@ -106,10 +129,17 @@ class GeniusFilesAdsPlugin : Plugin() {
             object : AdLoadCallback<BannerAd> {
                 override fun onAdLoaded(ad: BannerAd) {
                     ad.adEventCallback = object : BannerAdEventCallback {}
+                    adLoaded = true
+                    activity.runOnUiThread { view.visibility = View.VISIBLE }
+                    notifyStatus(true, adSizeHeight(widthDp))
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    /* Aucun blocage de l'interface : l'espace reste vide. */
+                    // Réseau absent ou remplissage vide : l'application
+                    // continue normalement et aucun espace n'est réservé.
+                    adLoaded = false
+                    activity.runOnUiThread { view.visibility = View.INVISIBLE }
+                    notifyStatus(false, 0)
                 }
             },
         )
@@ -143,6 +173,7 @@ class GeniusFilesAdsPlugin : Plugin() {
         adView = null
         loadedUnitId = null
         lastWidthDp = 0
+        adLoaded = false
     }
 
     override fun handleOnDestroy() {

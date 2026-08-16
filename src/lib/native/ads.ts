@@ -84,3 +84,44 @@ export async function removeBanner(): Promise<void> {
     /* pont indisponible */
   }
 }
+
+/**
+ * Écoute le résultat de chargement de la bannière (chargée / échouée).
+ * Hors runtime natif, l'abonnement est un no-op.
+ */
+export function onBannerStatus(
+  handler: (status: { loaded: boolean; height: number }) => void,
+): () => void {
+  if (!plugin()) return () => {};
+  const capacitor = (
+    window as unknown as {
+      Capacitor?: {
+        Plugins?: Record<
+          string,
+          { addListener?: (e: string, cb: (data: unknown) => void) => unknown } | undefined
+        >;
+      };
+    }
+  ).Capacitor;
+  const api = capacitor?.Plugins?.["GeniusFilesAds"];
+  if (!api?.addListener) return () => {};
+  let handle: { remove?: () => void } | undefined;
+  try {
+    const result = api.addListener("bannerStatus", (data) => {
+      const status = data as { loaded?: boolean; height?: number };
+      handler({ loaded: Boolean(status?.loaded), height: Number(status?.height ?? 0) });
+    });
+    void Promise.resolve(result).then((h) => {
+      handle = h as { remove?: () => void };
+    });
+  } catch {
+    return () => {};
+  }
+  return () => {
+    try {
+      handle?.remove?.();
+    } catch {
+      /* pont fermé */
+    }
+  };
+}
