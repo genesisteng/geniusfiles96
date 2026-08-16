@@ -30,6 +30,7 @@ import type { PathRef } from "./types";
 import { toAbsolutePath, mockResolve, type MockNode } from "./fs";
 import { recordOperation } from "./history";
 import { t } from "@/lib/i18n";
+import { trackEvent } from "@/lib/native/analytics";
 import { loadTrashRetention, markTrashPurged, loadTrashLastPurgeAt } from "./preferences";
 
 export type TrashItem = {
@@ -210,7 +211,7 @@ export async function usageTrash(): Promise<{ count: number; bytes: number }> {
   return { count: items.length, bytes: totalBytes };
 }
 
-export async function restoreItems(
+async function restoreItemsImpl(
   items: TrashItem[],
   opts: RestoreOptions = {},
 ): Promise<RestoreOutcome> {
@@ -320,7 +321,7 @@ export async function restoreItems(
   return { restored, failed };
 }
 
-export async function permanentDelete(items: TrashItem[]): Promise<{
+async function permanentDeleteImpl(items: TrashItem[]): Promise<{
   deleted: number;
   failed: string[];
 }> {
@@ -360,7 +361,7 @@ export async function permanentDelete(items: TrashItem[]): Promise<{
   return { deleted: items.length, failed: [] };
 }
 
-export async function emptyTrash(): Promise<{ deleted: number; failed: number }> {
+async function emptyTrashImpl(): Promise<{ deleted: number; failed: number }> {
   if (isAndroidNative()) {
     const p = nativePlugin();
     if (!p) return { deleted: 0, failed: 0 };
@@ -428,4 +429,43 @@ function parseMockPath(abs: string): PathRef | null {
 
 export function trashAbsPath(): string {
   return `${toAbsolutePath({ rootId: "internal", segments: [] })}/.GeniusFilesTrash`;
+}
+
+/* Mesure d'usage : type d'action sur la corbeille, issue et volume
+   arrondi. Aucun nom, chemin ni contenu n'est transmis. */
+
+export async function restoreItems(
+  items: TrashItem[],
+  opts: RestoreOptions = {},
+): Promise<RestoreOutcome> {
+  const res = await restoreItemsImpl(items, opts);
+  trackEvent("trash_action", {
+    action: "restore",
+    result: res.failed.length === 0 ? "success" : res.restored > 0 ? "partial" : "failure",
+    count: res.restored,
+  });
+  return res;
+}
+
+export async function permanentDelete(items: TrashItem[]): Promise<{
+  deleted: number;
+  failed: string[];
+}> {
+  const res = await permanentDeleteImpl(items);
+  trackEvent("trash_action", {
+    action: "delete_permanent",
+    result: res.failed.length === 0 ? "success" : res.deleted > 0 ? "partial" : "failure",
+    count: res.deleted,
+  });
+  return res;
+}
+
+export async function emptyTrash(): Promise<{ deleted: number; failed: number }> {
+  const res = await emptyTrashImpl();
+  trackEvent("trash_action", {
+    action: "empty",
+    result: res.failed === 0 ? "success" : res.deleted > 0 ? "partial" : "failure",
+    count: res.deleted,
+  });
+  return res;
 }
