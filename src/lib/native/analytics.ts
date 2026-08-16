@@ -96,21 +96,43 @@ export function trackScreen(pathname: string): void {
 let installed = false;
 
 /**
- * Initialise la mesure : deux propriétés techniques + l'écran courant.
- * Aucun minuteur, aucune I/O, aucun écouteur permanent : coût négligeable.
+ * Initialise la mesure : collecte activée, deux propriétés techniques,
+ * l'écran courant. Si le pont natif n'est pas encore exposé par Capacitor au
+ * premier appel, l'installation est simplement retentée un peu plus tard
+ * (quelques essais espacés, puis abandon) : sans cela l'application ne
+ * remontait que les utilisateurs actifs, sans aucun écran ni événement.
  */
 export function installAnalytics(): void {
   if (installed || typeof window === "undefined") return;
   const p = plugin();
-  if (!p) return;
+  if (!p) {
+    retryInstall();
+    return;
+  }
   installed = true;
 
+  void p.setEnabled({ enabled: true }).catch(() => {});
   const language = (navigator.language || "unknown").slice(0, 12).replace(/[^\w-]/g, "");
   void p.setUserProperty({ name: "app_language", value: language }).catch(() => {});
   void p.setUserProperty({ name: "app_version", value: __APP_VERSION__ }).catch(() => {});
   trackScreen(window.location.pathname);
   trackEvent("app_open");
 }
+
+let retries = 0;
+let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Le pont Capacitor peut être exposé après le premier rendu React. */
+function retryInstall(): void {
+  if (installed || retryTimer !== undefined || retries >= 5) return;
+  if (!isNativeRuntime()) return;
+  retries += 1;
+  retryTimer = setTimeout(() => {
+    retryTimer = undefined;
+    installAnalytics();
+  }, 400 * retries);
+}
+
 
 /* ────────────────────────────────────────────────────────────────
    Événements de fonctionnalités
