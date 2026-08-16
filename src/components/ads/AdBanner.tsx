@@ -1,13 +1,15 @@
 /**
- * Emplacement publicitaire.
+ * Emplacement publicitaire ancré en bas de l'écran.
  *
- * Réserve un bloc dans la page et y superpose la bannière native AdMob à
- * l'emplacement exact du bloc. Sur le web (aperçu Lovable, SSR) rien n'est
+ * La bannière native est posée juste au-dessus de la barre de navigation et
+ * ne bouge plus pendant le défilement. L'espace qu'elle occupe est réservé
+ * dans la mise en page (variable CSS `--gf-ad-h`), donc elle ne recouvre ni
+ * le contenu ni la navigation. Sur le web (aperçu Lovable, SSR) rien n'est
  * rendu : aucun espace vide, aucune régression visuelle.
  */
 import { useEffect, useRef, useState } from "react";
 
-import { adsAvailable, hideBanner, removeBanner, showBannerAt } from "@/lib/native/ads";
+import { adsAvailable, removeBanner, showBannerAt } from "@/lib/native/ads";
 
 type Props = {
   /** Bloc d'annonces AdMob ; par défaut le bloc de test Google. */
@@ -15,9 +17,9 @@ type Props = {
   className?: string;
 };
 
-export function AdBanner({ unitId, className }: Props) {
+export function AdBanner({ unitId }: Props) {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(50);
   const [enabled, setEnabled] = useState(false);
 
   // Le pont natif n'est pas encore peuplé au tout premier rendu.
@@ -35,24 +37,13 @@ export function AdBanner({ unitId, className }: Props) {
     const host = hostRef.current;
     if (!host) return;
 
-    let frame = 0;
     let disposed = false;
-    let visible = true;
     let last = "";
 
     const sync = () => {
-      frame = 0;
       if (disposed) return;
       const rect = host.getBoundingClientRect();
-      const offScreen =
-        !visible || rect.width < 40 || rect.bottom < 0 || rect.top > window.innerHeight;
-      if (offScreen) {
-        if (last !== "hidden") {
-          last = "hidden";
-          void hideBanner();
-        }
-        return;
-      }
+      if (rect.width < 40) return;
       const key = `${Math.round(rect.left)}:${Math.round(rect.top)}:${Math.round(rect.width)}`;
       if (key === last) return;
       last = key;
@@ -61,37 +52,27 @@ export function AdBanner({ unitId, className }: Props) {
       });
     };
 
-    const schedule = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(sync);
-    };
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        visible = entries.some((e) => e.isIntersecting);
-        schedule();
-      },
-      { threshold: 0 },
-    );
-    io.observe(host);
-
-    const ro = new ResizeObserver(schedule);
+    // Position fixe : seuls un redimensionnement ou un changement de hauteur
+    // de bannière peuvent la déplacer — jamais le défilement.
+    const ro = new ResizeObserver(sync);
     ro.observe(host);
-
-    window.addEventListener("scroll", schedule, { passive: true, capture: true });
-    window.addEventListener("resize", schedule);
-    schedule();
+    window.addEventListener("resize", sync);
+    sync();
 
     return () => {
       disposed = true;
-      if (frame) window.cancelAnimationFrame(frame);
-      io.disconnect();
       ro.disconnect();
-      window.removeEventListener("scroll", schedule, { capture: true });
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", sync);
       void removeBanner();
     };
   }, [enabled, unitId]);
+
+  // Réserve la hauteur en bas de page pour ne rien recouvrir.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--gf-ad-h", enabled ? `${height}px` : "0px");
+    return () => root.style.setProperty("--gf-ad-h", "0px");
+  }, [enabled, height]);
 
   if (!enabled) return null;
 
@@ -99,8 +80,8 @@ export function AdBanner({ unitId, className }: Props) {
     <div
       ref={hostRef}
       aria-hidden="true"
-      className={className}
-      style={{ height: height > 0 ? height : 50 }}
+      className="pointer-events-none fixed inset-x-0 z-30 mx-auto max-w-[560px] px-4"
+      style={{ bottom: "calc(5.25rem + env(safe-area-inset-bottom))", height }}
     />
   );
 }
