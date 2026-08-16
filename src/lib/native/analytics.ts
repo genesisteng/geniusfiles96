@@ -22,6 +22,7 @@ import { isNativeRuntime, nativePlatform } from "./platform";
 
 type AnalyticsBridge = {
   logScreenView(options: { screen: string }): Promise<void>;
+  logEvent(options: { name: string; params?: Record<string, string>; count?: number }): Promise<void>;
   setUserProperty(options: { name: string; value: string }): Promise<void>;
   setEnabled(options: { enabled: boolean }): Promise<void>;
   isAvailable(): Promise<{ available: boolean }>;
