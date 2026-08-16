@@ -55,6 +55,12 @@ import {
 } from "@/lib/i18n";
 import { clearThumbnailCache } from "@/lib/native/thumbnails";
 import { sweepTempFiles } from "@/lib/native/temp-sweep";
+/* ⚠️ TEMPORAIRE — validation Crashlytics, à retirer après le test. */
+import {
+  isCrashTestAvailable,
+  sendTestNonFatal,
+  triggerTestCrash,
+} from "@/lib/native/crash-test";
 
 /* Injectée au build depuis `package.json` (voir vite.config.ts). */
 const APP_VERSION = __APP_VERSION__;
@@ -254,6 +260,11 @@ function SettingsPage() {
             href="mailto:support@geniusfiles.app"
           />
         </SettingsCard>
+
+        {/* ⚠️ TEMPORAIRE — validation Firebase Crashlytics. À SUPPRIMER
+            (cette carte + src/lib/native/crash-test.ts + le greffon natif
+            GeniusFilesCrashTestPlugin.kt et son registerPlugin). */}
+        <CrashlyticsTestCard />
       </div>
 
       <p className="pb-4 text-center text-[11px] text-muted-foreground/70">
