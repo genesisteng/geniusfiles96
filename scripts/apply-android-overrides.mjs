@@ -127,6 +127,23 @@ if (existsSync(gradlePath)) {
     );
   }
 
+  // JDK 21 runs Gradle in CI, but Java and Kotlin must emit the same
+  // bytecode level. Without an explicit target, javac stays on 1.8 while
+  // Kotlin inherits 21 and compileReleaseKotlin aborts before compiling.
+  if (!gradle.includes("GENIUSFILES_JVM_TARGET")) {
+    const jvmTargetBlock = `
+    // GENIUSFILES_JVM_TARGET — keep javac and Kotlin aligned in CI.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+`;
+    gradle = gradle.replace(/android\s*\{/, (m) => `${m}\n${jvmTargetBlock}`);
+  }
+
   const versionCode = Number(
     process.env.ANDROID_VERSION_CODE || process.env.GITHUB_RUN_NUMBER || 1,
   );
@@ -315,6 +332,14 @@ if (!rootGradle.includes("org.jetbrains.kotlin:kotlin-gradle-plugin")) {
 }
 if (!appGradle.includes("org.jetbrains.kotlin.android")) {
   console.error("✗ Android app/build.gradle does not apply the Kotlin Android plugin.");
+  process.exit(1);
+}
+if (
+  !appGradle.includes("GENIUSFILES_JVM_TARGET") ||
+  !appGradle.includes("sourceCompatibility JavaVersion.VERSION_17") ||
+  !appGradle.includes('jvmTarget = "17"')
+) {
+  console.error("✗ Android Java and Kotlin compilers must both target JVM 17.");
   process.exit(1);
 }
 if (!existsSync(kotlinMain)) {
