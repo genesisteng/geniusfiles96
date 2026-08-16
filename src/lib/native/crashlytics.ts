@@ -60,7 +60,10 @@ export function sanitizeDiagnostic(input: unknown, max = 240): string {
     .replace(/"[^"]{0,400}"/g, '"[redacted]"')
     .replace(/'[^']{0,400}'/g, "'[redacted]'")
     // noms de fichiers isolés
-    .replace(/\b[\w.\- ]{1,80}\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|gif|webp|heic|mp[34]|m4a|wav|mkv|avi|mov|zip|rar|7z|apk|txt|csv|epub)\b/gi, "[file]")
+    .replace(
+      /\b[\w.\- ]{1,80}\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|gif|webp|heic|mp[34]|m4a|wav|mkv|avi|mov|zip|rar|7z|apk|txt|csv|epub)\b/gi,
+      "[file]",
+    )
     // longues séquences de chiffres (numéros, identifiants)
     .replace(/\b\d{6,}\b/g, "[num]");
   text = text.replace(/\s+/g, " ").trim();
@@ -99,9 +102,7 @@ export function recordNonFatal(error: unknown, context?: string): void {
   const name = sanitizeDiagnostic(err?.name ?? "Error", 60) || "Error";
   const base = err?.message ?? (typeof error === "string" ? error : "unknown");
   const message = sanitizeDiagnostic(context ? `${context}: ${base}` : base);
-  void p
-    .recordError({ name, message, stack: sanitizeStack(err?.stack) })
-    .catch(() => {});
+  void p.recordError({ name, message, stack: sanitizeStack(err?.stack) }).catch(() => {});
 }
 
 let installed = false;
