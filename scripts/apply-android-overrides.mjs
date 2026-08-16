@@ -95,6 +95,24 @@ if (existsSync(rootGradlePath)) {
     await writeFile(rootGradlePath, rootGradle, "utf8");
     console.log("✓ Google Services Gradle plugin enabled in android/build.gradle.");
   }
+  // Crashlytics : plug-in Gradle (upload des mappings + rapports NDK/ANR).
+  if (hasFirebase && !rootGradle.includes("firebase-crashlytics-gradle")) {
+    rootGradle = rootGradle.replace(
+      /classpath 'com\.google\.gms:google-services:[^']+'\n/,
+      (m) => `${m}        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'\n`,
+    );
+    await writeFile(rootGradlePath, rootGradle, "utf8");
+    console.log("✓ Crashlytics Gradle plugin enabled in android/build.gradle.");
+  }
+}
+
+// Sans configuration Firebase, le pont Crashlytics ne compile pas : il est
+// retiré du projet généré (l'app garde toutes ses autres fonctionnalités).
+if (!hasFirebase) {
+  console.error(
+    "✗ android-overrides/app/google-services.json is required: Crashlytics (stability monitoring) is compiled into the app.",
+  );
+  process.exit(1);
 }
 
 // Patch app/build.gradle: stable debug signing + versionCode/versionName from env.
@@ -182,21 +200,34 @@ if (existsSync(gradlePath)) {
     console.log("✓ androidx.biometric dependency added to app/build.gradle.");
   }
 
-  // Firebase : BoM + Analytics (aucune collecte personnalisée, aucun
-  // évènement applicatif envoyé par le code GeniusFiles).
+  // Firebase : BoM + Analytics (fil d'Ariane Crashlytics) + Crashlytics
+  // (crashs, erreurs non fatales, ANR). Aucun évènement applicatif custom,
+  // aucun nom/chemin de fichier, aucun contenu n'est envoyé par le code.
   if (hasFirebase && !gradle.includes("com.google.firebase:firebase-bom")) {
     gradle = gradle.replace(
       /dependencies\s*\{/,
       (m) =>
-        `${m}\n    implementation platform("com.google.firebase:firebase-bom:34.1.0")\n    implementation "com.google.firebase:firebase-analytics"\n`,
+        `${m}\n    implementation platform("com.google.firebase:firebase-bom:34.1.0")\n    implementation "com.google.firebase:firebase-analytics"\n    implementation "com.google.firebase:firebase-crashlytics"\n`,
     );
-    console.log("✓ Firebase BoM + Analytics added to app/build.gradle.");
+    console.log("✓ Firebase BoM + Analytics + Crashlytics added to app/build.gradle.");
+  } else if (hasFirebase && !gradle.includes("com.google.firebase:firebase-crashlytics")) {
+    gradle = gradle.replace(
+      /dependencies\s*\{/,
+      (m) => `${m}\n    implementation "com.google.firebase:firebase-crashlytics"\n`,
+    );
+    console.log("✓ Firebase Crashlytics dependency added to app/build.gradle.");
   }
   if (hasFirebase && !gradle.includes("com.google.gms.google-services")) {
     // Le plug-in s'applique en fin de fichier, comme recommandé par Google
     // pour la syntaxe `apply plugin:`.
     gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.gms.google-services'\n`;
     console.log("✓ google-services plugin applied in app/build.gradle.");
+  }
+  // Après google-services : le plug-in Crashlytics (mappings de
+  // dé-obfuscation, crashs natifs et ANR) lit sa configuration.
+  if (hasFirebase && !gradle.includes("com.google.firebase.crashlytics")) {
+    gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.firebase.crashlytics'\n`;
+    console.log("✓ Crashlytics Gradle plugin applied in app/build.gradle.");
   }
 
   await writeFile(gradlePath, gradle, "utf8");

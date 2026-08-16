@@ -23,6 +23,7 @@ import { SplashOverlay, SPLASH_ART_SRCSET } from "../components/brand/SplashOver
 import { OnboardingOverlay } from "../components/onboarding/OnboardingOverlay";
 import { markStartupSignal, onStartupReady } from "../lib/startup/boot";
 import { installNativeBehaviors } from "../lib/native/web-behaviors";
+import { installCrashReporting } from "../lib/native/crashlytics";
 import { prefetchRoots } from "../lib/files/fs";
 // Bootstrap personnalisation (thème / densité / animations / barres système).
 import "../lib/personalization/applier";
@@ -281,6 +282,10 @@ function RootComponent() {
   // Aucun menu contextuel de navigateur, aucune sélection de texte hors
   // champs de saisie : l'application se comporte comme une app Android.
   useEffect(() => installNativeBehaviors(), []);
+
+  // Surveillance de stabilité Android (Crashlytics) : erreurs JS non fatales
+  // uniquement, entièrement assainies. No-op hors runtime natif.
+  useEffect(() => installCrashReporting(), []);
 
   // Préchauffage des stockages : tâche NON critique. Elle est repoussée
   // après la fin du démarrage puis exécutée pendant un temps mort, afin de
