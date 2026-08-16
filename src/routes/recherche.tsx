@@ -20,6 +20,7 @@ import { Spinner } from "@/components/ui/states";
 import { BACK_PRIORITY, useBackHandler } from "@/lib/navigation/back-stack";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 import { IllustratedEmptyState } from "@/components/ui/IllustratedEmptyState";
 import { FileIcon } from "@/components/files/FileIcon";
 import { BottomSheet } from "@/components/files/BottomSheet";
@@ -593,6 +594,15 @@ function ResultsSection({
             id="search"
             description={t("search.empty.description", { query })}
           />
+        </div>
+      ) : null}
+
+      {/* Publicité : toujours après le contenu (dernier résultat ou état
+          vide), jamais au milieu des résultats. Se réduit à zéro sans
+          annonce ; masquée pendant la recherche pour éviter tout saut. */}
+      {!scanning && (results.length > 0 || showEmpty) ? (
+        <div className="mt-4">
+          <InlineAdBanner slot="search" />
         </div>
       ) : null}
     </>
