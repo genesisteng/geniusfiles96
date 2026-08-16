@@ -20,17 +20,16 @@ import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 /**
  * Bannière AdMob (GMA Next-Gen) ancrée à un emplacement DÉCIDÉ PAR LA PAGE.
  *
- * La WebView ne peut pas héberger de vue native : la bannière est donc une
- * `AdView` superposée à la WebView, positionnée aux coordonnées CSS que le
- * composant React lui transmet (rectangle du bloc réservé sous les outils
- * de l'accueil). Quand la page défile ou change, JS renvoie la position ;
- * quand le bloc disparaît, `hideBanner()` retire la vue.
+ * L'`AdView` est ajoutée DIRECTEMENT au conteneur de l'activité, à la taille
+ * exacte du bloc réservé par la page : aucune vue plein écran n'est posée
+ * au-dessus de la WebView (une telle superposition rendait l'interface
+ * invisible pendant le défilement). Quand la page défile, JS renvoie la
+ * nouvelle position ; quand le bloc sort de l'écran, la vue est masquée.
  *
  * Aucune donnée personnelle n'est transmise au SDK par ce pont.
  */
 @CapacitorPlugin(name = "GeniusFilesAds")
 class GeniusFilesAdsPlugin : Plugin() {
-    private var container: FrameLayout? = null
     private var adView: AdView? = null
     private var loadedUnitId: String? = null
     private var lastWidthDp: Int = 0
@@ -66,41 +65,30 @@ class GeniusFilesAdsPlugin : Plugin() {
         activity.runOnUiThread {
             try {
                 val root = activity.findViewById<ViewGroup>(android.R.id.content)
-                val frame = container ?: FrameLayout(activity).also {
-                    it.layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                    )
-                    // La superposition ne doit jamais intercepter le défilement
-                    // de la WebView : seuls les enfants (l'AdView) sont
-                    // cliquables.
-                    it.isClickable = false
-                    it.isFocusable = false
-                    root.addView(it)
-                    container = it
-                }
-                frame.visibility = View.VISIBLE
 
                 val needsReload = adView == null || loadedUnitId != unitId || lastWidthDp != widthDp
                 if (needsReload) {
                     releaseAdView()
                     val view = AdView(activity)
-                    frame.addView(view)
+                    root.addView(view)
                     adView = view
                     loadedUnitId = unitId
                     lastWidthDp = widthDp
                     loadInto(view, unitId, widthDp)
                 }
 
-                adView?.layoutParams = FrameLayout.LayoutParams(
-                    (widthDp * density).toInt(),
-                    (heightDp * density).toInt(),
-                    Gravity.TOP or Gravity.START,
-                ).also { lp ->
-                    lp.leftMargin = (xDp * density).toInt()
-                    lp.topMargin = (yDp * density).toInt()
+                adView?.let { view ->
+                    view.layoutParams = FrameLayout.LayoutParams(
+                        (widthDp * density).toInt(),
+                        (heightDp * density).toInt(),
+                        Gravity.TOP or Gravity.START,
+                    ).also { lp ->
+                        lp.leftMargin = (xDp * density).toInt()
+                        lp.topMargin = (yDp * density).toInt()
+                    }
+                    view.visibility = View.VISIBLE
+                    view.requestLayout()
                 }
-                adView?.requestLayout()
                 call.resolve(JSObject().put("height", heightDp).put("shown", true))
             } catch (t: Throwable) {
                 call.resolve(
@@ -130,7 +118,7 @@ class GeniusFilesAdsPlugin : Plugin() {
     @PluginMethod
     fun hideBanner(call: PluginCall) {
         activity.runOnUiThread {
-            container?.visibility = View.GONE
+            adView?.visibility = View.GONE
             call.resolve()
         }
     }
@@ -139,7 +127,6 @@ class GeniusFilesAdsPlugin : Plugin() {
     fun removeBanner(call: PluginCall) {
         activity.runOnUiThread {
             releaseAdView()
-            container?.visibility = View.GONE
             call.resolve()
         }
     }
