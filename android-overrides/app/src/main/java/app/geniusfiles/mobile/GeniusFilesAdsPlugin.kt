@@ -1,6 +1,7 @@
 package app.geniusfiles.mobile
 
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.getcapacitor.JSObject
@@ -8,7 +9,6 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
-import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
 import com.google.android.libraries.ads.mobile.sdk.banner.AdView
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd
@@ -16,167 +16,155 @@ import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdEventCallback
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
-import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 
 /**
- * GeniusFilesAds — pont natif Google Mobile Ads (GMA Next-Gen SDK).
+ * Bannière AdMob (GMA Next-Gen) ancrée à un emplacement DÉCIDÉ PAR LA PAGE.
  *
- * Le SDK est initialisé une seule fois, sur un thread d'arrière-plan
- * (exigence Google : une initialisation sur le thread principal peut
- * provoquer un ANR au démarrage).
+ * La WebView ne peut pas héberger de vue native : la bannière est donc une
+ * `AdView` superposée à la WebView, positionnée aux coordonnées CSS que le
+ * composant React lui transmet (rectangle du bloc réservé sous les outils
+ * de l'accueil). Quand la page défile ou change, JS renvoie la position ;
+ * quand le bloc disparaît, `hideBanner()` retire la vue.
  *
- * Exposé à la WebView :
- *   - initialize()  : initialisation explicite (idempotente).
- *   - showBanner()  : bannière adaptative ancrée en bas de l'écran.
- *   - hideBanner()  : retrait de la bannière + libération des ressources.
- *
- * Aucune donnée personnelle, aucun nom ni chemin de fichier n'est transmis
- * au SDK publicitaire.
+ * Aucune donnée personnelle n'est transmise au SDK par ce pont.
  */
 @CapacitorPlugin(name = "GeniusFilesAds")
 class GeniusFilesAdsPlugin : Plugin() {
-
-    companion object {
-        /** Identifiant d'application AdMob de GeniusFiles. */
-        const val APP_ID = "ca-app-pub-4007496300800778~9248149643"
-
-        /** Bloc d'annonces de TEST Google (bannière Android). */
-        const val TEST_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/9214589741"
-
-        @Volatile
-        private var initialized = false
-
-        /**
-         * Initialise le SDK sur un thread d'arrière-plan. Sans effet si
-         * l'initialisation a déjà été demandée.
-         */
-        fun initializeOnce(context: android.content.Context) {
-            if (initialized) return
-            initialized = true
-            Thread {
-                try {
-                    MobileAds.initialize(
-                        context.applicationContext,
-                        InitializationConfig.Builder(APP_ID).build(),
-                    ) {
-                        /* adaptateurs de médiation prêts */
-                    }
-                } catch (_: Throwable) {
-                    initialized = false
-                }
-            }
-                .start()
-        }
-    }
-
     private var container: FrameLayout? = null
     private var adView: AdView? = null
+    private var loadedUnitId: String? = null
+    private var lastWidthDp: Int = 0
+
+    /** Hauteur (dp) réservée par la bannière adaptative pour cette largeur. */
+    private fun adSizeFor(widthDp: Int): AdSize =
+        AdSize.getLargeAnchoredAdaptiveBannerAdSize(activity, widthDp.coerceIn(200, 1200))
 
     @PluginMethod
-    fun initialize(call: PluginCall) {
-        initializeOnce(context)
-        call.resolve(JSObject().put("initialized", true))
+    fun isAvailable(call: PluginCall) {
+        call.resolve(JSObject().put("available", true))
     }
 
+    /**
+     * Affiche (ou repositionne) la bannière.
+     *
+     * @param x,y,width  rectangle CSS px du bloc réservé dans la page.
+     * @param unitId     bloc d'annonces ; par défaut le bloc de TEST Google.
+     */
     @PluginMethod
     fun showBanner(call: PluginCall) {
-        val adUnitId = call.getString("adUnitId") ?: TEST_BANNER_AD_UNIT_ID
-        val widthDp = call.getInt("widthDp") ?: 360
-        val activity = activity ?: run {
-            call.reject("Activity unavailable")
-            return
+        val density = context.resources.displayMetrics.density
+        val xDp = (call.getDouble("x") ?: 0.0).toInt()
+        val yDp = (call.getDouble("y") ?: 0.0).toInt()
+        val widthDp = (call.getDouble("width") ?: 0.0).toInt().let { if (it <= 0) 360 else it }
+        val unitId = call.getString("unitId") ?: TEST_BANNER_UNIT_ID
+        val heightDp = try {
+            adSizeFor(widthDp).height
+        } catch (_: Throwable) {
+            50
         }
-        initializeOnce(context)
 
         activity.runOnUiThread {
             try {
-                removeBanner()
+                val root = activity.findViewById<ViewGroup>(android.R.id.content)
+                val frame = container ?: FrameLayout(activity).also {
+                    it.layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    )
+                    // La superposition ne doit jamais intercepter le défilement
+                    // de la WebView : seuls les enfants (l'AdView) sont
+                    // cliquables.
+                    it.isClickable = false
+                    it.isFocusable = false
+                    root.addView(it)
+                    container = it
+                }
+                frame.visibility = View.VISIBLE
 
-                val holder = FrameLayout(activity)
-                val holderParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                )
-                holderParams.gravity = Gravity.BOTTOM
-                activity.addContentView(holder, holderParams)
+                val needsReload = adView == null || loadedUnitId != unitId || lastWidthDp != widthDp
+                if (needsReload) {
+                    releaseAdView()
+                    val view = AdView(activity)
+                    frame.addView(view)
+                    adView = view
+                    loadedUnitId = unitId
+                    lastWidthDp = widthDp
+                    loadInto(view, unitId, widthDp)
+                }
 
-                val view = AdView(activity)
-                holder.addView(
-                    view,
-                    FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM,
-                    ),
-                )
-                container = holder
-                adView = view
-
-                val adSize = AdSize.getLargeAnchoredAdaptiveBannerAdSize(activity, widthDp)
-                val request = BannerAdRequest.Builder(adUnitId, adSize).build()
-                view.loadAd(
-                    request,
-                    object : AdLoadCallback<BannerAd> {
-                        override fun onAdLoaded(ad: BannerAd) {
-                            ad.adEventCallback = object : BannerAdEventCallback {
-                                override fun onAdImpression() = notifyListeners(
-                                    "bannerImpression",
-                                    JSObject(),
-                                )
-
-                                override fun onAdClicked() = notifyListeners(
-                                    "bannerClicked",
-                                    JSObject(),
-                                )
-                            }
-                            notifyListeners("bannerLoaded", JSObject())
-                        }
-
-                        override fun onAdFailedToLoad(adError: LoadAdError) {
-                            notifyListeners(
-                                "bannerFailed",
-                                JSObject().put("error", adError.toString()),
-                            )
-                        }
-                    },
-                )
-                call.resolve(JSObject().put("shown", true))
+                adView?.layoutParams = FrameLayout.LayoutParams(
+                    (widthDp * density).toInt(),
+                    (heightDp * density).toInt(),
+                    Gravity.TOP or Gravity.START,
+                ).also { lp ->
+                    lp.leftMargin = (xDp * density).toInt()
+                    lp.topMargin = (yDp * density).toInt()
+                }
+                adView?.requestLayout()
+                call.resolve(JSObject().put("height", heightDp).put("shown", true))
             } catch (t: Throwable) {
-                call.reject(t.message ?: "Banner unavailable")
+                call.resolve(
+                    JSObject().put("height", heightDp).put("shown", false)
+                        .put("error", t.message ?: "banner error"),
+                )
             }
         }
+    }
+
+    private fun loadInto(view: AdView, unitId: String, widthDp: Int) {
+        val request = BannerAdRequest.Builder(unitId, adSizeFor(widthDp)).build()
+        view.loadAd(
+            request,
+            object : AdLoadCallback<BannerAd> {
+                override fun onAdLoaded(ad: BannerAd) {
+                    ad.adEventCallback = object : BannerAdEventCallback {}
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    /* Aucun blocage de l'interface : l'espace reste vide. */
+                }
+            },
+        )
     }
 
     @PluginMethod
     fun hideBanner(call: PluginCall) {
-        val activity = activity
-        if (activity == null) {
-            call.resolve(JSObject().put("shown", false))
-            return
-        }
         activity.runOnUiThread {
-            removeBanner()
-            call.resolve(JSObject().put("shown", false))
+            container?.visibility = View.GONE
+            call.resolve()
         }
     }
 
-    /** Retire la bannière de la hiérarchie de vues et libère ses ressources. */
-    private fun removeBanner() {
+    @PluginMethod
+    fun removeBanner(call: PluginCall) {
+        activity.runOnUiThread {
+            releaseAdView()
+            container?.visibility = View.GONE
+            call.resolve()
+        }
+    }
+
+    /** Retire la bannière de la hiérarchie et libère ses ressources. */
+    private fun releaseAdView() {
+        val view = adView ?: return
+        (view.parent as? ViewGroup)?.removeView(view)
         try {
-            adView?.let { view ->
-                (view.parent as? ViewGroup)?.removeView(view)
-                view.destroy()
-            }
-            container?.let { holder -> (holder.parent as? ViewGroup)?.removeView(holder) }
+            view.destroy()
         } catch (_: Throwable) {
-            /* vue déjà détachée */
+            /* déjà libérée */
         }
         adView = null
-        container = null
+        loadedUnitId = null
+        lastWidthDp = 0
     }
 
     override fun handleOnDestroy() {
-        removeBanner()
         super.handleOnDestroy()
+        releaseAdView()
+    }
+
+    companion object {
+        /** Bloc de TEST officiel Google — jamais de trafic réel en debug. */
+        const val TEST_BANNER_UNIT_ID = "ca-app-pub-3940256099942544/9214589741"
     }
 }

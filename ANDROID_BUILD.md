@@ -86,21 +86,6 @@ Un plugin Capacitor natif custom exposant `StoragePermission.check()` /
 `openSettings()` sera à ajouter sous `android-overrides/` lors de la
 première génération d'APK réussie (fondations JS déjà en place).
 
-## Publicités (Google Mobile Ads — GMA Next-Gen SDK)
-
-- ID d'application AdMob : `ca-app-pub-4007496300800778~9248149643`
-  (déclaré dans `AndroidManifest.xml` via `com.google.android.gms.ads.APPLICATION_ID`).
-- Dépendance injectée par `apply-android-overrides.mjs` :
-  `com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.3.1`,
-  avec `minSdk >= 24` / `compileSdk >= 35` forcés dans `variables.gradle`.
-- Initialisation en arrière-plan dès `GeniusFilesApplication.onCreate()`
-  (évite tout ANR au démarrage).
-- Pont WebView : plugin natif `GeniusFilesAds` + `src/lib/native/ads.ts`
-  (`initializeAds`, `showBannerAd`, `hideBannerAd`) — no-op sur le web.
-- Bannière adaptative ancrée en bas d'écran. Par défaut le **bloc de test**
-  `ca-app-pub-3940256099942544/9214589741` est utilisé : le remplacer par le
-  bloc réel avant publication.
-
 ## Fichiers ajoutés
 
 ```
@@ -117,3 +102,18 @@ ANDROID_BUILD.md
 
 `android/` est généré à la volée par la CI (`npx cap add android`) et ne
 doit pas être commité.
+
+## Publicité (Google Mobile Ads Next-Gen)
+
+- ID d'application `ca-app-pub-4007496300800778~9248149643` déclaré en
+  `meta-data` dans `AndroidManifest.xml` (obligatoire : sans lui le SDK fait
+  planter l'app au démarrage), avec `android:hardwareAccelerated="true"`.
+- Dépendance `ads-mobile-sdk:1.3.1` + `minSdk 24` / `compileSdk 35` injectés
+  par `scripts/apply-android-overrides.mjs` (avec vérifications bloquantes).
+- Initialisation hors thread principal dans `GeniusFilesApplication` (anti-ANR).
+- Plugin `GeniusFilesAdsPlugin` : `AdView` superposée à la WebView, bannière
+  adaptative ancrée positionnée aux coordonnées CSS envoyées par la page.
+- Côté web : `src/lib/native/ads.ts` + `src/components/ads/AdBanner.tsx`
+  (bloc réservé sous les outils de l'accueil, no-op hors APK).
+- Bloc d'annonces de TEST par défaut (`ca-app-pub-3940256099942544/9214589741`)
+  — à remplacer par votre bloc réel avant publication.

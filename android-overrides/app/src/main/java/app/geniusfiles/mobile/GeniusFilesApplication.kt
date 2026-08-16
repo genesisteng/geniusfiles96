@@ -3,6 +3,7 @@ package app.geniusfiles.mobile
 import android.app.Application
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.libraries.ads.mobile.sdk.initialization.MobileAds
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
@@ -27,11 +28,23 @@ class GeniusFilesApplication : Application() {
             }
         )
         initCrashlyticsKeys()
-        // Google Mobile Ads : initialisation sur un thread d'arrière-plan
-        // (une initialisation sur le thread principal peut provoquer un ANR).
-        GeniusFilesAdsPlugin.initializeOnce(this)
+        initMobileAds()
     }
 
+    /**
+     * SDK Google Mobile Ads (Next-Gen). L'initialisation est faite hors du
+     * thread principal : elle effectue des I/O disque et réseau et
+     * provoquerait sinon un ANR au démarrage.
+     */
+    private fun initMobileAds() {
+        Thread {
+            try {
+                MobileAds.initialize(this)
+            } catch (_: Throwable) {
+                /* Publicité indisponible — l'application reste utilisable */
+            }
+        }.apply { name = "gf-ads-init" }.start()
+    }
 
     /**
      * Coût négligeable (quelques écritures clé/valeur en mémoire) et exécuté
