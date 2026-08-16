@@ -17,4 +17,13 @@
     <color name="widget_accent">#1372F0</color>
     <color name="widget_text">#15171C</color>
     <color name="widget_text_muted">#5A616B</color>
+    <!-- Annonces natives avancées (AdMob) : jour. -->
+    <color name="gf_ad_surface">#FFFFFF</color>
+    <color name="gf_ad_border">#E1E4EA</color>
+    <color name="gf_ad_text">#15171C</color>
+    <color name="gf_ad_text_muted">#5A616B</color>
+    <color name="gf_ad_badge_bg">#FFCC66</color>
+    <color name="gf_ad_badge_text">#3A2A00</color>
+    <color name="gf_ad_cta_bg">#1372F0</color>
+    <color name="gf_ad_cta_text">#FFFFFF</color>
 </resources>

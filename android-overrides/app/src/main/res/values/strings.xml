@@ -26,4 +26,6 @@
     <string name="widget_recent_title">Fichiers récents</string>
     <string name="widget_recent_empty">Aucun fichier récent accessible</string>
     <string name="widget_recent_description">Les derniers fichiers modifiés sur l\'appareil</string>
+    <!-- Mention obligatoire sur les annonces natives. -->
+    <string name="gf_ad_attribution">Annonce</string>
 </resources>
