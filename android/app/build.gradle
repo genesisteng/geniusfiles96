@@ -3,6 +3,16 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
 
+    // GENIUSFILES_JVM_TARGET — keep javac and Kotlin aligned in CI.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+
     // GENIUSFILES_SIGNING — debug uses the committed debug.keystore for
     // stable signatures across CI builds. Release uses a keystore
     // reconstructed at CI time from GitHub Secrets, never committed.
