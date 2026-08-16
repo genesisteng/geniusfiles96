@@ -200,15 +200,28 @@ if (existsSync(gradlePath)) {
     console.log("✓ androidx.biometric dependency added to app/build.gradle.");
   }
 
-  // Firebase : BoM + Analytics (aucune collecte personnalisée, aucun
-  // évènement applicatif envoyé par le code GeniusFiles).
+  // Firebase : BoM + Analytics (fil d'Ariane Crashlytics) + Crashlytics
+  // (crashs, erreurs non fatales, ANR). Aucun évènement applicatif custom,
+  // aucun nom/chemin de fichier, aucun contenu n'est envoyé par le code.
   if (hasFirebase && !gradle.includes("com.google.firebase:firebase-bom")) {
     gradle = gradle.replace(
       /dependencies\s*\{/,
       (m) =>
-        `${m}\n    implementation platform("com.google.firebase:firebase-bom:34.1.0")\n    implementation "com.google.firebase:firebase-analytics"\n`,
+        `${m}\n    implementation platform("com.google.firebase:firebase-bom:34.1.0")\n    implementation "com.google.firebase:firebase-analytics"\n    implementation "com.google.firebase:firebase-crashlytics"\n`,
     );
-    console.log("✓ Firebase BoM + Analytics added to app/build.gradle.");
+    console.log("✓ Firebase BoM + Analytics + Crashlytics added to app/build.gradle.");
+  } else if (hasFirebase && !gradle.includes("com.google.firebase:firebase-crashlytics")) {
+    gradle = gradle.replace(
+      /dependencies\s*\{/,
+      (m) => `${m}\n    implementation "com.google.firebase:firebase-crashlytics"\n`,
+    );
+    console.log("✓ Firebase Crashlytics dependency added to app/build.gradle.");
+  }
+  // Le rapport des crashs natifs/ANR et l'envoi des mappings de
+  // dé-obfuscation nécessitent le plug-in Gradle Crashlytics.
+  if (hasFirebase && !gradle.includes("com.google.firebase.crashlytics")) {
+    gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.firebase.crashlytics'\n`;
+    console.log("✓ Crashlytics Gradle plugin applied in app/build.gradle.");
   }
   if (hasFirebase && !gradle.includes("com.google.gms.google-services")) {
     // Le plug-in s'applique en fin de fichier, comme recommandé par Google
