@@ -111,9 +111,7 @@ export function AdBanner({
 
   if (!allowed) return null;
 
-  const bottom = anchorSelector
-    ? `${anchorH}px`
-    : "calc(env(safe-area-inset-bottom) + 8px)";
+  const bottom = anchorSelector ? `${anchorH}px` : "calc(env(safe-area-inset-bottom) + 8px)";
 
   return (
     <div
