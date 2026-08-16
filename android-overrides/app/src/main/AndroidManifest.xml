@@ -126,6 +126,12 @@
         android:requestLegacyExternalStorage="true"
         android:preserveLegacyExternalStorage="true">
 
+        <!-- Google Mobile Ads : identifiant d'application AdMob. Son
+             absence provoque un crash « Missing application ID ». -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4007496300800778~9248149643" />
+
         <activity
             android:name="app.geniusfiles.mobile.MainActivity"
             android:exported="true"

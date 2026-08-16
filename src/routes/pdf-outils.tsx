@@ -51,6 +51,7 @@ import {
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/native/analytics";
 import { AppShell } from "@/components/AppShell";
+import { NativeAdSlot } from "@/components/ads/NativeAdSlot";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
@@ -367,6 +368,9 @@ function PdfToolsPage() {
       <ToolSection title={t("pdf.section.create")} tools={createTools(t)} onOpen={openTool} />
       <ToolSection title={t("pdf.section.annotate")} tools={annotTools(t)} onOpen={openTool} />
       <ToolSection title={t("pdf.section.extract")} tools={extractTools(t)} onOpen={openTool} />
+
+      {/* Annonce native (APK Android uniquement) */}
+      <NativeAdSlot id="pdf-tools" height={260} className="mt-1" />
 
       <BottomSheetDefaultsProvider fullScreen>
         <ToolSheet tool={tool} onClose={() => setTool(null)} />
