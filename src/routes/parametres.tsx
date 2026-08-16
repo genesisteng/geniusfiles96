@@ -11,7 +11,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Bell,
-  Bug,
   Eraser,
   FileText,
   HardDrive,
@@ -56,9 +55,6 @@ import {
 } from "@/lib/i18n";
 import { clearThumbnailCache } from "@/lib/native/thumbnails";
 import { sweepTempFiles } from "@/lib/native/temp-sweep";
-/* ⚠️ TEMPORAIRE — validation Crashlytics, à retirer après le test. */
-import { isCrashTestAvailable, sendTestNonFatal, triggerTestCrash } from "@/lib/native/crash-test";
-
 /* Injectée au build depuis `package.json` (voir vite.config.ts). */
 const APP_VERSION = __APP_VERSION__;
 
@@ -257,11 +253,6 @@ function SettingsPage() {
             href="mailto:support@geniusfiles.app"
           />
         </SettingsCard>
-
-        {/* ⚠️ TEMPORAIRE — validation Firebase Crashlytics. À SUPPRIMER
-            (cette carte + src/lib/native/crash-test.ts + le greffon natif
-            GeniusFilesCrashTestPlugin.kt et son registerPlugin). */}
-        <CrashlyticsTestCard />
       </div>
 
       <p className="pb-4 text-center text-[11px] text-muted-foreground/70">
@@ -375,79 +366,5 @@ function LanguagePicker({
         );
       })}
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* ⚠️ TEMPORAIRE — VALIDATION FIREBASE CRASHLYTICS. À SUPPRIMER.       */
-/* Bloc autonome : le supprimer entièrement (ainsi que son usage plus  */
-/* haut, l'import de `@/lib/native/crash-test`, le fichier             */
-/* `src/lib/native/crash-test.ts` et le greffon natif                  */
-/* `GeniusFilesCrashTestPlugin.kt`) une fois le test terminé.          */
-/* ------------------------------------------------------------------ */
-function CrashlyticsTestCard() {
-  const [available, setAvailable] = useState(false);
-  const [armed, setArmed] = useState(false);
-
-  useEffect(() => {
-    setAvailable(isCrashTestAvailable());
-  }, []);
-
-  return (
-    <SettingsCard
-      icon={Bug}
-      title="Diagnostic Crashlytics (temporaire)"
-      description="Outil de test — à supprimer après validation"
-      defaultOpen={false}
-    >
-      <SettingsItem
-        label="Erreur non fatale de test"
-        desc={
-          available
-            ? "Envoie un rapport « non-fatal » à Firebase. L'application continue de fonctionner."
-            : "Disponible uniquement dans l'application Android installée."
-        }
-      >
-        <SettingsAction
-          icon={Bug}
-          disabled={!available}
-          onClick={() => {
-            void sendTestNonFatal().then((ok) =>
-              ok
-                ? toast.success("Erreur de test envoyée à Crashlytics")
-                : toast.error("Greffon de test indisponible"),
-            );
-          }}
-        >
-          Envoyer
-        </SettingsAction>
-      </SettingsItem>
-
-      <SettingsItem
-        label="Provoquer un vrai crash"
-        desc="L'application se ferme immédiatement. Le rapport part au prochain démarrage."
-        stacked
-      >
-        {armed ? (
-          <div className="flex flex-wrap gap-2">
-            <SettingsAction
-              danger
-              icon={Bug}
-              disabled={!available}
-              onClick={() => {
-                void triggerTestCrash();
-              }}
-            >
-              Confirmer le crash
-            </SettingsAction>
-            <SettingsAction onClick={() => setArmed(false)}>Annuler</SettingsAction>
-          </div>
-        ) : (
-          <SettingsAction danger icon={Bug} disabled={!available} onClick={() => setArmed(true)}>
-            Provoquer un crash de test
-          </SettingsAction>
-        )}
-      </SettingsItem>
-    </SettingsCard>
   );
 }
