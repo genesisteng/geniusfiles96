@@ -282,6 +282,10 @@ function RootComponent() {
   // champs de saisie : l'application se comporte comme une app Android.
   useEffect(() => installNativeBehaviors(), []);
 
+  // Surveillance de stabilité Android (Crashlytics) : erreurs JS non fatales
+  // uniquement, entièrement assainies. No-op hors runtime natif.
+  useEffect(() => installCrashReporting(), []);
+
   // Préchauffage des stockages : tâche NON critique. Elle est repoussée
   // après la fin du démarrage puis exécutée pendant un temps mort, afin de
   // ne consommer aucun cycle CPU ni accès disque avant l'affichage de la
