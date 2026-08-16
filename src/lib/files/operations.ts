@@ -1342,7 +1342,7 @@ export async function deleteEntries(
   opts: DeleteOptions = {},
 ): Promise<OperationResult> {
   const res = await deleteEntriesImpl(parent, entries, opts);
-  trackFileAction(opts.permanent ? "delete_permanent" : "delete", res);
+  trackFileAction("delete", res);
   return res;
 }
 
