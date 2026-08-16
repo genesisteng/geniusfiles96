@@ -223,6 +223,13 @@ if (existsSync(gradlePath)) {
     gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.gms.google-services'\n`;
     console.log("✓ google-services plugin applied in app/build.gradle.");
   }
+  // Après google-services : le plug-in Crashlytics (mappings de
+  // dé-obfuscation, crashs natifs et ANR) lit sa configuration.
+  if (hasFirebase && !gradle.includes("com.google.firebase.crashlytics")) {
+    gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.firebase.crashlytics'\n`;
+    console.log("✓ Crashlytics Gradle plugin applied in app/build.gradle.");
+  }
+
 
   await writeFile(gradlePath, gradle, "utf8");
   console.log(`✓ build.gradle patched (versionCode=${versionCode}, versionName=${versionName}).`);
