@@ -965,6 +965,15 @@ export function CategoryPage({ kind }: { kind: CategoryKind }) {
         </div>
       )}
 
+      {/* Publicité : dernier bloc du contenu, après la dernière catégorie
+          ou le dernier fichier. Jamais superposée, jamais intercalée, et
+          absente des écrans vides ou d'une session de sélection. */}
+      {!pick && (showFolders ? visibleFolders.length > 0 : sorted.length > 0) ? (
+        <div className="pt-3">
+          <InlineAdBanner slot="category" />
+        </div>
+      ) : null}
+
       {selectionMode && !pick ? (
         <SelectionBar
           count={selectedFiles.length}
