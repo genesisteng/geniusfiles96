@@ -42,6 +42,9 @@ class MainActivity : BridgeActivity() {
         // « Ouvrir avec… » entrant : une autre application peut confier un
         // fichier à GeniusFiles (ACTION_VIEW / EDIT / SEND).
         registerPlugin(GeniusFilesIntentPlugin::class.java)
+        // Surveillance de stabilité : journalisation technique assainie
+        // envoyée à Crashlytics (aucune donnée personnelle, aucun chemin).
+        registerPlugin(GeniusFilesCrashlyticsPlugin::class.java)
         // Source de vérité unique côté Android : le mode nuit AppCompat est
         // aligné sur le choix persisté AVANT toute inflation. Le thème
         // DayNight, le splash (values-night), `windowLightStatusBar` et les
