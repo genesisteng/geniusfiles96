@@ -178,6 +178,7 @@ import {
   type ArchiveFormat,
 } from "@/lib/files/archive";
 import { useT, t as translate } from "@/lib/i18n";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
