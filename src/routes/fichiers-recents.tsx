@@ -70,6 +70,7 @@ import {
   type AddedFile,
 } from "@/lib/recents/added";
 import { useT, t as translate } from "@/lib/i18n";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 
 export const Route = createFileRoute("/fichiers-recents")({
   head: () => ({
@@ -647,6 +648,14 @@ export function AddedFilesPage() {
           ))}
         </div>
       )}
+
+      {/* Publicité en fin de contenu : après le dernier élément récent,
+          jamais superposée, repliée à zéro sans annonce. */}
+      {sorted.length > 0 && !pick && !selectionMode ? (
+        <div className="pt-3">
+          <InlineAdBanner slot="recents" />
+        </div>
+      ) : null}
 
       {selectionMode && !pick ? (
         <SelectionBar
