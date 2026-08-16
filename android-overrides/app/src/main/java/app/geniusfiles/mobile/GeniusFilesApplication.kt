@@ -3,7 +3,7 @@ package app.geniusfiles.mobile
 import android.app.Application
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.libraries.ads.mobile.sdk.initialization.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
