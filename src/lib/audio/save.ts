@@ -89,3 +89,30 @@ async function saveEditedAudioImpl(options: {
     throw new AudioEditorError("failed", t("media.error.exportFailed"));
   }
 }
+
+/* Mesure d'usage de l'éditeur audio : format d'export et issue seulement. */
+export async function saveEditedAudio(options: {
+  parent: PathRef;
+  entry: FileEntry;
+  clip: AudioClip;
+  mode: "new" | "replace";
+  name?: string;
+  format?: AudioExportFormat;
+  bitrate?: number;
+  mono?: boolean;
+  onProgress?: (ratio: number) => void;
+}): Promise<{ path: string; size: number; name: string }> {
+  try {
+    const res = await saveEditedAudioImpl(options);
+    trackEvent("media_edit", {
+      tool: "audio_editor",
+      action: "save",
+      kind: options.format ?? "wav",
+      result: "success",
+    });
+    return res;
+  } catch (err) {
+    trackEvent("media_edit", { tool: "audio_editor", action: "save", result: "failure" });
+    throw err;
+  }
+}
