@@ -287,6 +287,17 @@ function RootComponent() {
   // uniquement, entièrement assainies. No-op hors runtime natif.
   useEffect(() => installCrashReporting(), []);
 
+  // Mesure d'usage global (Google Analytics for Firebase) : vues d'écran
+  // logiques uniquement, jamais de chemin ni de nom de fichier. Le SDK
+  // fournit seul sessions, versions, appareils, langues et pays.
+  useEffect(() => {
+    installAnalytics();
+    trackScreen(router.state.location.pathname);
+    return router.subscribe("onResolved", (event) => {
+      trackScreen(event.toLocation.pathname);
+    });
+  }, [router]);
+
   // Préchauffage des stockages : tâche NON critique. Elle est repoussée
   // après la fin du démarrage puis exécutée pendant un temps mort, afin de
   // ne consommer aucun cycle CPU ni accès disque avant l'affichage de la
