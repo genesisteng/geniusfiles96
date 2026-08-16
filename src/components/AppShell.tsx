@@ -137,6 +137,7 @@ function BottomNav({ pathname }: { pathname: string }) {
 
   return (
     <nav
+      data-gf-bottom-nav
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-[560px] justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pl-safe pr-safe"
       aria-label={t("home.nav.aria")}
     >
