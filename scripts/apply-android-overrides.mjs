@@ -217,12 +217,6 @@ if (existsSync(gradlePath)) {
     );
     console.log("✓ Firebase Crashlytics dependency added to app/build.gradle.");
   }
-  // Le rapport des crashs natifs/ANR et l'envoi des mappings de
-  // dé-obfuscation nécessitent le plug-in Gradle Crashlytics.
-  if (hasFirebase && !gradle.includes("com.google.firebase.crashlytics")) {
-    gradle = `${gradle.trimEnd()}\n\napply plugin: 'com.google.firebase.crashlytics'\n`;
-    console.log("✓ Crashlytics Gradle plugin applied in app/build.gradle.");
-  }
   if (hasFirebase && !gradle.includes("com.google.gms.google-services")) {
     // Le plug-in s'applique en fin de fichier, comme recommandé par Google
     // pour la syntaxe `apply plugin:`.
