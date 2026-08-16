@@ -11,6 +11,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Bell,
+  Bug,
   Eraser,
   FileText,
   HardDrive,
@@ -378,5 +379,79 @@ function LanguagePicker({
         );
       })}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* ⚠️ TEMPORAIRE — VALIDATION FIREBASE CRASHLYTICS. À SUPPRIMER.       */
+/* Bloc autonome : le supprimer entièrement (ainsi que son usage plus  */
+/* haut, l'import de `@/lib/native/crash-test`, le fichier             */
+/* `src/lib/native/crash-test.ts` et le greffon natif                  */
+/* `GeniusFilesCrashTestPlugin.kt`) une fois le test terminé.          */
+/* ------------------------------------------------------------------ */
+function CrashlyticsTestCard() {
+  const [available, setAvailable] = useState(false);
+  const [armed, setArmed] = useState(false);
+
+  useEffect(() => {
+    setAvailable(isCrashTestAvailable());
+  }, []);
+
+  return (
+    <SettingsCard
+      icon={Bug}
+      title="Diagnostic Crashlytics (temporaire)"
+      description="Outil de test — à supprimer après validation"
+      defaultOpen={false}
+    >
+      <SettingsItem
+        label="Erreur non fatale de test"
+        desc={
+          available
+            ? "Envoie un rapport « non-fatal » à Firebase. L'application continue de fonctionner."
+            : "Disponible uniquement dans l'application Android installée."
+        }
+      >
+        <SettingsAction
+          icon={Bug}
+          disabled={!available}
+          onClick={() => {
+            void sendTestNonFatal().then((ok) =>
+              ok
+                ? toast.success("Erreur de test envoyée à Crashlytics")
+                : toast.error("Greffon de test indisponible"),
+            );
+          }}
+        >
+          Envoyer
+        </SettingsAction>
+      </SettingsItem>
+
+      <SettingsItem
+        label="Provoquer un vrai crash"
+        desc="L'application se ferme immédiatement. Le rapport part au prochain démarrage."
+        stacked
+      >
+        {armed ? (
+          <div className="flex flex-wrap gap-2">
+            <SettingsAction
+              danger
+              icon={Bug}
+              disabled={!available}
+              onClick={() => {
+                void triggerTestCrash();
+              }}
+            >
+              Confirmer le crash
+            </SettingsAction>
+            <SettingsAction onClick={() => setArmed(false)}>Annuler</SettingsAction>
+          </div>
+        ) : (
+          <SettingsAction danger icon={Bug} disabled={!available} onClick={() => setArmed(true)}>
+            Provoquer un crash de test
+          </SettingsAction>
+        )}
+      </SettingsItem>
+    </SettingsCard>
   );
 }
