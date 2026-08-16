@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Pont unique entre Genius AI et le moteur d'exécution.
  *
@@ -221,6 +222,20 @@ function summarizeEntry(entry: FileEntry) {
 /* ---------- Routeur unique ---------- */
 
 export async function runEngineTool(toolName: string, rawInput: unknown): Promise<ToolOutput> {
+  const out = await runEngineToolImpl(toolName, rawInput);
+  // Mesure d'usage : type général d'opération et issue uniquement — jamais
+  // le prompt, la réponse, les chemins ni le contenu analysé.
+  trackEvent("ai_usage", {
+    action: "tool",
+    tool: typeof (rawInput as { type?: unknown })?.type === "string"
+      ? String((rawInput as { type?: unknown }).type)
+      : "unknown",
+    result: out.ok ? "success" : "failure",
+  });
+  return out;
+}
+
+async function runEngineToolImpl(toolName: string, rawInput: unknown): Promise<ToolOutput> {
   const started = Date.now();
   if (toolName !== "run_engine_command") {
     return fail("UNKNOWN_COMMAND", t("system.ai.unknownTool", { name: toolName }), started);

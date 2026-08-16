@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Saving edited photos back to the device.
  *
@@ -66,7 +67,7 @@ export function replacementName(original: string, format: ExportFormat): string 
   return ext === EXT[format] ? original : `${base}.${EXT[format]}`;
 }
 
-export async function saveEditedImage(options: {
+async function saveEditedImageImpl(options: {
   parent: PathRef;
   entry: FileEntry;
   canvas: HTMLCanvasElement;

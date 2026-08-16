@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Export de l'audio édité vers le stockage.
  *
@@ -35,7 +36,7 @@ export function replacementAudioName(original: string, format: AudioExportFormat
   return `${baseName(original)}.${format}`;
 }
 
-export async function saveEditedAudio(options: {
+async function saveEditedAudioImpl(options: {
   parent: PathRef;
   entry: FileEntry;
   clip: AudioClip;
