@@ -46,7 +46,6 @@ import {
   type GfIconComponent,
 } from "@/components/icons";
 import { useStorageStats, type StorageStats } from "@/lib/native/use-storage-stats";
-import { NativeAdSlot } from "@/components/ads/NativeAdSlot";
 import { StorageCards } from "@/components/home/StorageCards";
 import { RecentFilesSection } from "@/components/home/RecentFilesSection";
 import { refreshAddedFiles } from "@/lib/recents/added";
@@ -1483,7 +1482,6 @@ function DirectoryView({
           <FileListView
             entries={entries}
             parent={parent}
-            adSlot={<NativeAdSlot id="files-list" height={250} className="px-1 py-2" />}
             onOpen={onOpen}
             onQuickOpen={onQuickOpen}
             onLongPress={onLongPress}
@@ -1894,9 +1892,6 @@ function RootView({
 
       {/* Fichiers récents */}
       <RecentFilesSection />
-
-      {/* Annonce native (APK Android uniquement) */}
-      <NativeAdSlot id="home" height={260} />
 
       {/* Tools grid — compact (masqués pendant une sélection) */}
       {pick ? null : (

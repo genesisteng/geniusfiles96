@@ -1,5 +1,5 @@
 import { CheckCircle2, ChevronRight, Circle, Eye, MoreVertical } from "lucide-react";
-import { Fragment, memo, useRef } from "react";
+import { memo, useRef } from "react";
 import { countLabel } from "@/lib/copy";
 import { useT } from "@/lib/i18n";
 import { fileMetaLine, formatDate, formatSize, kindLabel } from "@/lib/files/format";
@@ -13,11 +13,6 @@ import { useWindowVirtualList } from "@/hooks/use-virtual-list";
 const ROW_HEIGHT = 66;
 const GRID_CELL_HEIGHT = 138;
 const GRID_ROW_HEIGHT = GRID_CELL_HEIGHT + 10; // + gap vertical
-
-// Emplacement d'annonce native : inséré après ce nombre de lignes, avec une
-// hauteur FIXE elle aussi, pour que la virtualisation reste exacte.
-const AD_AFTER_INDEX = 8;
-const AD_ROW_HEIGHT = 266;
 
 type Props = {
   entries: FileEntry[];
@@ -40,8 +35,6 @@ type Props = {
   selectionMode: boolean;
   isSelected: (entry: FileEntry) => boolean;
   onToggleSelect: (entry: FileEntry) => void;
-  /** Emplacement d'annonce native inséré dans la liste (APK Android). */
-  adSlot?: React.ReactNode;
 };
 
 const LONG_PRESS_MS = 380;
@@ -94,7 +87,6 @@ export function FileListView({
   selectionMode,
   isSelected,
   onToggleSelect,
-  adSlot,
 }: Props) {
   const { enabled, parentRef, virtualizer, scrollMargin } = useWindowVirtualList({
     count: entries.length,
@@ -102,60 +94,38 @@ export function FileListView({
     overscan: 10,
   });
 
-  // L'annonce ne s'insère que si la liste est assez longue pour ne pas
-  // repousser les fichiers hors de l'écran.
-  const showAd = adSlot != null && entries.length > AD_AFTER_INDEX;
-  const adOffset = showAd ? AD_ROW_HEIGHT : 0;
-
   if (!enabled) {
     return (
       <div className="divide-y divide-border/45">
-        {entries.map((entry, index) => (
-          <Fragment key={entry.path}>
-            {showAd && index === AD_AFTER_INDEX ? adSlot : null}
-            <FileRow
-              entry={entry}
-              parent={parent ?? null}
-              onOpen={onOpen}
-              onQuickOpen={onQuickOpen}
-              renderIcon={renderIcon}
-              onLongPress={onLongPress}
-              onMore={onMore}
-              selectionMode={selectionMode}
-              isSelected={isSelected(entry)}
-              onToggleSelect={onToggleSelect}
-            />
-          </Fragment>
+        {entries.map((entry) => (
+          <FileRow
+            key={entry.path}
+            entry={entry}
+            parent={parent ?? null}
+            onOpen={onOpen}
+            onQuickOpen={onQuickOpen}
+            renderIcon={renderIcon}
+            onLongPress={onLongPress}
+            onMore={onMore}
+            selectionMode={selectionMode}
+            isSelected={isSelected(entry)}
+            onToggleSelect={onToggleSelect}
+          />
         ))}
       </div>
     );
   }
 
   const items = virtualizer.getVirtualItems();
-  const totalSize = virtualizer.getTotalSize() + adOffset;
+  const totalSize = virtualizer.getTotalSize();
   return (
     <div
       ref={parentRef}
       className="divide-y divide-border/45"
       style={{ position: "relative", height: `${totalSize}px` }}
     >
-      {showAd ? (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: `${AD_ROW_HEIGHT}px`,
-            transform: `translateY(${AD_AFTER_INDEX * ROW_HEIGHT}px)`,
-          }}
-        >
-          {adSlot}
-        </div>
-      ) : null}
       {items.map((v) => {
         const entry = entries[v.index];
-        const shift = showAd && v.index >= AD_AFTER_INDEX ? adOffset : 0;
         return (
           <div
             key={entry.path}
@@ -167,7 +137,7 @@ export function FileListView({
               left: 0,
               width: "100%",
               height: `${ROW_HEIGHT}px`,
-              transform: `translateY(${v.start - scrollMargin + shift}px)`,
+              transform: `translateY(${v.start - scrollMargin}px)`,
               contain: "layout paint style",
             }}
           >

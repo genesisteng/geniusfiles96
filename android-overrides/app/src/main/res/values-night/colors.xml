@@ -9,13 +9,4 @@
     <color name="widget_accent">#4DA3FF</color>
     <color name="widget_text">#F4F4F5</color>
     <color name="widget_text_muted">#B4B4B8</color>
-    <!-- Annonces natives avancées (AdMob) : nuit. -->
-    <color name="gf_ad_surface">#232323</color>
-    <color name="gf_ad_border">#323232</color>
-    <color name="gf_ad_text">#F4F4F5</color>
-    <color name="gf_ad_text_muted">#B4B4B8</color>
-    <color name="gf_ad_badge_bg">#8A6A16</color>
-    <color name="gf_ad_badge_text">#FFF3D6</color>
-    <color name="gf_ad_cta_bg">#4DA3FF</color>
-    <color name="gf_ad_cta_text">#0C1420</color>
 </resources>
