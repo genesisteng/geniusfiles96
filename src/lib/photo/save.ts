@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Saving edited photos back to the device.
  *
@@ -66,7 +67,7 @@ export function replacementName(original: string, format: ExportFormat): string 
   return ext === EXT[format] ? original : `${base}.${EXT[format]}`;
 }
 
-export async function saveEditedImage(options: {
+async function saveEditedImageImpl(options: {
   parent: PathRef;
   entry: FileEntry;
   canvas: HTMLCanvasElement;
@@ -84,4 +85,28 @@ export async function saveEditedImage(options: {
     autoRename: mode === "new",
   });
   return { ...res, name: res.path.split("/").pop() ?? name };
+}
+
+/* Mesure d'usage de l'éditeur photo : format d'export et issue seulement. */
+export async function saveEditedImage(options: {
+  parent: PathRef;
+  entry: FileEntry;
+  canvas: HTMLCanvasElement;
+  format: ExportFormat;
+  quality: number;
+  mode: "new" | "replace";
+}): Promise<{ path: string; size: number; name: string }> {
+  try {
+    const res = await saveEditedImageImpl(options);
+    trackEvent("media_edit", {
+      tool: "photo_editor",
+      action: "save",
+      kind: options.format,
+      result: "success",
+    });
+    return res;
+  } catch (err) {
+    trackEvent("media_edit", { tool: "photo_editor", action: "save", result: "failure" });
+    throw err;
+  }
 }

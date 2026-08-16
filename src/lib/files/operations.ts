@@ -26,6 +26,7 @@ import { chunks, runQueued, tick } from "./op-queue";
 import { namesStillPresent, nameExists } from "./verify";
 import { checkEntryName, checkOperationPath, checkOperationTarget } from "@/lib/security/paths";
 import { t } from "@/lib/i18n";
+import { trackEvent, trackFileAction } from "@/lib/native/analytics";
 
 function dispatchStorageChanged() {
   if (typeof window === "undefined") return;
@@ -252,7 +253,7 @@ async function bulkPlan(absPath: string, rootName: string): Promise<WalkPlan> {
 
 /* ---------- create / rename ---------- */
 
-export async function createDirectory(
+async function createDirectoryImpl(
   parent: PathRef,
   name: string,
 ): Promise<{ ok: boolean; error?: string }> {
@@ -325,7 +326,7 @@ export async function createDirectory(
   return { ok: true };
 }
 
-export async function renameEntry(
+async function renameEntryImpl(
   parent: PathRef,
   entry: FileEntry,
   newName: string,
@@ -422,7 +423,7 @@ export type DeleteOptions = {
   signal?: OperationSignal;
 };
 
-export async function deleteEntries(
+async function deleteEntriesImpl(
   parent: PathRef,
   entries: FileEntry[],
   opts: DeleteOptions = {},
@@ -733,7 +734,7 @@ async function copyTreeStreaming(
   return "ok";
 }
 
-export async function transferEntries(
+async function transferEntriesImpl(
   source: PathRef,
   entries: FileEntry[],
   destination: PathRef,
@@ -1200,7 +1201,7 @@ async function runTransferEntries(
 
 /* ---------- share ---------- */
 
-export async function shareEntries(
+async function shareEntriesImpl(
   parent: PathRef,
   entries: FileEntry[],
 ): Promise<{ ok: boolean; error?: string }> {
@@ -1303,3 +1304,68 @@ export async function readDetails(parent: PathRef, entry: FileEntry): Promise<De
 }
 
 export { kindOf };
+
+/* ────────────────────────────────────────────────────────────────
+   Mesure d'usage (Analytics)
+
+   Chaque opération majeure remonte uniquement : le type d'action, son
+   issue (succès / échec / partiel / annulé) et un nombre d'éléments
+   arrondi en paliers. Jamais de nom, de chemin ni de contenu.
+   ──────────────────────────────────────────────────────────────── */
+
+export async function createDirectory(
+  parent: PathRef,
+  name: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const res = await createDirectoryImpl(parent, name);
+  trackEvent("file_action", { action: "create_folder", result: res.ok ? "success" : "failure" });
+  return res;
+}
+
+export async function renameEntry(
+  parent: PathRef,
+  entry: FileEntry,
+  newName: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const res = await renameEntryImpl(parent, entry, newName);
+  trackEvent("file_action", {
+    action: "rename",
+    kind: kindOf(entry.name, entry.isDirectory),
+    result: res.ok ? "success" : "failure",
+  });
+  return res;
+}
+
+export async function deleteEntries(
+  parent: PathRef,
+  entries: FileEntry[],
+  opts: DeleteOptions = {},
+): Promise<OperationResult> {
+  const res = await deleteEntriesImpl(parent, entries, opts);
+  trackFileAction("delete", res);
+  return res;
+}
+
+export async function transferEntries(
+  source: PathRef,
+  entries: FileEntry[],
+  destination: PathRef,
+  opts: TransferOptions,
+): Promise<OperationResult> {
+  const res = await transferEntriesImpl(source, entries, destination, opts);
+  trackFileAction(opts.mode === "move" ? "move" : "copy", res);
+  return res;
+}
+
+export async function shareEntries(
+  parent: PathRef,
+  entries: FileEntry[],
+): Promise<{ ok: boolean; error?: string }> {
+  const res = await shareEntriesImpl(parent, entries);
+  trackEvent("file_action", {
+    action: "share",
+    result: res.ok ? "success" : "failure",
+    count: entries.length,
+  });
+  return res;
+}

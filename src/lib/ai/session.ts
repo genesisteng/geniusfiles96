@@ -1,3 +1,4 @@
+import { trackEvent } from "@/lib/native/analytics";
 /**
  * Session Genius AI — la tâche vit en dehors de l'écran.
  *
@@ -339,6 +340,9 @@ function getConversationIdFromStorage(): string | null {
 }
 
 export function sendUserMessage(text: string) {
+  // Mesure d'usage : seul le fait d'utiliser Genius AI est enregistré.
+  // Le texte du message n'est jamais transmis à Analytics.
+  trackEvent("ai_usage", { action: "message" });
   const c = getChat();
   startTask();
   void c.sendMessage({ text }).finally(persist);

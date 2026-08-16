@@ -57,6 +57,51 @@ class GeniusFilesAnalyticsPlugin : Plugin() {
         call.resolve()
     }
 
+    /** Clés de paramètres autorisées : aucune autre n'est transmise. */
+    private val allowedKeys = setOf("action", "tool", "kind", "result")
+
+    /** Événements autorisés : toute autre valeur est ignorée. */
+    private val allowedEvents = setOf(
+        "app_open",
+        "feature_open",
+        "search_run",
+        "file_open",
+        "file_action",
+        "trash_action",
+        "vault_action",
+        "pdf_tool",
+        "media_edit",
+        "ai_usage",
+        "automation",
+    )
+
+    /**
+     * Événement de fonctionnalité : nom en liste blanche, paramètres
+     * courts en liste blanche, plus un compteur numérique déjà arrondi
+     * en paliers côté WebView. Aucun texte libre n'est accepté.
+     */
+    @PluginMethod
+    fun logEvent(call: PluginCall) {
+        val name = token(call.getString("name"), 32)
+        val fa = analytics
+        if (fa == null || name.isEmpty() || name !in allowedEvents) {
+            call.resolve()
+            return
+        }
+        val bundle = Bundle()
+        val params = call.getObject("params")
+        if (params != null) {
+            for (key in allowedKeys) {
+                val value = token(params.optString(key, ""), 32)
+                if (value.isNotEmpty()) bundle.putString(key, value)
+            }
+        }
+        val count = call.getInt("count")
+        if (count != null && count > 0) bundle.putLong("item_count", count.toLong())
+        fa.logEvent(name, bundle)
+        call.resolve()
+    }
+
     /** Propriété utilisateur technique (langue d'interface, version…). */
     @PluginMethod
     fun setUserProperty(call: PluginCall) {
