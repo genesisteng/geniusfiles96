@@ -17,7 +17,6 @@ import { useReaderMode } from "@/lib/viewer/reader-mode";
 import { useInPickLayer } from "@/components/files/pick-layer-context";
 import { PackageSheetHost } from "@/components/files/PackageSheet";
 import { IncomingFileHost } from "@/components/viewer/IncomingFileHost";
-import { AdBanner } from "@/components/ads/AdBanner";
 
 type NavItem = {
   to: string;
@@ -104,13 +103,9 @@ export function AppShell({ children }: { children?: ReactNode }) {
       {/* Conflit de copie / déplacement : une seule question, partout. */}
       <ConflictDialog />
       {reader || inPick ? null : <BottomNav pathname={pathname} />}
-      {/* Bannière adaptative globale : bande propre intercalée entre le
-          contenu et la navigation (CONTENU → BANNIÈRE → NAVIGATION). Sa
-          hauteur réelle est ajoutée à l'espace bas du contenu, donc rien
-          n'est jamais masqué ; sans annonce, aucun espace n'est réservé. */}
-      {reader || inPick || isChat ? null : (
-        <AdBanner slot="global" anchorSelector="[data-gf-bottom-nav]" />
-      )}
+      {/* La bannière n'est plus une couche fixe : chaque écran qui en
+          affiche une la place dans son propre flux de contenu
+          (voir <InlineAdBanner />). */}
       {/* Écran opaque de la barre d'état. */}
       {reader ? null : (
         <div
