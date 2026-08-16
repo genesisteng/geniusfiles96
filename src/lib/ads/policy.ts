@@ -55,9 +55,7 @@ export function adsSuspended(): boolean {
 
 /** `true` si le chemin courant est un écran déclaré sans publicité. */
 export function isAdFreeRoute(pathname: string): boolean {
-  return AD_FREE_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
+  return AD_FREE_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
 /** Décision finale pour un emplacement donné sur un chemin donné. */
