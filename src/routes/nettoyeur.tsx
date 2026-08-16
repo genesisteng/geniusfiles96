@@ -59,6 +59,8 @@ import { StorageScopePicker, type StorageScope } from "@/components/common/Stora
 import { resolveScope } from "@/components/common/storage-scope";
 import { useT, t as translate, formatNumber } from "@/lib/i18n";
 import { BACK_PRIORITY, useBackHandler } from "@/lib/navigation/back-stack";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
+import { resumeAds, suspendAds } from "@/lib/ads/policy";
 
 export const Route = createFileRoute("/nettoyeur")({
   head: () => ({
@@ -298,6 +300,18 @@ function CleanerPage() {
     (key) => scanning || (scan?.categories[key].items.length ?? 0) > 0,
   );
 
+  /* Opération importante en cours : analyse, revue des résultats,
+     sélection, confirmation ou suppression. La publicité s'efface alors
+     complètement et l'écran est entièrement rendu au Nettoyeur. */
+  const busy =
+    scanning || cleaning || confirming || openCategory !== null || selectedItems.length > 0;
+
+  useEffect(() => {
+    if (!busy) return;
+    suspendAds("cleaner");
+    return () => resumeAds("cleaner");
+  }, [busy]);
+
   return (
     <AppShell>
       <PageHeader
@@ -478,6 +492,14 @@ function CleanerPage() {
           })}
         </div>
       )}
+
+      {/* Zone secondaire : publicité en fin de contenu, jamais pendant une
+          opération. Sans annonce, le bloc se réduit à zéro. */}
+      {!busy ? (
+        <div className="pt-3">
+          <InlineAdBanner slot="cleaner" />
+        </div>
+      ) : null}
 
       {/* Category review sheet */}
       <CategorySheet
