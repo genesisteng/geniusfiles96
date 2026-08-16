@@ -339,6 +339,17 @@ if (!appGradle.includes("ads-mobile-sdk")) {
   console.error("✗ app/build.gradle is missing the Google Mobile Ads dependency.");
   process.exit(1);
 }
+const applicationSource = await readFile(kotlinApplication, "utf8");
+if (
+  !applicationSource.includes("InitializationConfig.Builder") ||
+  !applicationSource.includes("MobileAds.initialize(this, config)")
+) {
+  console.error(
+    "✗ GeniusFilesApplication must initialize Google Mobile Ads Next-Gen with InitializationConfig.",
+  );
+  process.exit(1);
+}
 console.log("✓ Manifest sanity checks passed (MainActivity + LAUNCHER + label).");
 console.log("✓ Native Kotlin plugin sanity checks passed (Application + MainActivity.kt).");
+console.log("✓ Google Mobile Ads Next-Gen initialization sanity check passed.");
 console.log("✓ Android overrides applied.");
