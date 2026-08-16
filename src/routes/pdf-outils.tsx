@@ -49,6 +49,7 @@ import {
   type StoredSignature,
 } from "@/lib/pdf/signatures";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/native/analytics";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";

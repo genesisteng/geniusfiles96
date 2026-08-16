@@ -54,6 +54,7 @@ import { viewerKindOf, type ViewerKind } from "@/lib/viewer/kinds";
 import { entryKey, sourceUrlOf } from "@/lib/viewer/source";
 import { getResume, setResume } from "@/lib/viewer/resume";
 import { touchRecentEntry } from "@/lib/recents/store";
+import { trackEvent } from "@/lib/native/analytics";
 import { loadTextFile, TEXT_SOFT_LIMIT, type TextLoadResult } from "@/lib/viewer/text";
 import { BottomSheet } from "@/components/files/BottomSheet";
 import { audioStore } from "@/lib/player/audio-store";
@@ -187,6 +188,13 @@ export function UniversalViewer({
     if (!open || !parent || !entry || entry.isDirectory) return;
     touchRecentEntry(parent, entry, "open");
   }, [open, parent, entry]);
+
+  /* Mesure d'usage : quel type de lecteur est utilisé (image, vidéo,
+     audio, document…). Aucun nom, chemin ni contenu n'est transmis. */
+  useEffect(() => {
+    if (!open || !entry || entry.isDirectory || kind === "none") return;
+    trackEvent("file_open", { action: "open", kind });
+  }, [open, entry, kind]);
 
   // ---- Keyboard shortcuts ----
   useEffect(() => {
