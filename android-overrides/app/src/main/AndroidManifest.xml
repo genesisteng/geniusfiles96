@@ -114,6 +114,7 @@
     -->
     <application
         android:name="app.geniusfiles.mobile.GeniusFilesApplication"
+        android:hardwareAccelerated="true"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -125,6 +126,12 @@
         android:usesCleartextTraffic="false"
         android:requestLegacyExternalStorage="true"
         android:preserveLegacyExternalStorage="true">
+
+        <!-- AdMob : identifiant d'application (obligatoire, sinon le SDK
+             fait planter l'app au démarrage). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4007496300800778~9248149643" />
 
         <activity
             android:name="app.geniusfiles.mobile.MainActivity"
