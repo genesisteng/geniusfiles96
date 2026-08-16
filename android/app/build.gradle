@@ -1,0 +1,65 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+android {
+
+    // GENIUSFILES_SIGNING — debug uses the committed debug.keystore for
+    // stable signatures across CI builds. Release uses a keystore
+    // reconstructed at CI time from GitHub Secrets, never committed.
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+        release {
+            def ksPath = System.getenv("GENIUSFILES_RELEASE_KEYSTORE") ?: "release.keystore"
+            def ksFile = file(ksPath)
+            if (ksFile.exists()
+                    && System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                    && System.getenv("ANDROID_KEY_ALIAS")
+                    && System.getenv("ANDROID_KEY_PASSWORD")) {
+                storeFile ksFile
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            } else {
+                storeFile file("debug.keystore")
+                storePassword "android"
+                keyAlias "androiddebugkey"
+                keyPassword "android"
+            }
+        }
+    }
+
+    namespace "app.geniusfiles.mobile"
+    defaultConfig {
+        versionCode 1
+        versionName "1.0.0"
+    }
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation platform("com.google.firebase:firebase-bom:34.1.0")
+    implementation "com.google.firebase:firebase-analytics"
+    implementation "com.google.firebase:firebase-crashlytics"
+
+    implementation "androidx.biometric:biometric:1.1.0"
+    implementation "androidx.fragment:fragment-ktx:1.8.5"
+
+    implementation project(':capacitor-android')
+}
+
+apply plugin: 'com.google.firebase.crashlytics'
+
+apply plugin: 'com.google.gms.google-services'
