@@ -79,6 +79,7 @@ import { CategoryFolderList, type CategoryFolder } from "@/components/files/Cate
 import { t, useT } from "@/lib/i18n";
 import { groupBySort, type FileGroup } from "@/lib/files/image-groups";
 import { IllustratedEmptyState } from "@/components/ui/IllustratedEmptyState";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 import type { EmptyIllustrationId } from "@/lib/copy/empty-illustrations";
 
 /** Illustration officielle correspondant à chaque catégorie. */
