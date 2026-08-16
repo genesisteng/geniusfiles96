@@ -79,6 +79,7 @@ import { CategoryFolderList, type CategoryFolder } from "@/components/files/Cate
 import { t, useT } from "@/lib/i18n";
 import { groupBySort, type FileGroup } from "@/lib/files/image-groups";
 import { IllustratedEmptyState } from "@/components/ui/IllustratedEmptyState";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 import type { EmptyIllustrationId } from "@/lib/copy/empty-illustrations";
 
 /** Illustration officielle correspondant à chaque catégorie. */
@@ -964,6 +965,15 @@ export function CategoryPage({ kind }: { kind: CategoryKind }) {
           ) : null}
         </div>
       )}
+
+      {/* Publicité : dernier bloc du contenu, après la dernière catégorie
+          ou le dernier fichier. Jamais superposée, jamais intercalée, et
+          absente des écrans vides ou d'une session de sélection. */}
+      {!pick && (showFolders ? visibleFolders.length > 0 : sorted.length > 0) ? (
+        <div className="pt-3">
+          <InlineAdBanner slot="category" />
+        </div>
+      ) : null}
 
       {selectionMode && !pick ? (
         <SelectionBar
