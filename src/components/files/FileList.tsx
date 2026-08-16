@@ -1,5 +1,5 @@
 import { CheckCircle2, ChevronRight, Circle, Eye, MoreVertical } from "lucide-react";
-import { memo, useRef } from "react";
+import { Fragment, memo, useRef } from "react";
 import { countLabel } from "@/lib/copy";
 import { useT } from "@/lib/i18n";
 import { fileMetaLine, formatDate, formatSize, kindLabel } from "@/lib/files/format";
@@ -13,6 +13,11 @@ import { useWindowVirtualList } from "@/hooks/use-virtual-list";
 const ROW_HEIGHT = 66;
 const GRID_CELL_HEIGHT = 138;
 const GRID_ROW_HEIGHT = GRID_CELL_HEIGHT + 10; // + gap vertical
+
+// Emplacement d'annonce native : inséré après ce nombre de lignes, avec une
+// hauteur FIXE elle aussi, pour que la virtualisation reste exacte.
+const AD_AFTER_INDEX = 8;
+const AD_ROW_HEIGHT = 266;
 
 type Props = {
   entries: FileEntry[];
@@ -35,6 +40,8 @@ type Props = {
   selectionMode: boolean;
   isSelected: (entry: FileEntry) => boolean;
   onToggleSelect: (entry: FileEntry) => void;
+  /** Emplacement d'annonce native inséré dans la liste (APK Android). */
+  adSlot?: React.ReactNode;
 };
 
 const LONG_PRESS_MS = 380;
