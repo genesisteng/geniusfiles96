@@ -1918,6 +1918,8 @@ function RootView({
               </button>
             ))}
           </div>
+          {/* Bannière AdMob (APK uniquement) — juste sous les outils. */}
+          <AdBanner className="mt-3" />
         </section>
       )}
 
