@@ -340,6 +340,13 @@ function PdfToolsPage() {
   const t = useT();
   const [tool, setTool] = useState<ToolId | null>(null);
 
+  /* Mesure d'usage : quel outil PDF est ouvert (identifiant d'outil
+     uniquement, jamais de fichier ni de contenu). */
+  const openTool = useCallback((id: ToolId) => {
+    trackEvent("pdf_tool", { action: "open", tool: id });
+    setTool(id);
+  }, []);
+
   /* Retour Android : un outil ouvert se referme d'abord et rend la liste
      des outils — jamais de sortie de l'écran PDF ni de l'application. */
   useBackHandler(
@@ -355,10 +362,10 @@ function PdfToolsPage() {
     <AppShell>
       <PageHeader title={t("pdf.page.title")} subtitle={t("pdf.page.subtitle")} />
 
-      <ToolSection title={t("pdf.section.edit")} tools={editTools(t)} onOpen={setTool} />
-      <ToolSection title={t("pdf.section.create")} tools={createTools(t)} onOpen={setTool} />
-      <ToolSection title={t("pdf.section.annotate")} tools={annotTools(t)} onOpen={setTool} />
-      <ToolSection title={t("pdf.section.extract")} tools={extractTools(t)} onOpen={setTool} />
+      <ToolSection title={t("pdf.section.edit")} tools={editTools(t)} onOpen={openTool} />
+      <ToolSection title={t("pdf.section.create")} tools={createTools(t)} onOpen={openTool} />
+      <ToolSection title={t("pdf.section.annotate")} tools={annotTools(t)} onOpen={openTool} />
+      <ToolSection title={t("pdf.section.extract")} tools={extractTools(t)} onOpen={openTool} />
 
       <BottomSheetDefaultsProvider fullScreen>
         <ToolSheet tool={tool} onClose={() => setTool(null)} />
