@@ -72,7 +72,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
         className={
           isChat
             ? "flex h-dvh min-h-0 flex-1 flex-col overflow-hidden px-0 pb-0 pt-0"
-            : `flex-1 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] ${
+            : `flex-1 px-4 pb-[calc(5.5rem+var(--gf-ad-h,0px)+env(safe-area-inset-bottom))] ${
                 ownsSafeArea ? "pt-0" : "pt-safe"
               }`
         }
