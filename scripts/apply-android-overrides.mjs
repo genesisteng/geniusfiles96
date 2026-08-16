@@ -95,6 +95,21 @@ if (existsSync(rootGradlePath)) {
     await writeFile(rootGradlePath, rootGradle, "utf8");
     console.log("✓ Google Services Gradle plugin enabled in android/build.gradle.");
   }
+  // Crashlytics : plug-in Gradle (upload des mappings + rapports NDK/ANR).
+  if (hasFirebase && !rootGradle.includes("firebase-crashlytics-gradle")) {
+    rootGradle = rootGradle.replace(
+      /classpath 'com\.google\.gms:google-services:[^']+'\n/,
+      (m) => `${m}        classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'\n`,
+    );
+    await writeFile(rootGradlePath, rootGradle, "utf8");
+    console.log("✓ Crashlytics Gradle plugin enabled in android/build.gradle.");
+  }
+}
+
+// Sans configuration Firebase, le pont Crashlytics ne compile pas : il est
+// retiré du projet généré (l'app garde toutes ses autres fonctionnalités).
+if (!hasFirebase) {
+  await rm(join(pkgDir, "GeniusFilesCrashlyticsPlugin.kt"), { force: true });
 }
 
 // Patch app/build.gradle: stable debug signing + versionCode/versionName from env.
