@@ -102,3 +102,18 @@ ANDROID_BUILD.md
 
 `android/` est généré à la volée par la CI (`npx cap add android`) et ne
 doit pas être commité.
+
+## Publicité (Google Mobile Ads Next-Gen)
+
+- ID d'application `ca-app-pub-4007496300800778~9248149643` déclaré en
+  `meta-data` dans `AndroidManifest.xml` (obligatoire : sans lui le SDK fait
+  planter l'app au démarrage), avec `android:hardwareAccelerated="true"`.
+- Dépendance `ads-mobile-sdk:1.3.1` + `minSdk 24` / `compileSdk 35` injectés
+  par `scripts/apply-android-overrides.mjs` (avec vérifications bloquantes).
+- Initialisation hors thread principal dans `GeniusFilesApplication` (anti-ANR).
+- Plugin `GeniusFilesAdsPlugin` : `AdView` superposée à la WebView, bannière
+  adaptative ancrée positionnée aux coordonnées CSS envoyées par la page.
+- Côté web : `src/lib/native/ads.ts` + `src/components/ads/AdBanner.tsx`
+  (bloc réservé sous les outils de l'accueil, no-op hors APK).
+- Bloc d'annonces de TEST par défaut (`ca-app-pub-3940256099942544/9214589741`)
+  — à remplacer par votre bloc réel avant publication.
