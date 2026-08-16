@@ -87,6 +87,7 @@ export function FileListView({
   selectionMode,
   isSelected,
   onToggleSelect,
+  adSlot,
 }: Props) {
   const { enabled, parentRef, virtualizer, scrollMargin } = useWindowVirtualList({
     count: entries.length,
@@ -94,38 +95,60 @@ export function FileListView({
     overscan: 10,
   });
 
+  // L'annonce ne s'insère que si la liste est assez longue pour ne pas
+  // repousser les fichiers hors de l'écran.
+  const showAd = adSlot != null && entries.length > AD_AFTER_INDEX;
+  const adOffset = showAd ? AD_ROW_HEIGHT : 0;
+
   if (!enabled) {
     return (
       <div className="divide-y divide-border/45">
-        {entries.map((entry) => (
-          <FileRow
-            key={entry.path}
-            entry={entry}
-            parent={parent ?? null}
-            onOpen={onOpen}
-            onQuickOpen={onQuickOpen}
-            renderIcon={renderIcon}
-            onLongPress={onLongPress}
-            onMore={onMore}
-            selectionMode={selectionMode}
-            isSelected={isSelected(entry)}
-            onToggleSelect={onToggleSelect}
-          />
+        {entries.map((entry, index) => (
+          <Fragment key={entry.path}>
+            {showAd && index === AD_AFTER_INDEX ? adSlot : null}
+            <FileRow
+              entry={entry}
+              parent={parent ?? null}
+              onOpen={onOpen}
+              onQuickOpen={onQuickOpen}
+              renderIcon={renderIcon}
+              onLongPress={onLongPress}
+              onMore={onMore}
+              selectionMode={selectionMode}
+              isSelected={isSelected(entry)}
+              onToggleSelect={onToggleSelect}
+            />
+          </Fragment>
         ))}
       </div>
     );
   }
 
   const items = virtualizer.getVirtualItems();
-  const totalSize = virtualizer.getTotalSize();
+  const totalSize = virtualizer.getTotalSize() + adOffset;
   return (
     <div
       ref={parentRef}
       className="divide-y divide-border/45"
       style={{ position: "relative", height: `${totalSize}px` }}
     >
+      {showAd ? (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: `${AD_ROW_HEIGHT}px`,
+            transform: `translateY(${AD_AFTER_INDEX * ROW_HEIGHT}px)`,
+          }}
+        >
+          {adSlot}
+        </div>
+      ) : null}
       {items.map((v) => {
         const entry = entries[v.index];
+        const shift = showAd && v.index >= AD_AFTER_INDEX ? adOffset : 0;
         return (
           <div
             key={entry.path}
@@ -137,7 +160,7 @@ export function FileListView({
               left: 0,
               width: "100%",
               height: `${ROW_HEIGHT}px`,
-              transform: `translateY(${v.start - scrollMargin}px)`,
+              transform: `translateY(${v.start - scrollMargin + shift}px)`,
               contain: "layout paint style",
             }}
           >
@@ -159,6 +182,7 @@ export function FileListView({
     </div>
   );
 }
+
 
 export const FileRow = memo(function FileRow({
   entry,
