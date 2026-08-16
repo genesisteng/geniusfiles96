@@ -204,7 +204,7 @@ export function trackEvent(name: AnalyticsEvent, params: AnalyticsParams = {}): 
 /** Raccourci : issue d'une opération de fichiers (succès / échec partiel). */
 export function trackFileAction(
   action: string,
-  outcome: { ok: boolean; succeeded?: number; failed?: number; cancelled?: boolean },
+  outcome: { ok: boolean; succeeded?: number; cancelled?: boolean },
 ): void {
   const result: AnalyticsResult = outcome.cancelled
     ? "cancelled"

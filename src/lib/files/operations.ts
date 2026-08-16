@@ -1330,7 +1330,7 @@ export async function renameEntry(
   const res = await renameEntryImpl(parent, entry, newName);
   trackEvent("file_action", {
     action: "rename",
-    kind: entry.isDirectory ? "folder" : kindOf(entry.name),
+    kind: kindOf(entry.name, entry.isDirectory),
     result: res.ok ? "success" : "failure",
   });
   return res;
