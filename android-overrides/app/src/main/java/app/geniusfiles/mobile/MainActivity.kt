@@ -45,6 +45,10 @@ class MainActivity : BridgeActivity() {
         // Surveillance de stabilité : journalisation technique assainie
         // envoyée à Crashlytics (aucune donnée personnelle, aucun chemin).
         registerPlugin(GeniusFilesCrashlyticsPlugin::class.java)
+        // Mesure d'usage global (Google Analytics for Firebase) : vues
+        // d'écran logiques et propriétés techniques uniquement — aucune
+        // donnée personnelle, aucun nom ni chemin de fichier.
+        registerPlugin(GeniusFilesAnalyticsPlugin::class.java)
         // Source de vérité unique côté Android : le mode nuit AppCompat est
         // aligné sur le choix persisté AVANT toute inflation. Le thème
         // DayNight, le splash (values-night), `windowLightStatusBar` et les
