@@ -70,6 +70,7 @@ import {
   type AddedFile,
 } from "@/lib/recents/added";
 import { useT, t as translate } from "@/lib/i18n";
+import { InlineAdBanner } from "@/components/ads/InlineAdBanner";
 
 export const Route = createFileRoute("/fichiers-recents")({
   head: () => ({
