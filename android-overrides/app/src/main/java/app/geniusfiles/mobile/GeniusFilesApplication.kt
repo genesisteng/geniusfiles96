@@ -27,7 +27,11 @@ class GeniusFilesApplication : Application() {
             }
         )
         initCrashlyticsKeys()
+        // Google Mobile Ads : initialisation sur un thread d'arrière-plan
+        // (une initialisation sur le thread principal peut provoquer un ANR).
+        GeniusFilesAdsPlugin.initializeOnce(this)
     }
+
 
     /**
      * Coût négligeable (quelques écritures clé/valeur en mémoire) et exécuté

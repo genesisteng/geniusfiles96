@@ -124,7 +124,19 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false"
         android:requestLegacyExternalStorage="true"
+        android:hardwareAccelerated="true"
         android:preserveLegacyExternalStorage="true">
+
+        <!--
+          Google Mobile Ads (GMA Next-Gen SDK) : l'identifiant d'application
+          AdMob doit figurer dans le manifeste (exigé par le SDK et par
+          l'UMP SDK). Sans lui, l'application plante au démarrage du SDK.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4007496300800778~9248149643" />
+
+
 
         <activity
             android:name="app.geniusfiles.mobile.MainActivity"

@@ -49,6 +49,10 @@ class MainActivity : BridgeActivity() {
         // d'écran logiques et propriétés techniques uniquement — aucune
         // donnée personnelle, aucun nom ni chemin de fichier.
         registerPlugin(GeniusFilesAnalyticsPlugin::class.java)
+        // Publicités Google Mobile Ads (GMA Next-Gen SDK) : bannière
+        // adaptative ancrée, pilotée depuis la WebView.
+        registerPlugin(GeniusFilesAdsPlugin::class.java)
+
         // Source de vérité unique côté Android : le mode nuit AppCompat est
         // aligné sur le choix persisté AVANT toute inflation. Le thème
         // DayNight, le splash (values-night), `windowLightStatusBar` et les

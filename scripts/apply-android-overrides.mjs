@@ -200,6 +200,18 @@ if (existsSync(gradlePath)) {
     console.log("✓ androidx.biometric dependency added to app/build.gradle.");
   }
 
+  // Google Mobile Ads (GMA Next-Gen SDK) : bannières adaptatives ancrées.
+  // Prérequis Google : minSdk >= 24 et compileSdk >= 35 (appliqués plus bas
+  // dans variables.gradle).
+  if (!gradle.includes("ads-mobile-sdk")) {
+    gradle = gradle.replace(
+      /dependencies\s*\{/,
+      (m) =>
+        `${m}\n    implementation "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.3.1"\n`,
+    );
+    console.log("✓ Google Mobile Ads Next-Gen SDK added to app/build.gradle.");
+  }
+
   // Firebase : BoM + Analytics (fil d'Ariane Crashlytics) + Crashlytics
   // (crashs, erreurs non fatales, ANR). Aucun évènement applicatif custom,
   // aucun nom/chemin de fichier, aucun contenu n'est envoyé par le code.
@@ -234,6 +246,24 @@ if (existsSync(gradlePath)) {
   console.log(`✓ build.gradle patched (versionCode=${versionCode}, versionName=${versionName}).`);
 }
 
+// Prérequis du SDK Google Mobile Ads Next-Gen : minSdk >= 24 et
+// compileSdk >= 35. Capacitor génère parfois des valeurs inférieures ;
+// on les remonte sans jamais les abaisser.
+const variablesPath = join(ANDROID, "variables.gradle");
+if (existsSync(variablesPath)) {
+  let variables = await readFile(variablesPath, "utf8");
+  const raise = (key, floor) => {
+    variables = variables.replace(new RegExp(`${key}\\s*=\\s*(\\d+)`), (m, value) =>
+      Number(value) < floor ? `${key} = ${floor}` : m,
+    );
+  };
+  raise("minSdkVersion", 24);
+  raise("compileSdkVersion", 35);
+  raise("targetSdkVersion", 35);
+  await writeFile(variablesPath, variables, "utf8");
+  console.log("✓ variables.gradle aligned with Google Mobile Ads requirements.");
+}
+
 if (hasFirebase) {
   const gs = JSON.parse(await readFile(googleServicesJson, "utf8"));
   const pkgs = (gs.client ?? []).map((c) => c?.client_info?.android_client_info?.package_name);
@@ -261,6 +291,7 @@ const checks = [
   ["MAIN action", /android\.intent\.action\.MAIN/],
   ["app label bound to strings.xml", /android:label="@string\/app_name"/],
   ["launcher icon set", /android:icon="@mipmap\/ic_launcher"/],
+  ["AdMob application ID declared", /com\.google\.android\.gms\.ads\.APPLICATION_ID/],
 ];
 const failed = checks.filter(([, re]) => !re.test(manifest));
 if (failed.length) {

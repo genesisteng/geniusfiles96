@@ -86,6 +86,21 @@ Un plugin Capacitor natif custom exposant `StoragePermission.check()` /
 `openSettings()` sera à ajouter sous `android-overrides/` lors de la
 première génération d'APK réussie (fondations JS déjà en place).
 
+## Publicités (Google Mobile Ads — GMA Next-Gen SDK)
+
+- ID d'application AdMob : `ca-app-pub-4007496300800778~9248149643`
+  (déclaré dans `AndroidManifest.xml` via `com.google.android.gms.ads.APPLICATION_ID`).
+- Dépendance injectée par `apply-android-overrides.mjs` :
+  `com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk:1.3.1`,
+  avec `minSdk >= 24` / `compileSdk >= 35` forcés dans `variables.gradle`.
+- Initialisation en arrière-plan dès `GeniusFilesApplication.onCreate()`
+  (évite tout ANR au démarrage).
+- Pont WebView : plugin natif `GeniusFilesAds` + `src/lib/native/ads.ts`
+  (`initializeAds`, `showBannerAd`, `hideBannerAd`) — no-op sur le web.
+- Bannière adaptative ancrée en bas d'écran. Par défaut le **bloc de test**
+  `ca-app-pub-3940256099942544/9214589741` est utilisé : le remplacer par le
+  bloc réel avant publication.
+
 ## Fichiers ajoutés
 
 ```
