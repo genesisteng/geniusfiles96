@@ -45,9 +45,6 @@ class MainActivity : BridgeActivity() {
         // Surveillance de stabilité : journalisation technique assainie
         // envoyée à Crashlytics (aucune donnée personnelle, aucun chemin).
         registerPlugin(GeniusFilesCrashlyticsPlugin::class.java)
-        // ⚠️ TEMPORAIRE — greffon de validation Crashlytics. À SUPPRIMER
-        // avec GeniusFilesCrashTestPlugin.kt après le test.
-        registerPlugin(GeniusFilesCrashTestPlugin::class.java)
         // Source de vérité unique côté Android : le mode nuit AppCompat est
         // aligné sur le choix persisté AVANT toute inflation. Le thème
         // DayNight, le splash (values-night), `windowLightStatusBar` et les
