@@ -648,6 +648,14 @@ export function AddedFilesPage() {
         </div>
       )}
 
+      {/* Publicité en fin de contenu : après le dernier élément récent,
+          jamais superposée, repliée à zéro sans annonce. */}
+      {sorted.length > 0 && !pick && !selectionMode ? (
+        <div className="pt-3">
+          <InlineAdBanner slot="recents" />
+        </div>
+      ) : null}
+
       {selectionMode && !pick ? (
         <SelectionBar
           count={selectedFiles.length}
